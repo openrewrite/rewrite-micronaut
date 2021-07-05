@@ -1,5 +1,5 @@
 ![Logo](https://github.com/openrewrite/rewrite/raw/main/doc/logo-oss.png)
-### Migrate to new versions of Micronaut. Automatically.
+### Apply Micronaut upgrades and best practices. Automatically.
 
 [![ci](https://github.com/openrewrite/rewrite-micronaut/actions/workflows/ci.yml/badge.svg)](https://github.com/openrewrite/rewrite-migrate-java/actions/workflows/ci.yml)
 [![Apache 2.0](https://img.shields.io/github/license/openrewrite/rewrite-micronaut.svg)](https://www.apache.org/licenses/LICENSE-2.0)
@@ -7,7 +7,7 @@
 
 ### What is this?
 
-This project implements a [Rewrite module](https://github.com/openrewrite/rewrite) that performs common tasks when migrating between versions of Micronaut
+This project implements a [Rewrite module](https://github.com/openrewrite/rewrite) that applies best practices and migrations for those projects using the [Micronaut framework](https://micronaut.io/).
 
 # Micronaut Migration Recipes
 
