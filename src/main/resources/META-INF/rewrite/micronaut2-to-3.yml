@@ -52,6 +52,34 @@ recipeList:
   - org.openrewrite.java.ChangeMethodName:
       methodPattern: io.micronaut.web.router accept(io.micronaut.http.MediaType)
       newMethodName: doesConsume
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: io.micronaut.web.router.Route acceptAll()
+      newMethodName: consumesAll
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: io.micronaut.web.router.RouteMatch explicitAccept(io.micronaut.http.MediaType)
+      newMethodName: explicitlyConsumes
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: io.micronaut.web.router.RouteMatch accept(io.micronaut.http.MediaType)
+      newMethodName: doesConsume
   - org.openrewrite.java.ChangeType:
       oldFullyQualifiedTypeName: io.micronaut.core.async.SupplierUtil
       newFullyQualifiedTypeName: io.micronaut.core.util.SupplierUtil
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: io.micronaut.http.netty.stream.DelegateHttpRequest getMethod()
+      newMethodName: method
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: io.micronaut.http.netty.stream.DelegateHttpRequest getUri()
+      newMethodName: uri
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: io.micronaut.http.netty.stream.DelegateHttpResponse getStatus()
+      newMethodName: status
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: io.micronaut.http.server.netty.DelegateHttpResponse getStatus()
+      newMethodName: status
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: io.micronaut.http.netty.stream.DelegateHttpMessage getProtocolVersion()
+      newMethodName: protocolVersion
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: io.micronaut.http.netty.stream.DelegateHttpMessage getDecoderResult()
+      newMethodName: decoderResult
+
