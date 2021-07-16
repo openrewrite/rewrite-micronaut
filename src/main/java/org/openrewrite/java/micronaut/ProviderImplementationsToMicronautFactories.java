@@ -15,6 +15,7 @@
  */
 package org.openrewrite.java.micronaut;
 
+import org.openrewrite.Cursor;
 import org.openrewrite.ExecutionContext;
 import org.openrewrite.Recipe;
 import org.openrewrite.TreeVisitor;
@@ -32,9 +33,29 @@ public class ProviderImplementationsToMicronautFactories extends Recipe {
             JavaParser.fromJavaVersion().dependsOn(
                     "package javax.inject; public interface Provider<T> {T get();}",
                     "package javax.inject; public @interface Singleton {}",
+                    "package jakarta.inject; public interface Provider<T> {T get();}",
+                    "package jakarta.inject; public @interface Singleton {}",
                     "package io.micronaut.context.annotation; @Singleton public @interface Factory {}")
                     .build());
-    private static final AnnotationMatcher SINGLETON_ANNOTATION_MATCHER = new AnnotationMatcher("@javax.inject.Singleton");
+    private static final AnnotationMatcher JAVAX_SINGLETON_ANNOTATION_MATCHER = new AnnotationMatcher("@javax.inject.Singleton");
+    private static final AnnotationMatcher JAKARTA_SINGLETON_ANNOTATION_MATCHER = new AnnotationMatcher("@jakarta.inject.Singleton");
+
+    private static boolean isSingletonAnnotation(J.Annotation annotation) {
+        return JAKARTA_SINGLETON_ANNOTATION_MATCHER.matches(annotation) || JAVAX_SINGLETON_ANNOTATION_MATCHER.matches(annotation);
+    }
+
+    @Nullable
+    private static String getProviderType(J.ClassDeclaration classDecl) {
+        String providerType = null;
+        if (classDecl.getImplements() != null) {
+            if (classDecl.getImplements().stream().anyMatch(impl -> TypeUtils.isOfClassType(impl.getType(), "javax.inject.Provider"))) {
+                providerType = "javax";
+            }    else if (classDecl.getImplements().stream().anyMatch(impl -> TypeUtils.isOfClassType(impl.getType(), "jakarta.inject.Provider"))) {
+                providerType = "jakarta";
+            }
+        }
+        return providerType;
+    }
 
     @Override
     public String getDisplayName() {
@@ -48,7 +69,14 @@ public class ProviderImplementationsToMicronautFactories extends Recipe {
 
     @Override
     protected @Nullable TreeVisitor<?, ExecutionContext> getSingleSourceApplicableTest() {
-        return new UsesType<>("javax.inject.Provider");
+        return new JavaIsoVisitor<ExecutionContext>() {
+            @Override
+            public J.CompilationUnit visitCompilationUnit(J.CompilationUnit cu, ExecutionContext executionContext) {
+                doAfterVisit(new UsesType<>("javax.inject.Provider"));
+                doAfterVisit(new UsesType<>("jakarta.inject.Provider"));
+                return cu;
+            }
+        };
     }
 
     @Override
@@ -56,9 +84,8 @@ public class ProviderImplementationsToMicronautFactories extends Recipe {
         return new JavaIsoVisitor<ExecutionContext>() {
             @Override
             public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext executionContext) {
-                if (classDecl.getImplements() != null
-                        && classDecl.getImplements().stream().anyMatch(impl -> TypeUtils.isOfClassType(impl.getType(), "javax.inject.Provider")
-                        && classDecl.getLeadingAnnotations().stream().anyMatch(SINGLETON_ANNOTATION_MATCHER::matches))) {
+                String providerType = getProviderType(classDecl);
+                if (providerType != null && classDecl.getLeadingAnnotations().stream().anyMatch(ProviderImplementationsToMicronautFactories::isSingletonAnnotation)) {
                     doAfterVisit(new ProviderImplementationsGenerateFactoriesVisitor());
                 }
                 return classDecl;
@@ -71,11 +98,15 @@ public class ProviderImplementationsToMicronautFactories extends Recipe {
         public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext executionContext) {
             if (classDecl.getType() != null) {
                 getCursor().putMessage("provider-get", new MethodMatcher(classDecl.getType().getFullyQualifiedName() + " get()"));
+                String providerType = getProviderType(classDecl);
+                if (providerType != null) {
+                    getCursor().putMessage("provider-type", providerType);
+                }
             }
             J.ClassDeclaration cd = super.visitClassDeclaration(classDecl, executionContext);
-            if (cd.getLeadingAnnotations().stream().anyMatch(SINGLETON_ANNOTATION_MATCHER::matches)) {
+            if (cd.getLeadingAnnotations().stream().anyMatch(ProviderImplementationsToMicronautFactories::isSingletonAnnotation)) {
                 cd = cd.withLeadingAnnotations(ListUtils.map(cd.getLeadingAnnotations(), anno -> {
-                    if (SINGLETON_ANNOTATION_MATCHER.matches(anno)) {
+                    if (isSingletonAnnotation(anno)) {
                         anno = anno.withTemplate(JavaTemplate.builder(this::getCursor, "@Factory")
                                         .imports("io.micronaut.context.annotation.Factory")
                                         .javaParser(JAVA_PARSER::get).build(),
@@ -91,14 +122,16 @@ public class ProviderImplementationsToMicronautFactories extends Recipe {
         @Override
         public J.MethodDeclaration visitMethodDeclaration(J.MethodDeclaration method, ExecutionContext executionContext) {
             J.MethodDeclaration md = super.visitMethodDeclaration(method, executionContext);
-            MethodMatcher mm = getCursor().dropParentUntil(J.ClassDeclaration.class::isInstance).getMessage("provider-get");
-            if (mm != null && mm.matches(md.getType())
-                    && md.getLeadingAnnotations().stream().noneMatch(SINGLETON_ANNOTATION_MATCHER::matches)) {
+            Cursor classDeclCursor = getCursor().dropParentUntil(J.ClassDeclaration.class::isInstance);
+            MethodMatcher mm = classDeclCursor.getMessage("provider-get");
+            String providerType = classDeclCursor.getMessage("provider-type");
+            if (mm != null && providerType != null && mm.matches(md.getType())
+                    && md.getLeadingAnnotations().stream().noneMatch(ProviderImplementationsToMicronautFactories::isSingletonAnnotation)) {
                 md = md.withTemplate(JavaTemplate.builder(this::getCursor, "@Singleton")
-                                .imports("javax.inject.Singleton")
+                                .imports(providerType + ".inject.Singleton")
                                 .javaParser(JAVA_PARSER::get).build(),
                         md.getCoordinates().addAnnotation(Comparator.comparing(J.Annotation::getSimpleName)));
-                maybeAddImport("javax.inject.Singleton");
+                maybeAddImport(providerType + ".inject.Singleton");
             }
             return md;
         }

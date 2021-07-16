@@ -113,6 +113,7 @@ dependencies {
 
     testRuntimeOnly("io.micronaut:micronaut-core:2.+")
     testRuntimeOnly("io.micronaut:micronaut-inject-java:2.+")
+    testRuntimeOnly("jakarta.inject:jakarta.inject-api:2.+")
 }
 
 tasks.named<Test>("test") {

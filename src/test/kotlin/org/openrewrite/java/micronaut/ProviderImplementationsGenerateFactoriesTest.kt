@@ -23,7 +23,7 @@ import org.openrewrite.java.JavaRecipeTest
 class ProviderImplementationsGenerateFactoriesTest : JavaRecipeTest {
     override val parser: JavaParser
         get() = JavaParser.fromJavaVersion()
-            .classpath("micronaut-core", "javax.inject")
+            .classpath("micronaut-core", "javax.inject", "jakarta.inject-api")
             .dependsOn("""
                 package abc;
                 public class A {}
@@ -33,7 +33,7 @@ class ProviderImplementationsGenerateFactoriesTest : JavaRecipeTest {
         get() = ProviderImplementationsToMicronautFactories()
 
     @Test
-    fun addsFactoryAnnotation() = assertChanged(
+    fun javaxProviderImplementation() = assertChanged(
         before = """
             package abc;
             import javax.inject.Provider;
@@ -57,6 +57,46 @@ class ProviderImplementationsGenerateFactoriesTest : JavaRecipeTest {
             
             import javax.inject.Provider;
             import javax.inject.Singleton;
+            
+            @Factory
+            public class AProvider implements Provider<A> {
+            
+                @Override
+                @Singleton
+                public A get() {
+                    return new AImpl();
+                }
+                
+                private void doSomething() {
+                }
+            }
+        """
+    )
+
+    @Test
+    fun jakartaProviderImplementation() = assertChanged(
+        before = """
+            package abc;
+            import jakarta.inject.Provider;
+            import jakarta.inject.Singleton;
+            
+            @Singleton
+            public class AProvider implements Provider<A> {
+            
+                @Override
+                public A get() {
+                    return new AImpl();
+                }
+                
+                private void doSomething() {
+                }
+            }
+        """,
+        after = """
+            package abc;
+            import io.micronaut.context.annotation.Factory;
+            import jakarta.inject.Provider;
+            import jakarta.inject.Singleton;
             
             @Factory
             public class AProvider implements Provider<A> {
