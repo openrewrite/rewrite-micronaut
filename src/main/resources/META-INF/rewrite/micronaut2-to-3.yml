@@ -56,6 +56,15 @@ recipeList:
       methodPattern: io.micronaut.http.netty.stream.DelegateHttpMessage getProtocolVersion()
       newMethodName: protocolVersion
   - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.management.endpoint.beans.impl.RxJavaBeanDefinitionDataCollector
+      newFullyQualifiedTypeName: io.micronaut.management.endpoint.beans.impl.DefaultBeanDefinitionDataCollector
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.management.endpoint.routes.impl.RxJavaRouteDataCollector
+      newFullyQualifiedTypeName: io.micronaut.management.endpoint.routes.impl.DefaultRouteDataCollector
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.management.health.aggregator.RxJavaHealthAggregator
+      newFullyQualifiedTypeName: io.micronaut.management.health.aggregator.DefaultHealthAggregator
+  - org.openrewrite.java.ChangeType:
       oldFullyQualifiedTypeName: io.micronaut.messaging.annotation.Body
       newFullyQualifiedTypeName: io.micronaut.messaging.annotation.MessageBody
   - org.openrewrite.java.ChangeType:
