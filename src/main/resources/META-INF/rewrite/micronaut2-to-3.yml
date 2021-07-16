@@ -27,6 +27,11 @@ recipeList:
       groupId: io.micronaut
       artifactId: micronaut-parent
       newVersion: 3.0.0-M2
+  - org.openrewrite.maven.UpgradeDependencyVersion:
+      groupId: io.micronaut
+      artifactId: micronaut-bom
+      newVersion: 3.0.0-M2
+      trustParent: true
   # Deprecations and renames
   - org.openrewrite.java.ChangePackage:
         oldPackageName: io.micronaut.configuration.cassandra

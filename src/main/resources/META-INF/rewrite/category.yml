@@ -15,5 +15,5 @@
 #
 ---
 type: specs.openrewrite.org/v1beta/category
-name: Micronaut 3.x
+name: Micronaut
 packageName: org.openrewrite.java.micronaut
