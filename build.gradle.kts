@@ -112,6 +112,7 @@ dependencies {
     testRuntimeOnly("org.openrewrite:rewrite-java-8:${rewriteVersion}")
 
     testRuntimeOnly("io.micronaut:micronaut-core:2.+")
+    testRuntimeOnly("io.micronaut:micronaut-inject-java:2.+")
 }
 
 tasks.named<Test>("test") {

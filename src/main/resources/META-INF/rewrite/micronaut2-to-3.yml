@@ -28,6 +28,7 @@ recipeList:
       newPackageName: io.micronaut.cassandra
   - org.openrewrite.java.migrate.JavaxInjectMigrationToJakartaInject
   - org.openrewrite.java.micronaut.BeanPropertyCapitalizationStrategy
+  - org.openrewrite.java.micronaut.ProviderImplementationsToMicronautFactories
   # Deprecated changes
   - org.openrewrite.java.ChangeMethodName:
         methodPattern: io.micronaut.context.ApplicationContext build(..)
