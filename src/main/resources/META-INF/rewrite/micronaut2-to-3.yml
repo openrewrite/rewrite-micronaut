@@ -22,6 +22,7 @@ recipeList:
   - org.openrewrite.java.migrate.JavaxInjectMigrationToJakartaInject
   - org.openrewrite.java.micronaut.BeanPropertyCapitalizationStrategy
   - org.openrewrite.java.micronaut.FactoryBeansAreTyped
+  - org.openrewrite.java.micronaut.OncePerRequestHttpServerFilterToHttpServerFilter
   - org.openrewrite.java.micronaut.ProviderImplementationsToMicronautFactories
   # maven dependency upgrades
   - org.openrewrite.maven.UpgradeParentVersion:
