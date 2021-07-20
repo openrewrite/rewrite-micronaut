@@ -22,6 +22,7 @@ import org.openrewrite.internal.ListUtils;
 import org.openrewrite.internal.lang.Nullable;
 import org.openrewrite.java.ChangeMethodName;
 import org.openrewrite.java.JavaIsoVisitor;
+import org.openrewrite.java.JavaVisitor;
 import org.openrewrite.java.MethodMatcher;
 import org.openrewrite.java.search.UsesType;
 import org.openrewrite.java.tree.*;
@@ -43,7 +44,7 @@ public class OncePerRequestHttpServerFilterToHttpServerFilter extends Recipe {
     }
 
     @Override
-    protected @Nullable TreeVisitor<?, ExecutionContext> getSingleSourceApplicableTest() {
+    protected UsesType<ExecutionContext> getSingleSourceApplicableTest() {
         return new UsesType<>(ONCE_PER_REQUEST_FILTER_FQN);
     }
 

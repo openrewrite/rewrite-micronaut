@@ -17,7 +17,6 @@ package org.openrewrite.java.micronaut;
 
 import org.openrewrite.ExecutionContext;
 import org.openrewrite.Recipe;
-import org.openrewrite.TreeVisitor;
 import org.openrewrite.java.ChangeLiteral;
 import org.openrewrite.java.JavaIsoVisitor;
 import org.openrewrite.java.MethodMatcher;
@@ -37,7 +36,7 @@ public class BeanPropertyCapitalizationStrategy extends Recipe {
     }
 
     @Override
-    protected TreeVisitor<?, ExecutionContext> getSingleSourceApplicableTest() {
+    protected UsesType<ExecutionContext> getSingleSourceApplicableTest() {
         return new UsesType<>("io.micronaut.core.beans.BeanIntrospection");
     }
 
