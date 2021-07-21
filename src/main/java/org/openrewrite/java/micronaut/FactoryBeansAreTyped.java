@@ -50,7 +50,7 @@ public class FactoryBeansAreTyped extends Recipe {
 
     @Override
     public String getDescription() {
-        return "It is no longer possible to inject the internal implementation type from beans produced via factories, the behavior is restored by using the new `typed` member of the `@Bean` annotation";
+        return "As of Micronaut 3.x it is no longer possible to inject the internal implementation type from beans produced via factories, the behavior is restored by using the new `typed` member of the `@Bean` annotation";
     }
 
     @Override

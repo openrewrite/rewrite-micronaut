@@ -32,7 +32,7 @@ public class BeanPropertyCapitalizationStrategy extends Recipe {
 
     @Override
     public String getDescription() {
-        return "2.x getter names like getXForwarded() would result in the bean property being XForwarded. In 3.x the name is now xForwarded.";
+        return "As of Micronaut 3.x property names for getters like `getXForwarded()` are de-capitalized from `XForwarded` to `xForwarded`.";
     }
 
     @Override

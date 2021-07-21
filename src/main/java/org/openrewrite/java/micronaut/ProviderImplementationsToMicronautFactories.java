@@ -63,7 +63,7 @@ public class ProviderImplementationsToMicronautFactories extends Recipe {
 
     @Override
     public String getDescription() {
-        return "Micronaut 2.x `javax.inject.Provider` beans automatically created beans for the return type of the get method, Micronaut 3.x uses the `@Factory` to express the same behavior.";
+        return "As of Micronaut 3.x the `@Factory` annotation is required for creating beans from `javax.inject.Provider get()` implementations";
     }
 
     @Override

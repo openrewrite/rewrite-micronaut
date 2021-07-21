@@ -49,7 +49,7 @@ public class TypeRequiresIntrospection extends Recipe {
 
     @Override
     public String getDescription() {
-        return "In several places in Micronaut, it is required to get a map representation of your object. In previous versions, a reflection based strategy was used to retrieve that information if the class was not annotated with `@introspected`. That functionality has been removed and it is now required to annotate classes with `@introspected` that are being used in this way. Any class may be affected if it is passed as an argument or returned from any controller or client, among other use cases.";
+        return "In Micronaut 2.x a reflection based strategy was used to retrieve that information if the class was not annotated with `@introspected`. As of Micronaut 3.x it is required to annotate classes with `@introspected` that are being used in this way.";
     }
 
     @Override

@@ -37,7 +37,7 @@ public class OncePerRequestHttpServerFilterToHttpServerFilter extends Recipe {
 
     @Override
     public String getDescription() {
-        return "All filters are executed once per request starting in Micronaut 3.0. Directly implement `HttpServerFilter` instead of extending `OncePerRequestHttpServerFilter` and replace any usages of `micronaut.once` attributes with a custom attribute name.";
+        return "Starting in Micronaut 3.0 all filters are executed once per request. Directly implement `HttpServerFilter` instead of extending `OncePerRequestHttpServerFilter` and replace any usages of `micronaut.once` attributes with a custom attribute name.";
     }
 
     @Override
