@@ -24,6 +24,7 @@ recipeList:
   - org.openrewrite.java.micronaut.FactoryBeansAreTyped
   - org.openrewrite.java.micronaut.OncePerRequestHttpServerFilterToHttpServerFilter
   - org.openrewrite.java.micronaut.ProviderImplementationsToMicronautFactories
+  - org.openrewrite.java.micronaut.TypeRequiresIntrospection
   # maven dependency upgrades
   - org.openrewrite.maven.UpgradeParentVersion:
       groupId: io.micronaut
