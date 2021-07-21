@@ -53,6 +53,11 @@ public class TypeRequiresIntrospection extends Recipe {
     }
 
     @Override
+    protected JavaIsoVisitor<ExecutionContext> getApplicableTest() {
+        return new UsesType<>("io.micronaut.*");
+    }
+
+    @Override
     protected JavaIsoVisitor<ExecutionContext> getSingleSourceApplicableTest() {
         return new JavaIsoVisitor<ExecutionContext>() {
             @Override

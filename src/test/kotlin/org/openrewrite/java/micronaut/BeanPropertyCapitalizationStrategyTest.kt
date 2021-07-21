@@ -24,15 +24,16 @@ class BeanPropertyCapitalizationStrategyTest : JavaRecipeTest {
     override val parser: JavaParser
         get() = JavaParser.fromJavaVersion()
             .classpath("micronaut-core")
-            .dependsOn("""
+            .dependsOn(
+                """
                 package a.b;
                 public class C {
                     public String getCName() {
                         return "";
                     }
                 }
-            """)
-            .build()
+            """
+            ).build()
     override val recipe: Recipe
         get() = BeanPropertyCapitalizationStrategy()
 

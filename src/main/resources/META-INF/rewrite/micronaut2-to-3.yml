@@ -37,8 +37,8 @@ recipeList:
       trustParent: true
   # Deprecations and renames
   - org.openrewrite.java.ChangePackage:
-        oldPackageName: io.micronaut.configuration.cassandra
-        newPackageName: io.micronaut.cassandra
+      oldPackageName: io.micronaut.configuration.cassandra
+      newPackageName: io.micronaut.cassandra
   - org.openrewrite.java.ChangeMethodName:
       methodPattern: io.micronaut.context.ApplicationContext build(..)
       newMethodName: builder

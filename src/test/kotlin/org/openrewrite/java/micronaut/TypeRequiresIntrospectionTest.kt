@@ -26,6 +26,7 @@ class TypeRequiresIntrospectionTest : JavaRecipeTest {
             .classpath("micronaut-core", "micronaut-http", "micronaut-http-client-core").build()
     override val recipe: Recipe
         get() = TypeRequiresIntrospection()
+
     companion object {
         private const val pojoD: String = """
                 package a.b;
@@ -57,6 +58,7 @@ class TypeRequiresIntrospectionTest : JavaRecipeTest {
                 }
             """
     }
+
     @Test
     fun hasIntrospectionAnnotation() = assertUnchanged(
         dependsOn = arrayOf(controllerClass, pojoD),
@@ -102,7 +104,8 @@ class TypeRequiresIntrospectionTest : JavaRecipeTest {
 
     @Test
     fun addsIntrospectionAnnotationFromReturnType() = assertChanged(
-        dependsOn = arrayOf(pojoD,
+        dependsOn = arrayOf(
+            pojoD,
             """
                 package a.b;
                 import io.micronaut.http.annotation.Controller;
@@ -117,7 +120,8 @@ class TypeRequiresIntrospectionTest : JavaRecipeTest {
                     private void doNothing() {}
                     private int getSomething() {return 0;}
                 }
-            """),
+            """
+        ),
         before = """
             package a.b;
             

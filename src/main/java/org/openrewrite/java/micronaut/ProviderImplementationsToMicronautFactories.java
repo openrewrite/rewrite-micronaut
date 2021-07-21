@@ -18,7 +18,6 @@ package org.openrewrite.java.micronaut;
 import org.openrewrite.Cursor;
 import org.openrewrite.ExecutionContext;
 import org.openrewrite.Recipe;
-import org.openrewrite.TreeVisitor;
 import org.openrewrite.internal.ListUtils;
 import org.openrewrite.internal.lang.Nullable;
 import org.openrewrite.java.*;
@@ -50,7 +49,7 @@ public class ProviderImplementationsToMicronautFactories extends Recipe {
         if (classDecl.getImplements() != null) {
             if (classDecl.getImplements().stream().anyMatch(impl -> TypeUtils.isOfClassType(impl.getType(), "javax.inject.Provider"))) {
                 providerType = "javax";
-            }    else if (classDecl.getImplements().stream().anyMatch(impl -> TypeUtils.isOfClassType(impl.getType(), "jakarta.inject.Provider"))) {
+            } else if (classDecl.getImplements().stream().anyMatch(impl -> TypeUtils.isOfClassType(impl.getType(), "jakarta.inject.Provider"))) {
                 providerType = "jakarta";
             }
         }
@@ -65,6 +64,11 @@ public class ProviderImplementationsToMicronautFactories extends Recipe {
     @Override
     public String getDescription() {
         return "Micronaut 2.x `javax.inject.Provider` beans automatically created beans for the return type of the get method, Micronaut 3.x uses the `@Factory` to express the same behavior.";
+    }
+
+    @Override
+    protected JavaIsoVisitor<ExecutionContext> getApplicableTest() {
+        return new UsesType<>("io.micronaut.*");
     }
 
     @Override

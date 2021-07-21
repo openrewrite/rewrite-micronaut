@@ -18,7 +18,10 @@ package org.openrewrite.java.micronaut;
 import org.openrewrite.ExecutionContext;
 import org.openrewrite.Recipe;
 import org.openrewrite.internal.ListUtils;
-import org.openrewrite.java.*;
+import org.openrewrite.java.AnnotationMatcher;
+import org.openrewrite.java.JavaIsoVisitor;
+import org.openrewrite.java.JavaParser;
+import org.openrewrite.java.JavaTemplate;
 import org.openrewrite.java.search.UsesType;
 import org.openrewrite.java.tree.J;
 import org.openrewrite.java.tree.JavaType;
@@ -48,6 +51,11 @@ public class FactoryBeansAreTyped extends Recipe {
     @Override
     public String getDescription() {
         return "It is no longer possible to inject the internal implementation type from beans produced via factories, the behavior is restored by using the new `typed` member of the `@Bean` annotation";
+    }
+
+    @Override
+    protected JavaIsoVisitor<ExecutionContext> getApplicableTest() {
+        return new UsesType<>("io.micronaut.*");
     }
 
     @Override

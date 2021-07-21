@@ -24,11 +24,12 @@ class ProviderImplementationsGenerateFactoriesTest : JavaRecipeTest {
     override val parser: JavaParser
         get() = JavaParser.fromJavaVersion()
             .classpath("micronaut-core", "javax.inject", "jakarta.inject-api")
-            .dependsOn("""
+            .dependsOn(
+                """
                 package abc;
                 public class A {}
-            """)
-            .build()
+            """
+            ).build()
     override val recipe: Recipe
         get() = ProviderImplementationsToMicronautFactories()
 
@@ -36,6 +37,7 @@ class ProviderImplementationsGenerateFactoriesTest : JavaRecipeTest {
     fun javaxProviderImplementation() = assertChanged(
         before = """
             package abc;
+            import io.micronaut.core.annotation.NonNull;
             import javax.inject.Provider;
             import javax.inject.Singleton;
             
@@ -47,14 +49,14 @@ class ProviderImplementationsGenerateFactoriesTest : JavaRecipeTest {
                     return new AImpl();
                 }
                 
-                private void doSomething() {
+                private void doSomething(@NonNull String arg) {
                 }
             }
         """,
         after = """
             package abc;
             import io.micronaut.context.annotation.Factory;
-            
+            import io.micronaut.core.annotation.NonNull;
             import javax.inject.Provider;
             import javax.inject.Singleton;
             
@@ -67,7 +69,7 @@ class ProviderImplementationsGenerateFactoriesTest : JavaRecipeTest {
                     return new AImpl();
                 }
                 
-                private void doSomething() {
+                private void doSomething(@NonNull String arg) {
                 }
             }
         """
@@ -77,24 +79,27 @@ class ProviderImplementationsGenerateFactoriesTest : JavaRecipeTest {
     fun jakartaProviderImplementation() = assertChanged(
         before = """
             package abc;
+            import io.micronaut.core.annotation.NonNull;
             import jakarta.inject.Provider;
             import jakarta.inject.Singleton;
             
             @Singleton
             public class AProvider implements Provider<A> {
-            
+                
                 @Override
                 public A get() {
                     return new AImpl();
                 }
                 
-                private void doSomething() {
+                @NonNull
+                private String doSomething() {
                 }
             }
         """,
         after = """
             package abc;
             import io.micronaut.context.annotation.Factory;
+            import io.micronaut.core.annotation.NonNull;
             import jakarta.inject.Provider;
             import jakarta.inject.Singleton;
             
@@ -107,7 +112,8 @@ class ProviderImplementationsGenerateFactoriesTest : JavaRecipeTest {
                     return new AImpl();
                 }
                 
-                private void doSomething() {
+                @NonNull
+                private String doSomething() {
                 }
             }
         """

@@ -36,6 +36,11 @@ public class BeanPropertyCapitalizationStrategy extends Recipe {
     }
 
     @Override
+    protected JavaIsoVisitor<ExecutionContext> getApplicableTest() {
+        return new UsesType<>("io.micronaut.*");
+    }
+
+    @Override
     protected UsesType<ExecutionContext> getSingleSourceApplicableTest() {
         return new UsesType<>("io.micronaut.core.beans.BeanIntrospection");
     }
@@ -53,9 +58,9 @@ public class BeanPropertyCapitalizationStrategy extends Recipe {
         public J.MethodInvocation visitMethodInvocation(J.MethodInvocation method, ExecutionContext executionContext) {
             J.MethodInvocation mi = super.visitMethodInvocation(method, executionContext);
             if (BEAN_PROPERTY_METHOD.matches(mi) || REQUIRED_BEAN_PROPERTY_METHOD.matches(mi)) {
-                J.Literal propertyNameArg = (J.Literal)mi.getArguments().get(0);
+                J.Literal propertyNameArg = (J.Literal) mi.getArguments().get(0);
                 String sVal = String.valueOf(propertyNameArg.getValue());
-                final String newValue = sVal.substring(0,1).toLowerCase() + sVal.substring(1);
+                final String newValue = sVal.substring(0, 1).toLowerCase() + sVal.substring(1);
                 if (!sVal.equals(newValue)) {
                     doAfterVisit(new ChangeLiteral<>(propertyNameArg, p -> newValue));
                 }

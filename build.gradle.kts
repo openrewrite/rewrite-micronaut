@@ -44,7 +44,7 @@ group = "org.openrewrite.recipe"
 description = "Migrate between Mirconaut versions. Automatically."
 
 repositories {
-    if(!project.hasProperty("releasing")) {
+    if (!project.hasProperty("releasing")) {
         mavenLocal()
         maven {
             url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
@@ -76,7 +76,7 @@ configurations.all {
     }
 }
 
-val rewriteVersion = if(project.hasProperty("releasing")) {
+val rewriteVersion = if (project.hasProperty("releasing")) {
     "latest.release"
 } else {
     "latest.integration"

@@ -17,12 +17,9 @@ package org.openrewrite.java.micronaut;
 
 import org.openrewrite.ExecutionContext;
 import org.openrewrite.Recipe;
-import org.openrewrite.TreeVisitor;
 import org.openrewrite.internal.ListUtils;
-import org.openrewrite.internal.lang.Nullable;
 import org.openrewrite.java.ChangeMethodName;
 import org.openrewrite.java.JavaIsoVisitor;
-import org.openrewrite.java.JavaVisitor;
 import org.openrewrite.java.MethodMatcher;
 import org.openrewrite.java.search.UsesType;
 import org.openrewrite.java.tree.*;
@@ -41,6 +38,11 @@ public class OncePerRequestHttpServerFilterToHttpServerFilter extends Recipe {
     @Override
     public String getDescription() {
         return "All filters are executed once per request starting in Micronaut 3.0. Directly implement `HttpServerFilter` instead of extending `OncePerRequestHttpServerFilter` and replace any usages of `micronaut.once` attributes with a custom attribute name.";
+    }
+
+    @Override
+    protected JavaIsoVisitor<ExecutionContext> getApplicableTest() {
+        return new UsesType<>("io.micronaut.*");
     }
 
     @Override

@@ -26,13 +26,14 @@ class OncePerRequestHttpServerFilterToHttpServerFilterTest : JavaRecipeTest {
     override val parser: JavaParser
         get() = JavaParser.fromJavaVersion()
             .classpath("micronaut-http", "micronaut-core")
-            .dependsOn("""
+            .dependsOn(
+                """
                 package a.b;
                 public interface C {
                     String getCName();
                 }
-            """)
-            .build()
+            """
+            ).build()
 
     @Test
     fun simpleConversion() = assertChanged(
