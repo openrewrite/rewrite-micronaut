@@ -32,7 +32,7 @@ public class OncePerRequestHttpServerFilterToHttpServerFilter extends Recipe {
 
     @Override
     public String getDisplayName() {
-        return "Convert OncePerRequestServerFilter extensions to HttpServerFilter implementations";
+        return "Convert `OncePerRequestServerFilter` extensions to `HttpServerFilter`";
     }
 
     @Override
