@@ -44,12 +44,12 @@ public class TypeRequiresIntrospection extends Recipe {
 
     @Override
     public String getDisplayName() {
-        return "Add @Introspection annotation to classes requiring a map representation";
+        return "Add `@Introspected` to classes requiring a map representation";
     }
 
     @Override
     public String getDescription() {
-        return "In Micronaut 2.x a reflection based strategy was used to retrieve that information if the class was not annotated with `@introspected`. As of Micronaut 3.x it is required to annotate classes with `@introspected` that are being used in this way.";
+        return "In Micronaut 2.x a reflection-based strategy was used to retrieve that information if the class was not annotated with `@Introspected`. As of Micronaut 3.x it is required to annotate classes with `@Introspected` that are used in this way.";
     }
 
     @Override
