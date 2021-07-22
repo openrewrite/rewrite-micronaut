@@ -27,7 +27,7 @@ public class BeanPropertyCapitalizationStrategy extends Recipe {
 
     @Override
     public String getDisplayName() {
-        return "de-capitalize BeanIntrospection `getProperty(..)` and `getRequiredProperty(..)` name arguments";
+        return "De-capitalize BeanIntrospection `getProperty(..)` and `getRequiredProperty(..)` name arguments";
     }
 
     @Override
