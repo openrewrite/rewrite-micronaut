@@ -58,12 +58,12 @@ public class ProviderImplementationsToMicronautFactories extends Recipe {
 
     @Override
     public String getDisplayName() {
-        return "Provider implementation beans to Micronaut Factories";
+        return "`Provider` implementation beans to Micronaut `@Factory`";
     }
 
     @Override
     public String getDescription() {
-        return "As of Micronaut 3.x the `@Factory` annotation is required for creating beans from `javax.inject.Provider get()` implementations";
+        return "As of Micronaut 3.x the `@Factory` annotation is required for creating beans from `javax.inject.Provider get()` implementations.";
     }
 
     @Override
