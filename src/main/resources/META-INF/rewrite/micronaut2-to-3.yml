@@ -21,6 +21,7 @@ description: This recipe will apply changes required for migrating from Micronau
 recipeList:
   - org.openrewrite.java.migrate.JavaxInjectMigrationToJakartaInject
   - org.openrewrite.java.micronaut.BeanPropertyCapitalizationStrategy
+  - org.openrewrite.java.micronaut.CopyNonInheritedAnnotationsFromSuperClass
   - org.openrewrite.java.micronaut.FactoryBeansAreTyped
   - org.openrewrite.java.micronaut.OncePerRequestHttpServerFilterToHttpServerFilter
   - org.openrewrite.java.micronaut.ProviderImplementationsToMicronautFactories
