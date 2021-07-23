@@ -124,18 +124,17 @@ public class CopyNonInheritedAnnotationsFromSuperClass extends Recipe {
                 if (cd.getImplements() != null) {
                     parentTypes.addAll(cd.getImplements());
                 }
-                List<J.Annotation> newAnnos = calculatePossibleNewAnnotations(cd.getLeadingAnnotations(), parentTypes, cd.getPrefix().getIndent());
+                List<J.Annotation> newAnnos = calculatePossibleNewAnnotations(cd.getLeadingAnnotations(), parentTypes);
                 if (!newAnnos.isEmpty()) {
-                    cd = cd.withLeadingAnnotations(ListUtils.concatAll(cd.getLeadingAnnotations(), newAnnos));
+                    cd = maybeAutoFormat(cd, cd.withLeadingAnnotations(ListUtils.concatAll(cd.getLeadingAnnotations(), newAnnos)), cd, executionContext, getCursor());
                 }
                 return cd;
             }
 
-            private List<J.Annotation> calculatePossibleNewAnnotations(List<J.Annotation> existingAnnotations, List<TypeTree> parentTypes, String indent) {
+            private List<J.Annotation> calculatePossibleNewAnnotations(List<J.Annotation> existingAnnotations, List<TypeTree> parentTypes) {
                 return parentTypes.stream()
-                        .map(J.Identifier.class::cast)
                         .filter(Objects::nonNull)
-                        .map(J.Identifier::getType)
+                        .map(TypeTree::getType)
                         .filter(Objects::nonNull)
                         .map(JavaType.Class.class::cast)
                         .map(JavaType.Class::getAnnotations)
@@ -147,7 +146,7 @@ public class CopyNonInheritedAnnotationsFromSuperClass extends Recipe {
                             maybeAddImport(fq);
                             String name = fq.substring(fq.lastIndexOf(".") + 1);
                             J.Identifier ident = J.Identifier.build(UUID.randomUUID(), Space.EMPTY, Markers.EMPTY, name, JavaType.buildType(fq));
-                            return new J.Annotation(UUID.randomUUID(), Space.format("\n" + indent), Markers.EMPTY, ident, null);
+                            return new J.Annotation(UUID.randomUUID(), Space.EMPTY, Markers.EMPTY, ident, null);
                         })
                         .collect(Collectors.toList());
             }

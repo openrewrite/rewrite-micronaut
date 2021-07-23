@@ -71,6 +71,46 @@ class CopyNonInheritedAnnotationsFromSuperClassTest : JavaRecipeTest {
     )
 
     @Test
+    fun refreshableParameterized() = assertChanged(
+        dependsOn = arrayOf(
+            """
+                package abc;
+                public interface Thing<T> {
+                    T getThing();
+                }
+            """,
+            """
+                package abc;
+                
+                import io.micronaut.runtime.context.scope.Refreshable;
+                
+                @Refreshable
+                public class BaseThing implements Thing<String> {
+                    @Override
+                    String getThing() {
+                        return "thing";
+                    }
+                }
+            """
+        ),
+        before = """
+            package abc;
+            
+            public class MyController extends BaseThing {
+            }
+        """,
+        after = """
+            package abc;
+            
+            import io.micronaut.runtime.context.scope.Refreshable;
+            
+            @Refreshable
+            public class MyController extends BaseThing {
+            }
+        """
+    )
+
+    @Test
     fun refreshableController() = assertChanged(
         dependsOn = arrayOf(
             """
@@ -130,6 +170,7 @@ class CopyNonInheritedAnnotationsFromSuperClassTest : JavaRecipeTest {
             import io.micronaut.http.annotation.Get;
             
             public class SuperClass {
+            
                 @Controller
                 public class MyController extends BaseController {
                     @Get
@@ -146,6 +187,7 @@ class CopyNonInheritedAnnotationsFromSuperClassTest : JavaRecipeTest {
             import io.micronaut.runtime.context.scope.Refreshable;
             
             public class SuperClass {
+            
                 @Controller
                 @Refreshable
                 public class MyController extends BaseController {
