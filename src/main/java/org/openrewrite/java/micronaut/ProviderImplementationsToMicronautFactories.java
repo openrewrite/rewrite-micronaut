@@ -19,42 +19,33 @@ import org.openrewrite.Cursor;
 import org.openrewrite.ExecutionContext;
 import org.openrewrite.Recipe;
 import org.openrewrite.internal.ListUtils;
-import org.openrewrite.internal.lang.Nullable;
 import org.openrewrite.java.*;
 import org.openrewrite.java.search.UsesType;
 import org.openrewrite.java.tree.J;
+import org.openrewrite.java.tree.JavaType;
 import org.openrewrite.java.tree.TypeUtils;
 
 import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ProviderImplementationsToMicronautFactories extends Recipe {
     private static final ThreadLocal<JavaParser> JAVA_PARSER = ThreadLocal.withInitial(() ->
-            JavaParser.fromJavaVersion().dependsOn(
-                    "package javax.inject; public interface Provider<T> {T get();}",
-                    "package javax.inject; public @interface Singleton {}",
-                    "package jakarta.inject; public interface Provider<T> {T get();}",
-                    "package jakarta.inject; public @interface Singleton {}",
-                    "package io.micronaut.context.annotation; @Singleton public @interface Factory {}")
-                    .build());
-    private static final AnnotationMatcher JAVAX_SINGLETON_ANNOTATION_MATCHER = new AnnotationMatcher("@javax.inject.Singleton");
-    private static final AnnotationMatcher JAKARTA_SINGLETON_ANNOTATION_MATCHER = new AnnotationMatcher("@jakarta.inject.Singleton");
+            JavaParser.fromJavaVersion().dependsOn("package io.micronaut.context.annotation; public @interface Factory {}").build());
 
-    private static boolean isSingletonAnnotation(J.Annotation annotation) {
-        return JAKARTA_SINGLETON_ANNOTATION_MATCHER.matches(annotation) || JAVAX_SINGLETON_ANNOTATION_MATCHER.matches(annotation);
-    }
-
-    @Nullable
-    private static String getProviderType(J.ClassDeclaration classDecl) {
-        String providerType = null;
-        if (classDecl.getImplements() != null) {
-            if (classDecl.getImplements().stream().anyMatch(impl -> TypeUtils.isOfClassType(impl.getType(), "javax.inject.Provider"))) {
-                providerType = "javax";
-            } else if (classDecl.getImplements().stream().anyMatch(impl -> TypeUtils.isOfClassType(impl.getType(), "jakarta.inject.Provider"))) {
-                providerType = "jakarta";
-            }
-        }
-        return providerType;
-    }
+    private static final List<AnnotationMatcher> BEAN_ANNOTATION_MATCHERS = Stream.concat(
+            Stream.of("io.micronaut.context.annotation.Bean",
+                    "io.micronaut.context.annotation.Context",
+                    "io.micronaut.context.annotation.Prototype",
+                    "io.micronaut.context.annotation.Infrastructure",
+                    "io.micronaut.runtime.context.scope.Refreshable",
+                    "io.micronaut.runtime.context.scope.ThreadLocal",
+                    "io.micronaut.runtime.http.scope.RequestScope")
+                    .map(it -> new AnnotationMatcher("@" + it)),
+            Stream.of("@javax.inject", "@jakarta.inject")
+                    .map(it -> new AnnotationMatcher(it + ".Singleton")))
+            .map(AnnotationMatcher.class::cast).collect(Collectors.toList());
 
     @Override
     public String getDisplayName() {
@@ -87,39 +78,48 @@ public class ProviderImplementationsToMicronautFactories extends Recipe {
     protected JavaIsoVisitor<ExecutionContext> getVisitor() {
         return new JavaIsoVisitor<ExecutionContext>() {
             @Override
-            public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext executionContext) {
-                String providerType = getProviderType(classDecl);
-                if (providerType != null && classDecl.getLeadingAnnotations().stream().anyMatch(ProviderImplementationsToMicronautFactories::isSingletonAnnotation)) {
+            public J.CompilationUnit visitCompilationUnit(J.CompilationUnit cu, ExecutionContext executionContext) {
+                if (cu.getClasses().stream().anyMatch(cd -> isProvider(cd) && cd.getLeadingAnnotations().stream().anyMatch(ProviderImplementationsToMicronautFactories::isBeanAnnotation))) {
                     doAfterVisit(new ProviderImplementationsGenerateFactoriesVisitor());
                 }
-                return classDecl;
+                return cu;
             }
         };
+    }
+
+    private static boolean isBeanAnnotation(J.Annotation annotation) {
+        return BEAN_ANNOTATION_MATCHERS.stream().anyMatch(annotationMatcher -> annotationMatcher.matches(annotation));
+    }
+
+    private static boolean isProvider(J.ClassDeclaration classDecl) {
+        return classDecl.getType() != null && classDecl.getImplements() != null
+                && (classDecl.getImplements().stream().anyMatch(impl -> TypeUtils.isOfClassType(impl.getType(), "javax.inject.Provider"))
+                || classDecl.getImplements().stream().anyMatch(impl -> TypeUtils.isOfClassType(impl.getType(), "jakarta.inject.Provider")));
     }
 
     private static class ProviderImplementationsGenerateFactoriesVisitor extends JavaIsoVisitor<ExecutionContext> {
         @Override
         public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext executionContext) {
-            if (classDecl.getType() != null) {
-                getCursor().putMessage("provider-get", new MethodMatcher(classDecl.getType().getFullyQualifiedName() + " get()"));
-                String providerType = getProviderType(classDecl);
-                if (providerType != null) {
-                    getCursor().putMessage("provider-type", providerType);
-                }
+            List<J.Annotation> beanAnnotations = classDecl.getLeadingAnnotations().stream().filter(ProviderImplementationsToMicronautFactories::isBeanAnnotation).collect(Collectors.toList());
+            if (classDecl.getType() == null || !isProvider(classDecl) || beanAnnotations.isEmpty()) {
+                return classDecl;
             }
+            getCursor().putMessage("provider-get", new MethodMatcher(classDecl.getType().getFullyQualifiedName() + " get()"));
+            getCursor().putMessage("class-bean-annotations", beanAnnotations);
             J.ClassDeclaration cd = super.visitClassDeclaration(classDecl, executionContext);
-            if (cd.getLeadingAnnotations().stream().anyMatch(ProviderImplementationsToMicronautFactories::isSingletonAnnotation)) {
-                cd = cd.withLeadingAnnotations(ListUtils.map(cd.getLeadingAnnotations(), anno -> {
-                    if (isSingletonAnnotation(anno)) {
-                        anno = anno.withTemplate(JavaTemplate.builder(this::getCursor, "@Factory")
-                                        .imports("io.micronaut.context.annotation.Factory")
-                                        .javaParser(JAVA_PARSER::get).build(),
-                                anno.getCoordinates().replace());
-                        maybeAddImport("io.micronaut.context.annotation.Factory");
-                    }
-                    return anno;
-                }));
-            }
+
+            cd = cd.withLeadingAnnotations(ListUtils.map(cd.getLeadingAnnotations(), anno -> {
+                if (isBeanAnnotation(anno)) {
+                    return null;
+                }
+                return anno;
+            }));
+
+            cd = cd.withTemplate(JavaTemplate.builder(this::getCursor, "@Factory")
+                            .imports("io.micronaut.context.annotation.Factory")
+                            .javaParser(JAVA_PARSER::get).build(),
+                    cd.getCoordinates().addAnnotation(Comparator.comparing(J.Annotation::getSimpleName)));
+            maybeAddImport("io.micronaut.context.annotation.Factory");
             return cd;
         }
 
@@ -128,17 +128,22 @@ public class ProviderImplementationsToMicronautFactories extends Recipe {
             J.MethodDeclaration md = super.visitMethodDeclaration(method, executionContext);
             Cursor classDeclCursor = getCursor().dropParentUntil(J.ClassDeclaration.class::isInstance);
             MethodMatcher mm = classDeclCursor.getMessage("provider-get");
-            String providerType = classDeclCursor.getMessage("provider-type");
-            if (mm != null && providerType != null && mm.matches(md.getType())
-                    && md.getLeadingAnnotations().stream().noneMatch(ProviderImplementationsToMicronautFactories::isSingletonAnnotation)) {
-                md = md.withTemplate(JavaTemplate.builder(this::getCursor, "@Singleton")
-                                .imports(providerType + ".inject.Singleton")
-                                .javaParser(JAVA_PARSER::get).build(),
-                        md.getCoordinates().addAnnotation(Comparator.comparing(J.Annotation::getSimpleName)));
-                maybeAddImport(providerType + ".inject.Singleton");
+            List<J.Annotation> beanAnnotations = classDeclCursor.getMessage("class-bean-annotations");
+            if (mm != null && mm.matches(md.getType()) && beanAnnotations != null) {
+                List<J.Annotation> newBeanAnnotations = beanAnnotations.stream().filter(anno -> !annotationExists(method.getLeadingAnnotations(), anno)).collect(Collectors.toList());
+                if (!newBeanAnnotations.isEmpty()) {
+                    //noinspection ConstantConditions
+                    md = maybeAutoFormat(md, md.withLeadingAnnotations(ListUtils.concatAll(md.getLeadingAnnotations(), newBeanAnnotations)), executionContext, getCursor().getParent());
+                }
             }
             return md;
         }
-    }
 
+        private static boolean annotationExists(List<J.Annotation> annotations, J.Annotation annotation) {
+            return annotations.stream().anyMatch(anno -> {
+                JavaType.FullyQualified fq = TypeUtils.asFullyQualified(anno.getType());
+                return fq != null && fq.isAssignableFrom(TypeUtils.asFullyQualified(annotation.getType()));
+            });
+        }
+    }
 }
