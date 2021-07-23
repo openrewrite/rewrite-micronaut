@@ -103,7 +103,7 @@ public class CopyNonInheritedAnnotationsFromSuperClass extends Recipe {
 
     @Override
     public String getDescription() {
-        return "As of Micronaut 3.x only [annotations] that are explicitly meta-annotated with `@Inherited`(https://github.com/micronaut-projects/micronaut-core/blob/3.0.x/src/main/docs/guide/appendix/breaks.adoc#annotation-inheritance) are inherited from parent classes and interfaces.";
+        return "As of Micronaut 3.x only [annotations](https://github.com/micronaut-projects/micronaut-core/blob/3.0.x/src/main/docs/guide/appendix/breaks.adoc#annotation-inheritance) that are explicitly meta-annotated with `@Inherited` are inherited from parent classes and interfaces.";
     }
 
     @Override
