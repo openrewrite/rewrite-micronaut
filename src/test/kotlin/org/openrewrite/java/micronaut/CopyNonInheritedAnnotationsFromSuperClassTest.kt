@@ -33,9 +33,11 @@ class CopyNonInheritedAnnotationsFromSuperClassTest : JavaRecipeTest {
         dependsOn = arrayOf(
             """
                 package abc;
+                import io.micronaut.core.version.annotation.Version;
                 import io.micronaut.runtime.context.scope.Refreshable;
                 
                 @Refreshable
+                @Version("0.1")
                 public interface BaseController {
                 }
             """
@@ -55,12 +57,14 @@ class CopyNonInheritedAnnotationsFromSuperClassTest : JavaRecipeTest {
         """,
         after = """
             package abc;
+            import io.micronaut.core.version.annotation.Version;
             import io.micronaut.http.annotation.Controller;
             import io.micronaut.http.annotation.Get;
             import io.micronaut.runtime.context.scope.Refreshable;
             
             @Controller
             @Refreshable
+            @Version("0.1")
             public class MyController implements BaseController {
                 @Get
                 public String info() {
