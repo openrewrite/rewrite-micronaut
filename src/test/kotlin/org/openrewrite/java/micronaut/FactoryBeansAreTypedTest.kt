@@ -136,4 +136,72 @@ class FactoryBeansAreTypedTest : JavaRecipeTest {
             }
         """
     )
+
+    @Test
+    fun returnTypeIsNewClass() = assertChanged(
+        dependsOn = arrayOf(
+            """
+                package abc;
+                public interface MyInterface {}
+            """,
+            """
+                package abc;
+                public class MyThing implements MyInterface {
+                    private String name;
+                    public MyThing(String name) {
+                        if (name == null) {
+                            throw new IllegalArgumentException();
+                        }
+                        this.name = name;
+                    }
+                }
+            """,
+            """
+                package abc;
+                public class MyGenericThing<T> {}
+            """,
+            """
+                package abc;
+                public class MyOtherGenericThing<T> extends MyGenericThing<T> {}
+            """
+        ),
+        before = """
+            package abc;
+            import jakarta.inject.Singleton;
+            import io.micronaut.context.annotation.Factory;
+            
+            @Factory
+            public class ExecutorFactory {
+            
+                @Singleton
+                public MyInterface myInterface() {
+                    try {
+                        return new MyThing("some name");
+                    } catch (Exception ex) {
+                        return null;
+                    }
+                }
+            }
+        """,
+        after = """
+            package abc;
+            import jakarta.inject.Singleton;
+            import io.micronaut.context.annotation.Bean;
+            import io.micronaut.context.annotation.Factory;
+            
+            @Factory
+            public class ExecutorFactory {
+            
+                @Bean(typed = {MyInterface.class, MyThing.class})
+                @Singleton
+                public MyInterface myInterface() {
+                    try {
+                        return new MyThing("some name");
+                    } catch (Exception ex) {
+                        return null;
+                    }
+                }
+            }
+        """
+    )
 }
