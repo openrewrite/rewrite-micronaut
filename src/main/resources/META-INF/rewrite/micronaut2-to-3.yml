@@ -19,7 +19,7 @@ name: org.openrewrite.java.micronaut.Micronaut2to3Migration
 displayName: Migrate from Micronaut 2.x to 3.x
 description: This recipe will apply changes required for migrating from Micronaut 2 to Micronaut 3.
 recipeList:
-  - org.openrewrite.java.migrate.JavaxInjectMigrationToJakartaInject
+  - org.openrewrite.java.migrate.JavaxMigrationToJakarta
   - org.openrewrite.java.micronaut.BeanPropertyCapitalizationStrategy
   - org.openrewrite.java.micronaut.CopyNonInheritedAnnotationsFromSuperClass
   - org.openrewrite.java.micronaut.FactoryBeansAreTyped
