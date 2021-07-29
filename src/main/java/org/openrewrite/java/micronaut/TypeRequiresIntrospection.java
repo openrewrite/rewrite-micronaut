@@ -131,6 +131,7 @@ public class TypeRequiresIntrospection extends Recipe {
     }
 
     private static class AddIntrospectionRecipe extends Recipe {
+        private static final AnnotationMatcher INTROSPECTION_ANNOTATION_MATCHER = new AnnotationMatcher("@io.micronaut.core.annotation.Introspected");
         private static final ThreadLocal<JavaParser> JAVA_PARSER = ThreadLocal.withInitial(() ->
                 JavaParser.fromJavaVersion().dependsOn(
                         "package io.micronaut.core.annotation; public @interface Introspected {}")
@@ -151,10 +152,12 @@ public class TypeRequiresIntrospection extends Recipe {
                 @Override
                 public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext executionContext) {
                     J.ClassDeclaration cd = super.visitClassDeclaration(classDecl, executionContext);
-                    Set<JavaType.Class> needsAnnotation = executionContext.getMessage(CONTEXT_KEY);
-                    if (needsAnnotation != null && needsAnnotation.stream().anyMatch(jc -> jc.isAssignableFrom(classDecl.getType()))) {
-                        cd = cd.withTemplate(templ, cd.getCoordinates().addAnnotation(Comparator.comparing(J.Annotation::getSimpleName)));
-                        maybeAddImport(INTROSPECTED_ANNOTATION.getFullyQualifiedName());
+                    if (cd.getLeadingAnnotations().stream().noneMatch(INTROSPECTION_ANNOTATION_MATCHER::matches)) {
+                        Set<JavaType.Class> needsAnnotation = executionContext.getMessage(CONTEXT_KEY);
+                        if (needsAnnotation != null && needsAnnotation.stream().anyMatch(jc -> jc.isAssignableFrom(classDecl.getType()))) {
+                            cd = cd.withTemplate(templ, cd.getCoordinates().addAnnotation(Comparator.comparing(J.Annotation::getSimpleName)));
+                            maybeAddImport(INTROSPECTED_ANNOTATION.getFullyQualifiedName());
+                        }
                     }
                     return cd;
                 }
