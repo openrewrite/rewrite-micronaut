@@ -56,7 +56,7 @@ public class OncePerRequestHttpServerFilterToHttpServerFilter extends Recipe {
     }
 
     private static class OncePerRequestHttpServerFilterToHttpServerFilterVisitor extends JavaIsoVisitor<ExecutionContext> {
-        private final MethodMatcher GET_KEY_METHOD = new MethodMatcher(ONCE_PER_REQUEST_FILTER_FQN + " getKey(Class<? extends OncePerRequestHttpServerFilter>)");
+        private final MethodMatcher GET_KEY_METHOD = new MethodMatcher(ONCE_PER_REQUEST_FILTER_FQN + " getKey(Class)");
 
         @Override
         public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext executionContext) {
