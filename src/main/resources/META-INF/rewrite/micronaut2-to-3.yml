@@ -89,6 +89,21 @@ recipeList:
   - org.openrewrite.java.ChangeType:
       oldFullyQualifiedTypeName: io.micronaut.runtime.server.EmbeddedServerInstance
       newFullyQualifiedTypeName: io.micronaut.discovery.EmbeddedServerInstance
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.http.client.RxHttpClient
+      newFullyQualifiedTypeName: io.micronaut.rxjava2.http.client.RxHttpClient
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.http.client.RxProxyHttpClient
+      newFullyQualifiedTypeName: io.micronaut.rxjava2.http.client.proxy.RxProxyHttpClient
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.http.client.RxStreamingHttpClient
+      newFullyQualifiedTypeName: io.micronaut.rxjava2.http.client.RxStreamingHttpClient
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.http.client.sse.RxSseClient
+      newFullyQualifiedTypeName: io.micronaut.rxjava2.http.client.sse.RxSseClient
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.websocket.RxWebSocketClient
+      newFullyQualifiedTypeName: io.micronaut.rxjava2.http.client.websockets.RxWebSocketClient
   - org.openrewrite.java.ChangeMethodName:
       methodPattern: io.micronaut.web.router accept(io.micronaut.http.MediaType)
       newMethodName: doesConsume
