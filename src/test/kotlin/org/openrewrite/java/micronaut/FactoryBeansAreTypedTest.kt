@@ -155,14 +155,6 @@ class FactoryBeansAreTypedTest : JavaRecipeTest {
                         this.name = name;
                     }
                 }
-            """,
-            """
-                package abc;
-                public class MyGenericThing<T> {}
-            """,
-            """
-                package abc;
-                public class MyOtherGenericThing<T> extends MyGenericThing<T> {}
             """
         ),
         before = """
