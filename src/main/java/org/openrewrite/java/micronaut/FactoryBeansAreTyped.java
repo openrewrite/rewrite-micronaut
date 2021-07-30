@@ -127,7 +127,6 @@ public class FactoryBeansAreTyped extends Recipe {
 
                 if (fqn != null && fqn2 != null && !fqn.getFullyQualifiedName().equals(fqn2.getFullyQualifiedName())) {
                     String beanText = "Bean(typed = {" + fqn.getClassName() + ".class, " + fqn2.getClassName() + ".class})";
-                    AnnotationMatcher typedBeanAnnotationMatcher = new AnnotationMatcher("@io.micronaut.context.annotation." + beanText);
                     JavaTemplate t = JavaTemplate.builder(this::getCursor,
                                     "@" + beanText).javaParser(JAVA_PARSER::get)
                             .imports("io.micronaut.context.annotation.Bean")
@@ -136,9 +135,9 @@ public class FactoryBeansAreTyped extends Recipe {
                     if (md.getLeadingAnnotations().stream().noneMatch(BEAN_ANNOTATION_MATCHER::matches)) {
                         md = md.withTemplate(t, md.getCoordinates().addAnnotation(Comparator.comparing(J.Annotation::getSimpleName)));
                         maybeAddImport("io.micronaut.context.annotation.Bean");
-                    } else if (md.getLeadingAnnotations().stream().noneMatch(typedBeanAnnotationMatcher::matches)) {
+                    } else {
                         md = md.withLeadingAnnotations(ListUtils.map(md.getLeadingAnnotations(), anno -> {
-                            if (BEAN_ANNOTATION_MATCHER.matches(anno)) {
+                            if (BEAN_ANNOTATION_MATCHER.matches(anno) && anno.getArguments() != null && anno.getArguments().isEmpty()) {
                                 anno = anno.withTemplate(t, anno.getCoordinates().replace());
                             }
                             return anno;
