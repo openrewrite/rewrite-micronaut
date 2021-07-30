@@ -108,7 +108,9 @@ public class FactoryBeansAreTyped extends Recipe {
                 Cursor methodDeclCursor = getCursor().dropParentUntil(J.MethodDeclaration.class::isInstance);
                 JavaType returnedType = returnExpression.getType();
                 if (returnedType instanceof JavaType.Method) {
-                    returnedType = ((JavaType.Method) returnedType).getDeclaringType();
+                    JavaType.Method methodType = (JavaType.Method)returnedType;
+                    //noinspection AssignmentToNull
+                    returnedType = methodType.getResolvedSignature() != null ? methodType.getResolvedSignature().getReturnType() : null;
                 }
                 if (returnedType != null) {
                     methodDeclCursor.putMessage("returned-type", returnedType);
