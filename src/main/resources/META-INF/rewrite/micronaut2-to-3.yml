@@ -86,6 +86,9 @@ recipeList:
   - org.openrewrite.java.ChangeMethodName:
       methodPattern: io.micronaut.rss.itunespodcast.ItunesPodcast explict(boolean)
       newMethodName: setExplicit
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: io.micronaut.rss.itunespodcast.ItunesPodcastEpisode isExplict()
+      newMethodName: isExplicit
   - org.openrewrite.java.ChangeType:
       oldFullyQualifiedTypeName: io.micronaut.runtime.server.EmbeddedServerInstance
       newFullyQualifiedTypeName: io.micronaut.discovery.EmbeddedServerInstance
