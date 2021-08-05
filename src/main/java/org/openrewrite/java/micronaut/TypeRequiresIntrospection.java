@@ -101,22 +101,24 @@ public class TypeRequiresIntrospection extends Recipe {
                     @Override
                     public J.MethodDeclaration visitMethodDeclaration(J.MethodDeclaration method, ExecutionContext executionContext) {
                         J.MethodDeclaration md = super.visitMethodDeclaration(method, executionContext);
-                        // method parameters need introspection
-                        md.getParameters().stream()
-                                .filter(J.VariableDeclarations.class::isInstance)
-                                .map(j -> ((J.VariableDeclarations) j).getVariables())
-                                .flatMap(List::stream)
-                                .map(J.VariableDeclarations.NamedVariable::getType)
-                                .filter(JavaType.Class.class::isInstance)
-                                .map(JavaType.Class.class::cast)
-                                .filter(RequiresIntrospectionVisitor::needsIntrospectedAnnotation)
-                                .forEach(jc -> executionContext.putMessageInSet(CONTEXT_KEY, jc));
-                        // return type needs introspection
-                        if (md.getReturnTypeExpression() instanceof J.Identifier) {
-                            J.Identifier ident = (J.Identifier) md.getReturnTypeExpression();
-                            JavaType.Class jc = ident.getType() != null && ident.getType() instanceof JavaType.Class ? (JavaType.Class) ident.getType() : null;
-                            if (needsIntrospectedAnnotation(jc)) {
-                                executionContext.putMessageInSet(CONTEXT_KEY, jc);
+                        if (!md.isConstructor()) {
+                            // method parameters need introspection
+                            md.getParameters().stream()
+                                    .filter(J.VariableDeclarations.class::isInstance)
+                                    .map(j -> ((J.VariableDeclarations) j).getVariables())
+                                    .flatMap(List::stream)
+                                    .map(J.VariableDeclarations.NamedVariable::getType)
+                                    .filter(JavaType.Class.class::isInstance)
+                                    .map(JavaType.Class.class::cast)
+                                    .filter(RequiresIntrospectionVisitor::needsIntrospectedAnnotation)
+                                    .forEach(jc -> executionContext.putMessageInSet(CONTEXT_KEY, jc));
+                            // return type needs introspection
+                            if (md.getReturnTypeExpression() instanceof J.Identifier) {
+                                J.Identifier ident = (J.Identifier) md.getReturnTypeExpression();
+                                JavaType.Class jc = ident.getType() != null && ident.getType() instanceof JavaType.Class ? (JavaType.Class) ident.getType() : null;
+                                if (needsIntrospectedAnnotation(jc)) {
+                                    executionContext.putMessageInSet(CONTEXT_KEY, jc);
+                                }
                             }
                         }
                         return md;

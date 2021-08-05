@@ -144,4 +144,37 @@ class TypeRequiresIntrospectionTest : JavaRecipeTest {
             }
         """
     )
+
+
+    @Test
+    fun serviceShouldNotBeIntrospected() = assertUnchanged(
+        dependsOn = arrayOf(
+            """
+                package a.b;
+                import io.micronaut.http.annotation.Controller;
+                
+                @Controller
+                public class AbController {
+                    private final CdService cdService;
+                    public AbController(CdService cdService) {
+                        this.cdService = cdService;
+                    }
+                }
+            """
+        ),
+        before = """
+            package a.b;
+
+            import io.micronaut.http.client.RxHttpClient;
+            import jakarta.inject.Inject;
+            import jakarta.inject.Singleton;
+            
+            @Singleton
+            public class CdService {
+                @Inject
+                private RxHttpClient httpClient;
+            }
+        """
+    )
+
 }
