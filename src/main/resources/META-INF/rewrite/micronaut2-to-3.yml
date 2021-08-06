@@ -29,11 +29,11 @@ recipeList:
   - org.openrewrite.maven.UpgradeParentVersion:
       groupId: io.micronaut
       artifactId: micronaut-parent
-      newVersion: 3.x
+      newVersion: 3.0.0-M5
   - org.openrewrite.maven.UpgradeDependencyVersion:
       groupId: io.micronaut
       artifactId: micronaut-bom
-      newVersion: 3.x
+      newVersion: 3.0.0-M5
       trustParent: true
   - org.openrewrite.java.ChangePackage:
       oldPackageName: io.micronaut.configuration.cassandra
@@ -86,6 +86,9 @@ recipeList:
   - org.openrewrite.java.ChangeMethodName:
       methodPattern: io.micronaut.rss.itunespodcast.ItunesPodcast explict(boolean)
       newMethodName: setExplicit
+  - org.openrewrite.java.ChangeMethodName:
+      methodPattern: io.micronaut.rss.itunespodcast.ItunesPodcastEpisode isExplict()
+      newMethodName: isExplicit
   - org.openrewrite.java.ChangeType:
       oldFullyQualifiedTypeName: io.micronaut.runtime.server.EmbeddedServerInstance
       newFullyQualifiedTypeName: io.micronaut.discovery.EmbeddedServerInstance
