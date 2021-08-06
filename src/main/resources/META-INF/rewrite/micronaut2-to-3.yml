@@ -43,6 +43,9 @@ recipeList:
   - org.openrewrite.java.ChangePackage:
       oldPackageName: io.micronaut.configuration.cassandra
       newPackageName: io.micronaut.cassandra
+  - org.openrewrite.java.ChangePackage:
+      oldPackageName: io.micronaut.configuration.security.ldap
+      newPackageName: io.micronaut.security.ldap
   - org.openrewrite.java.ChangeMethodName:
       methodPattern: io.micronaut.context.ApplicationContext build(..)
       newMethodName: builder
