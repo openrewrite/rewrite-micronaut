@@ -88,6 +88,7 @@ dependencies {
 
     implementation("org.openrewrite:rewrite-java:${rewriteVersion}")
     implementation("org.openrewrite:rewrite-maven:${rewriteVersion}")
+    implementation("org.openrewrite:rewrite-properties:${rewriteVersion}")
     runtimeOnly("org.openrewrite:rewrite-java-11:${rewriteVersion}")
     runtimeOnly("org.openrewrite.recipe:rewrite-migrate-java:${rewriteVersion}")
 

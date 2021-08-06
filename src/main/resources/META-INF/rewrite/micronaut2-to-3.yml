@@ -35,6 +35,8 @@ recipeList:
       artifactId: micronaut-bom
       newVersion: 3.0.0-M5
       trustParent: true
+  - org.openrewrite.java.micronaut.UpgradeGradlePropertiesVersion:
+      newVersion: 3.0.0-M5
   - org.openrewrite.java.ChangePackage:
       oldPackageName: io.micronaut.configuration.cassandra
       newPackageName: io.micronaut.cassandra
