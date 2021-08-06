@@ -35,6 +35,9 @@ recipeList:
       artifactId: micronaut-bom
       newVersion: 3.0.0-M5
       trustParent: true
+  - org.openrewrite.maven.ChangePropertyValue:
+      key: micronaut.version
+      newValue: 3.0.0-M5
   - org.openrewrite.java.micronaut.UpgradeGradlePropertiesVersion:
       newVersion: 3.0.0-M5
   - org.openrewrite.java.ChangePackage:
