@@ -35,6 +35,29 @@ class ExceptionHandlersHaveErrorResponseProcessorConstructorArgumentTest : JavaR
             package abc;
             import io.micronaut.validation.exceptions.ConstraintExceptionHandler;
             public class ApiClientValidationExceptionHandler extends ConstraintExceptionHandler {
+            }
+        """,
+        after = """
+            package abc;
+            import io.micronaut.validation.exceptions.ConstraintExceptionHandler;
+            import jakarta.inject.Inject;
+            
+            public class ApiClientValidationExceptionHandler extends ConstraintExceptionHandler {
+                @Inject
+                public ApiClientValidationExceptionHandler(ErrorResponseProcessor errorResponseProcessor) {
+                    super(errorResponseProcessor);
+                }
+            }
+        """,
+        typeValidation = {methodInvocations = false}
+    )
+
+    @Test
+    fun addsErrorProcessorConstructorArg() = assertChanged(
+        before = """
+            package abc;
+            import io.micronaut.validation.exceptions.ConstraintExceptionHandler;
+            public class ApiClientValidationExceptionHandler extends ConstraintExceptionHandler {
                 public ApiClientValidationExceptionHandler() {
                 }
             }

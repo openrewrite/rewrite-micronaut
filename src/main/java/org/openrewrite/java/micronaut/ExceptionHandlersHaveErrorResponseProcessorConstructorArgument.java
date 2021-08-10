@@ -111,6 +111,7 @@ public class ExceptionHandlersHaveErrorResponseProcessorConstructorArgument exte
                 J.ClassDeclaration cd = getCursor().firstEnclosing(J.ClassDeclaration.class);
                 if (cd != null && isClassExceptionHandler(cd)) {
                     if (md.isConstructor()) {
+                        getCursor().dropParentUntil(J.ClassDeclaration.class::isInstance).putMessage("constructor-exists", Boolean.TRUE);
                         if (md.getLeadingAnnotations().stream().noneMatch(anno -> jakarta_matcher.matches(anno) || javax_matcher.matches(anno))) {
                             md = md.withTemplate(injectTemplate, md.getCoordinates().addAnnotation(Comparator.comparing(J.Annotation::getSimpleName)));
                         }
@@ -148,6 +149,24 @@ public class ExceptionHandlersHaveErrorResponseProcessorConstructorArgument exte
                     }
                 }
                 return md;
+            }
+
+            @Override
+            public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext executionContext) {
+                J.ClassDeclaration cd = super.visitClassDeclaration(classDecl, executionContext);
+                JavaType.FullyQualified cdFq = cd.getExtends() != null ? TypeUtils.asFullyQualified(cd.getExtends().getType()) : null;
+                if (cdFq != null && exception_handlers.stream().anyMatch(fqn -> TypeUtils.isOfClassType(cdFq, fqn))) {
+                    if (!Boolean.TRUE.equals(getCursor().pollMessage("constructor-exists"))) {
+                        JavaTemplate template = JavaTemplate.builder(this::getCursor,
+                                        "@Inject\npublic " + cd.getSimpleName() + "(ErrorResponseProcessor errorResponseProcessor) {" +
+                                                "super(errorResponseProcessor);}")
+                                .imports(errorResponseProcessorFqn, "jakarta.inject.Inject", cdFq.getFullyQualifiedName())
+                                .javaParser(JAVA_PARSER::get).build();
+                        cd = cd.withTemplate(template, cd.getBody().getCoordinates().lastStatement());
+                        maybeAddImport("jakarta.inject.Inject");
+                    }
+                }
+                return cd;
             }
 
             private boolean isErrorProcessorParameter(Statement statement) {
