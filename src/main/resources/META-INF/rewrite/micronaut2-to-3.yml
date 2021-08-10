@@ -134,3 +134,6 @@ recipeList:
   - org.openrewrite.java.ChangeType:
       oldFullyQualifiedTypeName: javax.annotation.Nonnull
       newFullyQualifiedTypeName: io.micronaut.core.annotation.NonNull
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.test.annotation.MicronautTest
+      newFullyQualifiedTypeName: io.micronaut.test.extensions.junit5.annotation.MicronautTest
