@@ -136,14 +136,8 @@ public class ExceptionHandlersHaveErrorResponseProcessorConstructorArgument exte
                                         .imports(errorResponseProcessorFqn)
                                         .javaParser(JAVA_PARSER::get).build();
                                 md = maybeAutoFormat(md, md.withTemplate(superInvocationTemplate, md.getBody().getCoordinates().lastStatement(), errorResponseVar.get()), executionContext, getCursor().getParent());
-                                // Make sure the super method invocation is first
-                                if (md.getBody() != null && md.getBody().getStatements().size() > 1) {
-                                    List<Statement> statements = md.getBody().getStatements();
-                                    J.MethodInvocation superStatement = (J.MethodInvocation)statements.get(statements.size() - 1);
-                                    statements.remove(superStatement);
-                                    statements.add(0, superStatement);
-                                    md = md.withBody(md.getBody().withStatements(statements));
-                                }
+                                assert md.getBody() != null;
+                                md = md.withBody(moveLastStatementToFirst(md.getBody()));
                             }
                         }
                     }
@@ -163,6 +157,7 @@ public class ExceptionHandlersHaveErrorResponseProcessorConstructorArgument exte
                                 .imports(errorResponseProcessorFqn, "jakarta.inject.Inject", cdFq.getFullyQualifiedName())
                                 .javaParser(JAVA_PARSER::get).build();
                         cd = cd.withTemplate(template, cd.getBody().getCoordinates().lastStatement());
+                        cd = cd.withBody(moveLastStatementToFirst(cd.getBody()));
                         maybeAddImport("jakarta.inject.Inject");
                     }
                 }
@@ -177,6 +172,17 @@ public class ExceptionHandlersHaveErrorResponseProcessorConstructorArgument exte
             private boolean isClassExceptionHandler(J.ClassDeclaration cd) {
                 JavaType.FullyQualified cdFq = cd.getExtends() != null ? TypeUtils.asFullyQualified(cd.getExtends().getType()) : null;
                 return cdFq != null && exception_handlers.stream().anyMatch(fqn -> TypeUtils.isOfClassType(cdFq, fqn));
+            }
+
+            private J.Block moveLastStatementToFirst(J.Block block) {
+                if (block.getStatements().size() > 1) {
+                    List<Statement> statements = block.getStatements();
+                    Statement stmt = statements.get(statements.size() - 1);
+                    statements.remove(stmt);
+                    statements.add(0, stmt);
+                    block = block.withStatements(statements);
+                }
+                return block;
             }
         };
     }

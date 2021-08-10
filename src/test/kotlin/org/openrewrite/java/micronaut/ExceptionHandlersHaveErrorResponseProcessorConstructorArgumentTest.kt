@@ -35,6 +35,7 @@ class ExceptionHandlersHaveErrorResponseProcessorConstructorArgumentTest : JavaR
             package abc;
             import io.micronaut.validation.exceptions.ConstraintExceptionHandler;
             public class ApiClientValidationExceptionHandler extends ConstraintExceptionHandler {
+                private void someMethod(){}
             }
         """,
         after = """
@@ -43,10 +44,12 @@ class ExceptionHandlersHaveErrorResponseProcessorConstructorArgumentTest : JavaR
             import jakarta.inject.Inject;
             
             public class ApiClientValidationExceptionHandler extends ConstraintExceptionHandler {
+            
                 @Inject
                 public ApiClientValidationExceptionHandler(ErrorResponseProcessor errorResponseProcessor) {
                     super(errorResponseProcessor);
                 }
+                private void someMethod(){}
             }
         """,
         typeValidation = {methodInvocations = false}
