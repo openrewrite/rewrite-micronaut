@@ -20,14 +20,14 @@ import org.openrewrite.Recipe
 import org.openrewrite.java.JavaParser
 import org.openrewrite.java.JavaRecipeTest
 
-class ExceptionHandlersHaveErrorResponseProcessorConstructorArgumentTest : JavaRecipeTest {
+class FixDeprecatedExceptionHandlerConstructorsTest : JavaRecipeTest {
 
     override val parser: JavaParser
         get() = JavaParser.fromJavaVersion()
             .logCompilationWarningsAndErrors(true)
             .classpath("micronaut-core", "micronaut-http-server-netty", "micronaut-http", "micronaut-validation", "jakarta.inject-api", "validation-api").build()
     override val recipe: Recipe
-        get() = ExceptionHandlersHaveErrorResponseProcessorConstructorArgument()
+        get() = FixDeprecatedExceptionHandlerConstructors()
 
     @Test
     fun addsErrorProcessorConstructor() = assertChanged(

@@ -28,7 +28,7 @@ import org.openrewrite.marker.Markers;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ExceptionHandlersHaveErrorResponseProcessorConstructorArgument extends Recipe {
+public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
     private static final List<String> exception_handlers = Arrays.asList(
             "io.micronaut.http.server.netty.converters.DuplicateRouteHandler",
             "io.micronaut.http.server.netty.converters.UnsatisfiedRouteHandler",
