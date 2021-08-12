@@ -55,7 +55,7 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
 
     @Override
     public String getDisplayName() {
-        return "Fix deprecated no-arg `ExceptionHandler` constructors.";
+        return "Fix deprecated no-arg `ExceptionHandler` constructors";
     }
 
     @Override
