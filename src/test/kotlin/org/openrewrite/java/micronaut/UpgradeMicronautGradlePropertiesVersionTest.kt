@@ -20,9 +20,11 @@ import org.junit.jupiter.api.io.TempDir
 import org.openrewrite.properties.PropertiesRecipeTest
 import java.nio.file.Path
 
-class UpgradeGradlePropertiesVersionTest : PropertiesRecipeTest {
+@Suppress("UnusedProperty")
+class UpgradeMicronautGradlePropertiesVersionTest : PropertiesRecipeTest {
 
-    override val recipe = UpgradeGradlePropertiesVersion("~2.1")
+    override val recipe =
+        UpgradeMicronautGradlePropertiesVersion("~2.1")
 
     @Test
     fun changeValue(@TempDir tempDir: Path) {

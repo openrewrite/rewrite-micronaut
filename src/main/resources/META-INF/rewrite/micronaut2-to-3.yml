@@ -30,17 +30,16 @@ recipeList:
   - org.openrewrite.maven.UpgradeParentVersion:
       groupId: io.micronaut
       artifactId: micronaut-parent
-      newVersion: 3.0.0-M5
+      newVersion: 3.0.0-RC1
   - org.openrewrite.maven.UpgradeDependencyVersion:
       groupId: io.micronaut
       artifactId: micronaut-bom
-      newVersion: 3.0.0-M5
+      newVersion: 3.0.0-RC1
       trustParent: true
-  - org.openrewrite.maven.ChangePropertyValue:
-      key: micronaut.version
-      newValue: 3.0.0-M5
-  - org.openrewrite.java.micronaut.UpgradeGradlePropertiesVersion:
-      newVersion: 3.0.0-M5
+  - org.openrewrite.java.micronaut.UpgradeMicronautGradlePropertiesVersion:
+      newVersion: 3.0.0-RC1
+  - org.openrewrite.java.micronaut.UpgradeMicronautMavenPropertyVersion:
+      newVersion: 3.0.0-RC1
   - org.openrewrite.java.ChangePackage:
       oldPackageName: io.micronaut.configuration.cassandra
       newPackageName: io.micronaut.cassandra
