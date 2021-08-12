@@ -66,7 +66,10 @@ public class OncePerRequestHttpServerFilterToHttpServerFilter extends Recipe {
                 cd = cd.withExtends(null);
                 J.Identifier newImplementsIdentifier = J.Identifier.build(UUID.randomUUID(), Space.format(" "), Markers.EMPTY,
                         "HttpServerFilter", JavaType.buildType("io.micronaut.http.filter.HttpServerFilter"));
-                cd = cd.withImplements(ListUtils.concat(cd.getImplements(), newImplementsIdentifier));
+                J.Block body = cd.getBody();
+                //noinspection ConstantConditions
+                cd = maybeAutoFormat(cd, cd.withBody(null).withImplements(ListUtils.concat(cd.getImplements(), newImplementsIdentifier)), executionContext, getCursor());
+                cd = cd.withBody(body);
                 if (cd.getType() != null) {
                     doAfterVisit(new ChangeMethodName(
                             cd.getType().getFullyQualifiedName() + " doFilterOnce(io.micronaut.http.HttpRequest, io.micronaut.http.filter.ServerFilterChain)",

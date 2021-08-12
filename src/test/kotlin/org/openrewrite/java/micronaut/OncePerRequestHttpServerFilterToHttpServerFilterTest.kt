@@ -36,7 +36,7 @@ class OncePerRequestHttpServerFilterToHttpServerFilterTest : JavaRecipeTest {
             ).build()
 
     @Test
-    fun simpleConversion() = assertChanged(
+    fun simpleConversionWithExistingImplements() = assertChanged(
         before = """
             package a.b;
             
@@ -75,6 +75,64 @@ class OncePerRequestHttpServerFilterToHttpServerFilterTest : JavaRecipeTest {
             import org.reactivestreams.Publisher;
             
             public class MyServerFilter implements C, HttpServerFilter {
+                @Override
+                public int getOrder() {
+                    return Ordered.LOWEST_PRECEDENCE;
+                }
+                
+                @Override
+                public Publisher<MutableHttpResponse<?>> doFilter(HttpRequest<?> request, ServerFilterChain chain) {
+                    /*TODO: Replace with custom attribute name*/ getKey(MyServerFilter.class);
+                }
+                
+                @Override
+                public String getCName() {
+                    return "cname";
+                }
+            }
+        """
+    )
+
+    @Test
+    fun simpleConversion() = assertChanged(
+        before = """
+            package a.b;
+            
+            import io.micronaut.http.filter.OncePerRequestHttpServerFilter;
+            import io.micronaut.core.order.Ordered;
+            import io.micronaut.http.HttpRequest;
+            import io.micronaut.http.MutableHttpResponse;
+            import io.micronaut.http.filter.ServerFilterChain;
+            import org.reactivestreams.Publisher;
+            
+            public class MyServerFilter extends OncePerRequestHttpServerFilter {
+                @Override
+                public int getOrder() {
+                    return Ordered.LOWEST_PRECEDENCE;
+                }
+                
+                @Override
+                public Publisher<MutableHttpResponse<?>> doFilterOnce(HttpRequest<?> request, ServerFilterChain chain) {
+                    getKey(MyServerFilter.class);
+                }
+                
+                @Override
+                public String getCName() {
+                    return "cname";
+                }
+            }
+        """,
+        after = """
+            package a.b;
+            
+            import io.micronaut.core.order.Ordered;
+            import io.micronaut.http.HttpRequest;
+            import io.micronaut.http.MutableHttpResponse;
+            import io.micronaut.http.filter.HttpServerFilter;
+            import io.micronaut.http.filter.ServerFilterChain;
+            import org.reactivestreams.Publisher;
+            
+            public class MyServerFilter implements HttpServerFilter {
                 @Override
                 public int getOrder() {
                     return Ordered.LOWEST_PRECEDENCE;
