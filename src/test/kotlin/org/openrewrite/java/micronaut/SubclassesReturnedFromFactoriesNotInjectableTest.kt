@@ -284,6 +284,11 @@ class SubclassesReturnedFromFactoriesNotInjectableTest : JavaRecipeTest {
                 public Qi<String> t() {
                     return new Kq<>("b");
                 }
+                
+                @Singleton
+                public Qi t() {
+                    return new Kq<String>("b");
+                }
             }
         """,
         after = """
@@ -297,6 +302,11 @@ class SubclassesReturnedFromFactoriesNotInjectableTest : JavaRecipeTest {
                 @Singleton
                 public Kq<String> t() {
                     return new Kq<>("b");
+                }
+            
+                @Singleton
+                public Kq t() {
+                    return new Kq<String>("b");
                 }
             }
         """
