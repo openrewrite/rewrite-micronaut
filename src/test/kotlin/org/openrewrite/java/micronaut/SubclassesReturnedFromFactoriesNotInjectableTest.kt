@@ -55,7 +55,7 @@ class SubclassesReturnedFromFactoriesNotInjectableTest : JavaRecipeTest {
             import io.micronaut.context.annotation.Factory;
             
             public class ExecutorFactory {
-            
+                
                 @Singleton
                 public ExecutorService executorService() {
                     return ForkJoinPool.commonPool();
@@ -88,7 +88,7 @@ class SubclassesReturnedFromFactoriesNotInjectableTest : JavaRecipeTest {
             
             @Factory
             public class ExecutorFactory {
-                
+            
                 @Singleton
                 public ForkJoinPool executorService() {
                     return ForkJoinPool.commonPool();
@@ -230,7 +230,6 @@ class SubclassesReturnedFromFactoriesNotInjectableTest : JavaRecipeTest {
         ),
         before = """
             package abc;
-            import io.micronaut.context.ApplicationContext;
             import jakarta.inject.Inject;
             import jakarta.inject.Singleton;
             import io.micronaut.context.annotation.Factory;
@@ -251,6 +250,53 @@ class SubclassesReturnedFromFactoriesNotInjectableTest : JavaRecipeTest {
                     } catch (Exception ex) {
                         return null;
                     }
+                }
+            }
+        """
+    )
+
+    @Test
+    fun parameterizedReturnTypes() = assertChanged(
+        dependsOn = arrayOf(
+            """
+                package abc;
+                public interface Qi<T> {}
+            """,
+            """
+                package abc;
+                public class Kq<T> implements Qi<T> {
+                    String n;
+                    public Kq(String n) {
+                        this.n = n;
+                    }
+                }
+            """
+        ),
+        before = """
+            package abc;
+            import jakarta.inject.Singleton;
+            import io.micronaut.context.annotation.Factory;
+            
+            @Factory
+            public class ExecutorFactory {
+            
+                @Singleton
+                public Qi<String> t() {
+                    return new Kq<>("b");
+                }
+            }
+        """,
+        after = """
+            package abc;
+            import jakarta.inject.Singleton;
+            import io.micronaut.context.annotation.Factory;
+            
+            @Factory
+            public class ExecutorFactory {
+            
+                @Singleton
+                public Kq<String> t() {
+                    return new Kq<>("b");
                 }
             }
         """

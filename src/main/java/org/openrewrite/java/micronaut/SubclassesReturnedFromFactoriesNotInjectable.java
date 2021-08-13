@@ -24,10 +24,7 @@ import org.openrewrite.java.search.UsesType;
 import org.openrewrite.java.tree.*;
 import org.openrewrite.marker.Markers;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -101,27 +98,30 @@ public class SubclassesReturnedFromFactoriesNotInjectable extends Recipe {
                     returnedType = methodType.getResolvedSignature() != null ? methodType.getResolvedSignature().getReturnType() : null;
                 }
                 if (returnedType != null) {
-                    JavaType.FullyQualified fullyQualifiedReturnType = TypeUtils.asFullyQualified(returnedType);
-                    assert fullyQualifiedReturnType != null;
-                    methodDeclCursor.computeMessageIfAbsent("return-types", v -> new HashSet<String>()).add(fullyQualifiedReturnType.getFullyQualifiedName());
+                    methodDeclCursor.computeMessageIfAbsent("return-types", v -> new HashSet<JavaType>()).add(returnedType);
                 }
             }
             return rtn;
         }
 
+        @SuppressWarnings("ConstantConditions")
         @Override
         public J.MethodDeclaration visitMethodDeclaration(J.MethodDeclaration method, ExecutionContext executionContext) {
             J.MethodDeclaration md = super.visitMethodDeclaration(method, executionContext);
-            Set<String> returnTypes = getCursor().pollMessage("return-types");
+            Set<JavaType> returnTypes = getCursor().pollMessage("return-types");
             if (returnTypes != null && returnTypes.size() == 1) {
+                JavaType returnedType = returnTypes.iterator().next();
                 JavaType.FullyQualified methodReturnType = md.getReturnTypeExpression() != null ? TypeUtils.asFullyQualified(md.getReturnTypeExpression().getType()) : null;
-                String returnedFqn = returnTypes.iterator().next();
-                if (methodReturnType != null && returnedFqn != null && !TypeUtils.isOfClassType(methodReturnType, returnedFqn)) {
-                    JavaType returnedType = JavaType.buildType(returnedFqn);
-                    JavaType.FullyQualified returnedTypeFqn = TypeUtils.asFullyQualified(returnedType);
-                    assert returnedTypeFqn != null;
-                    J.Identifier resolvedReturnType = J.Identifier.build(UUID.randomUUID(), Space.format(" "), Markers.EMPTY, returnedTypeFqn.getClassName(), returnedType);
-                    md = md.withReturnTypeExpression(resolvedReturnType);
+                JavaType.FullyQualified returnedTypeFqn = TypeUtils.asFullyQualified(returnedType);
+                if (returnedTypeFqn != null && methodReturnType != null && !TypeUtils.isOfType(methodReturnType, returnedType)) {
+                    J.Identifier resolvedReturnType = J.Identifier.build(UUID.randomUUID(), Space.EMPTY, Markers.EMPTY, returnedTypeFqn.getClassName(), returnedType);
+                    if (returnedType instanceof JavaType.Parameterized) {
+                        J.ParameterizedType mdReturnTypeExpression = (J.ParameterizedType) md.getReturnTypeExpression();
+                        mdReturnTypeExpression = mdReturnTypeExpression.withClazz(resolvedReturnType);
+                        md = maybeAutoFormat(md, md.withReturnTypeExpression(mdReturnTypeExpression), md.getName(), executionContext, getCursor().getParent());
+                    } else {
+                        md = maybeAutoFormat(md, md.withReturnTypeExpression(resolvedReturnType), md.getName(), executionContext, getCursor().getParent());
+                    }
                     maybeRemoveImport(methodReturnType.getFullyQualifiedName());
                 }
             }
