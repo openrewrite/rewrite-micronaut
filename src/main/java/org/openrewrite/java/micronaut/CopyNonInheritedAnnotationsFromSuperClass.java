@@ -97,7 +97,7 @@ public class CopyNonInheritedAnnotationsFromSuperClass extends Recipe {
             "io.micronaut.websocket.annotation.WebSocketComponent"
     ).collect(Collectors.toSet());
 
-    private final Map<String, List<J.Annotation>> parentAnnotationsByType = new HashMap<>();
+    private final String PARENT_ANNOTATIONS_KEY = "CopyNonInheritedAnnotationsFromSuperClass-Super-Annotations";
 
     @Override
     public String getDisplayName() {
@@ -116,40 +116,29 @@ public class CopyNonInheritedAnnotationsFromSuperClass extends Recipe {
 
     @Override
     protected List<SourceFile> visit(List<SourceFile> before, ExecutionContext ctx) {
-        new Recipe() {
+        Map<String, List<J.Annotation>> parentAnnotationsByType = new HashMap<>();
+        JavaIsoVisitor<Map<String, List<J.Annotation>>> visitor = new org.openrewrite.java.JavaIsoVisitor<Map<String, List<J.Annotation>>>() {
             @Override
-            public String getDisplayName() {
-                return "Collect non-inherited annotations";
+            public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, Map<String, List<J.Annotation>> classAnnos) {
+                J.ClassDeclaration cd = super.visitClassDeclaration(classDecl, classAnnos);
+                if (cd.getType() != null) {
+                    String classFqn = cd.getType().getFullyQualifiedName();
+                    cd = cd.withLeadingAnnotations(ListUtils.map(cd.getLeadingAnnotations(), annotation -> {
+                        JavaType.FullyQualified annoFq = TypeUtils.asFullyQualified(annotation.getType());
+                        if (annoFq != null && NON_INHERITED_ANNOTATION_TYPES.stream().anyMatch(fqn -> fqn.equals(annoFq.getFullyQualifiedName()))) {
+                            classAnnos.computeIfAbsent(classFqn, v -> new ArrayList<>()).add(annotation.withId(UUID.randomUUID()));
+                            return null;
+                        }
+                        return annotation;
+                    }));
+                }
+                return cd;
             }
-
-            @Override
-            protected TreeVisitor<?, ExecutionContext> getVisitor() {
-                return new org.openrewrite.java.JavaIsoVisitor<ExecutionContext>() {
-                    @Override
-                    public J.CompilationUnit visitCompilationUnit(J.CompilationUnit cu, ExecutionContext executionContext) {
-                        new JavaIsoVisitor<Map<String, List<J.Annotation>>>() {
-                            @Override
-                            public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, Map<String, List<J.Annotation>> classAnnos) {
-                                J.ClassDeclaration cd = super.visitClassDeclaration(classDecl, classAnnos);
-                                if (cd.getType() != null) {
-                                    String classFqn = cd.getType().getFullyQualifiedName();
-                                    cd = cd.withLeadingAnnotations(ListUtils.map(cd.getLeadingAnnotations(), annotation -> {
-                                        JavaType.FullyQualified annoFq = TypeUtils.asFullyQualified(annotation.getType());
-                                        if (annoFq != null && NON_INHERITED_ANNOTATION_TYPES.stream().anyMatch(fqn -> fqn.equals(annoFq.getFullyQualifiedName()))) {
-                                            classAnnos.computeIfAbsent(classFqn, v -> new ArrayList<>()).add(annotation.withId(UUID.randomUUID()));
-                                            return null;
-                                        }
-                                        return annotation;
-                                    }));
-                                }
-                                return cd;
-                            }
-                        }.visit(cu, parentAnnotationsByType);
-                        return cu;
-                    }
-                };
-            }
-        }.run(before);
+        };
+        for (SourceFile sourceFile : before) {
+            visitor.visit(sourceFile, parentAnnotationsByType);
+        }
+        ctx.putMessage(PARENT_ANNOTATIONS_KEY, parentAnnotationsByType);
         return before;
     }
 
@@ -159,6 +148,10 @@ public class CopyNonInheritedAnnotationsFromSuperClass extends Recipe {
             @Override
             public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext executionContext) {
                 J.ClassDeclaration cd = super.visitClassDeclaration(classDecl, executionContext);
+                Map<String, List<J.Annotation>> parentAnnotationsByType = executionContext.getMessage(PARENT_ANNOTATIONS_KEY);
+                if (parentAnnotationsByType == null || parentAnnotationsByType.isEmpty()) {
+                    return cd;
+                }
                 List<TypeTree> parentTypes = new ArrayList<>();
                 if (cd.getExtends() != null && cd.getExtends().getType() != null) {
                     parentTypes.add(cd.getExtends());
