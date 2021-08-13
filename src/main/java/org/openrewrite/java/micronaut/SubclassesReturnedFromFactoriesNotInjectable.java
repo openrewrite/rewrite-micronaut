@@ -18,40 +18,30 @@ package org.openrewrite.java.micronaut;
 import org.openrewrite.Cursor;
 import org.openrewrite.ExecutionContext;
 import org.openrewrite.Recipe;
-import org.openrewrite.internal.ListUtils;
 import org.openrewrite.java.AnnotationMatcher;
 import org.openrewrite.java.JavaIsoVisitor;
-import org.openrewrite.java.JavaParser;
-import org.openrewrite.java.JavaTemplate;
 import org.openrewrite.java.search.UsesType;
-import org.openrewrite.java.tree.Expression;
-import org.openrewrite.java.tree.J;
-import org.openrewrite.java.tree.JavaType;
-import org.openrewrite.java.tree.TypeUtils;
+import org.openrewrite.java.tree.*;
+import org.openrewrite.marker.Markers;
 
-import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class FactoryBeansAreTyped extends Recipe {
+public class SubclassesReturnedFromFactoriesNotInjectable extends Recipe {
     private static final AnnotationMatcher FACTORY_ANNOTATION_MATCHER = new AnnotationMatcher("@io.micronaut.context.annotation.Factory");
-
-    private static final ThreadLocal<JavaParser> JAVA_PARSER = ThreadLocal.withInitial(() ->
-            JavaParser.fromJavaVersion().dependsOn(
-                            "package javax.inject; public @interface Singleton {}",
-                            "package jakarta.inject; public @interface Singleton {}",
-                            "package io.micronaut.context.annotation; public @interface Bean { Class<?>[] typed() default {}; }")
-                    .build());
 
     @Override
     public String getDisplayName() {
-        return "Add typed bean annotation to beans produced by factories";
+        return "Change factory method return types to reflect their resolved return type";
     }
 
     @Override
     public String getDescription() {
-        return "As of Micronaut 3.x it is no longer possible to inject the internal implementation type from beans produced via factories. The behavior is restored by using the new `typed` member of the `@Bean` annotation.";
+        return "As of Micronaut 3.x It is no longer possible to inject the internal implementation type from beans produced via factories. Factory method return types are changed to reflect the resolved return type if the method returns a single non-null type that does not match the method declaration return type.";
     }
 
     @Override
@@ -91,8 +81,6 @@ public class FactoryBeansAreTyped extends Recipe {
                                 .map(it -> new AnnotationMatcher(it + ".Singleton")))
                 .map(AnnotationMatcher.class::cast).collect(Collectors.toList());
 
-        private static final AnnotationMatcher BEAN_ANNOTATION_MATCHER = new AnnotationMatcher("@io.micronaut.context.annotation.Bean");
-
         private static boolean isBeanAnnotation(J.Annotation annotation) {
             return BEAN_ANNOTATION_MATCHERS.stream().anyMatch(m -> m.matches(annotation));
         }
@@ -108,12 +96,14 @@ public class FactoryBeansAreTyped extends Recipe {
                 Cursor methodDeclCursor = getCursor().dropParentUntil(J.MethodDeclaration.class::isInstance);
                 JavaType returnedType = returnExpression.getType();
                 if (returnedType instanceof JavaType.Method) {
-                    JavaType.Method methodType = (JavaType.Method)returnedType;
+                    JavaType.Method methodType = (JavaType.Method) returnedType;
                     //noinspection AssignmentToNull
                     returnedType = methodType.getResolvedSignature() != null ? methodType.getResolvedSignature().getReturnType() : null;
                 }
                 if (returnedType != null) {
-                    methodDeclCursor.putMessage("returned-type", returnedType);
+                    JavaType.FullyQualified fullyQualifiedReturnType = TypeUtils.asFullyQualified(returnedType);
+                    assert fullyQualifiedReturnType != null;
+                    methodDeclCursor.computeMessageIfAbsent("return-types", v -> new HashSet<String>()).add(fullyQualifiedReturnType.getFullyQualifiedName());
                 }
             }
             return rtn;
@@ -122,29 +112,17 @@ public class FactoryBeansAreTyped extends Recipe {
         @Override
         public J.MethodDeclaration visitMethodDeclaration(J.MethodDeclaration method, ExecutionContext executionContext) {
             J.MethodDeclaration md = super.visitMethodDeclaration(method, executionContext);
-            JavaType returnType = getCursor().pollMessage("returned-type");
-            if (returnType != null) {
-                JavaType.FullyQualified fqn = md.getReturnTypeExpression() != null ? TypeUtils.asFullyQualified(md.getReturnTypeExpression().getType()) : null;
-                JavaType.FullyQualified fqn2 = TypeUtils.asFullyQualified(returnType);
-
-                if (fqn != null && fqn2 != null && !fqn.getFullyQualifiedName().equals(fqn2.getFullyQualifiedName())) {
-                    String beanText = "Bean(typed = {" + fqn.getClassName() + ".class, " + fqn2.getClassName() + ".class})";
-                    JavaTemplate t = JavaTemplate.builder(this::getCursor,
-                                    "@" + beanText).javaParser(JAVA_PARSER::get)
-                            .imports("io.micronaut.context.annotation.Bean")
-                            .build();
-
-                    if (md.getLeadingAnnotations().stream().noneMatch(BEAN_ANNOTATION_MATCHER::matches)) {
-                        md = md.withTemplate(t, md.getCoordinates().addAnnotation(Comparator.comparing(J.Annotation::getSimpleName)));
-                        maybeAddImport("io.micronaut.context.annotation.Bean");
-                    } else {
-                        md = md.withLeadingAnnotations(ListUtils.map(md.getLeadingAnnotations(), anno -> {
-                            if (BEAN_ANNOTATION_MATCHER.matches(anno) && anno.getArguments() != null && anno.getArguments().isEmpty()) {
-                                anno = anno.withTemplate(t, anno.getCoordinates().replace());
-                            }
-                            return anno;
-                        }));
-                    }
+            Set<String> returnTypes = getCursor().pollMessage("return-types");
+            if (returnTypes != null && returnTypes.size() == 1) {
+                JavaType.FullyQualified methodReturnType = md.getReturnTypeExpression() != null ? TypeUtils.asFullyQualified(md.getReturnTypeExpression().getType()) : null;
+                String returnedFqn = returnTypes.iterator().next();
+                if (methodReturnType != null && returnedFqn != null && !TypeUtils.isOfClassType(methodReturnType, returnedFqn)) {
+                    JavaType returnedType = JavaType.buildType(returnedFqn);
+                    JavaType.FullyQualified returnedTypeFqn = TypeUtils.asFullyQualified(returnedType);
+                    assert returnedTypeFqn != null;
+                    J.Identifier resolvedReturnType = J.Identifier.build(UUID.randomUUID(), Space.format(" "), Markers.EMPTY, returnedTypeFqn.getClassName(), returnedType);
+                    md = md.withReturnTypeExpression(resolvedReturnType);
+                    maybeRemoveImport(methodReturnType.getFullyQualifiedName());
                 }
             }
             return md;

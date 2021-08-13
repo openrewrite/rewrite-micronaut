@@ -20,9 +20,9 @@ import org.openrewrite.Recipe
 import org.openrewrite.java.JavaParser
 import org.openrewrite.java.JavaRecipeTest
 
-class FactoryBeansAreTypedTest : JavaRecipeTest {
+class SubclassesReturnedFromFactoriesNotInjectableTest : JavaRecipeTest {
     override val recipe: Recipe
-        get() = FactoryBeansAreTyped()
+        get() = SubclassesReturnedFromFactoriesNotInjectable()
     override val parser: JavaParser
         get() = JavaParser.fromJavaVersion()
             .classpath("micronaut-core", "micronaut-inject", "javax.inject", "jakarta.inject-api")
@@ -74,7 +74,7 @@ class FactoryBeansAreTypedTest : JavaRecipeTest {
             
             @Factory
             public class ExecutorFactory {
-            
+                
                 @Singleton
                 public ExecutorService executorService() {
                     return ForkJoinPool.commonPool();
@@ -83,18 +83,14 @@ class FactoryBeansAreTypedTest : JavaRecipeTest {
         """,
         after = """
             import java.util.concurrent.ForkJoinPool;
-            import java.util.concurrent.ExecutorService;
             import javax.inject.Singleton;
-            
-            import io.micronaut.context.annotation.Bean;
             import io.micronaut.context.annotation.Factory;
             
             @Factory
             public class ExecutorFactory {
-            
-                @Bean(typed = {ExecutorService.class, ForkJoinPool.class})
+                
                 @Singleton
-                public ExecutorService executorService() {
+                public ForkJoinPool executorService() {
                     return ForkJoinPool.commonPool();
                 }
             }
@@ -120,17 +116,14 @@ class FactoryBeansAreTypedTest : JavaRecipeTest {
         """,
         after = """
             import java.util.concurrent.ForkJoinPool;
-            import java.util.concurrent.ExecutorService;
             import jakarta.inject.Singleton;
-            import io.micronaut.context.annotation.Bean;
             import io.micronaut.context.annotation.Factory;
             
             @Factory
             public class ExecutorFactory {
             
-                @Bean(typed = {ExecutorService.class, ForkJoinPool.class})
                 @Singleton
-                public ExecutorService executorService() {
+                public ForkJoinPool executorService() {
                     return ForkJoinPool.commonPool();
                 }
             }
@@ -178,17 +171,83 @@ class FactoryBeansAreTypedTest : JavaRecipeTest {
         after = """
             package abc;
             import jakarta.inject.Singleton;
-            import io.micronaut.context.annotation.Bean;
             import io.micronaut.context.annotation.Factory;
             
             @Factory
             public class ExecutorFactory {
             
-                @Bean(typed = {MyInterface.class, MyThing.class})
+                @Singleton
+                public MyThing myInterface() {
+                    try {
+                        return new MyThing("some name");
+                    } catch (Exception ex) {
+                        return null;
+                    }
+                }
+            }
+        """
+    )
+
+    @Test
+    fun multipleReturnTypes() = assertUnchanged(
+        dependsOn = arrayOf(
+            """
+                package abc;
+                public class MyConfig {
+                    public boolean isSomething() {
+                        return false;
+                    }
+                }
+            """,
+            """
+                package abc;
+                public interface MyInterface {}
+            """,
+            """
+                package abc;
+                public class MyThing implements MyInterface {
+                    private String name;
+                    public MyThing(String name) {
+                        if (name == null) {
+                            throw new IllegalArgumentException();
+                        }
+                        this.name = name;
+                    }
+                }
+            """,
+            """
+                package abc;
+                public class MyOtherThing implements MyInterface {
+                    private String name;
+                    public MyOtherThing(String name) {
+                        if (name == null) {
+                            throw new IllegalArgumentException();
+                        }
+                        this.name = name;
+                    }
+                }
+            """
+        ),
+        before = """
+            package abc;
+            import io.micronaut.context.ApplicationContext;
+            import jakarta.inject.Inject;
+            import jakarta.inject.Singleton;
+            import io.micronaut.context.annotation.Factory;
+            
+            @Factory
+            public class ExecutorFactory {
+                @Inject
+                MyConfig myConfig;
+                
                 @Singleton
                 public MyInterface myInterface() {
                     try {
-                        return new MyThing("some name");
+                        if (myConfig.isSomething()) {
+                            return new MyThing("some name");
+                        } else {
+                            return new MyOtherThing("some other thing");
+                        }
                     } catch (Exception ex) {
                         return null;
                     }
