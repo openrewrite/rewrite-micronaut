@@ -105,7 +105,7 @@ class OncePerRequestHttpServerFilterToHttpServerFilterTest : JavaRecipeTest {
             import io.micronaut.http.filter.ServerFilterChain;
             import org.reactivestreams.Publisher;
             
-            public class MyServerFilter extends OncePerRequestHttpServerFilter {
+            protected class MyServerFilter extends OncePerRequestHttpServerFilter {
                 @Override
                 public int getOrder() {
                     return Ordered.LOWEST_PRECEDENCE;

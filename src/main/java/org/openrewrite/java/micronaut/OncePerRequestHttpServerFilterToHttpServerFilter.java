@@ -70,6 +70,11 @@ public class OncePerRequestHttpServerFilterToHttpServerFilter extends Recipe {
                 //noinspection ConstantConditions
                 cd = maybeAutoFormat(cd, cd.withBody(null).withImplements(ListUtils.concat(cd.getImplements(), newImplementsIdentifier)), executionContext, getCursor());
                 cd = cd.withBody(body);
+                cd = cd.withModifiers(
+                        ListUtils.map(cd.getModifiers(), mod -> mod.getType() == J.Modifier.Type.Private ||
+                                mod.getType() == J.Modifier.Type.Protected ?
+                                mod.withType(J.Modifier.Type.Public) : mod)
+                );
                 if (cd.getType() != null) {
                     doAfterVisit(new ChangeMethodName(
                             cd.getType().getFullyQualifiedName() + " doFilterOnce(io.micronaut.http.HttpRequest, io.micronaut.http.filter.ServerFilterChain)",
