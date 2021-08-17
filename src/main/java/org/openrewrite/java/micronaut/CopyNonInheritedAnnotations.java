@@ -31,7 +31,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class CopyNonInheritedAnnotationsFromSuperClass extends Recipe {
+public class CopyNonInheritedAnnotations extends Recipe {
 
     private static final Set<String> NON_INHERITED_ANNOTATION_TYPES = Stream.of(
             "io.micronaut.aop.Around",
@@ -123,14 +123,12 @@ public class CopyNonInheritedAnnotationsFromSuperClass extends Recipe {
                 J.ClassDeclaration cd = super.visitClassDeclaration(classDecl, classAnnos);
                 if (cd.getType() != null) {
                     String classFqn = cd.getType().getFullyQualifiedName();
-                    cd = cd.withLeadingAnnotations(ListUtils.map(cd.getLeadingAnnotations(), annotation -> {
+                    for (J.Annotation annotation : cd.getLeadingAnnotations()) {
                         JavaType.FullyQualified annoFq = TypeUtils.asFullyQualified(annotation.getType());
                         if (annoFq != null && NON_INHERITED_ANNOTATION_TYPES.stream().anyMatch(fqn -> fqn.equals(annoFq.getFullyQualifiedName()))) {
-                            classAnnos.computeIfAbsent(classFqn, v -> new ArrayList<>()).add(annotation.withId(UUID.randomUUID()));
-                            return null;
+                            classAnnos.computeIfAbsent(classFqn, v -> new ArrayList<>()).add(annotation);
                         }
-                        return annotation;
-                    }));
+                    }
                 }
                 return cd;
             }
@@ -148,29 +146,55 @@ public class CopyNonInheritedAnnotationsFromSuperClass extends Recipe {
             @Override
             public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext executionContext) {
                 J.ClassDeclaration cd = super.visitClassDeclaration(classDecl, executionContext);
+
                 Map<String, List<J.Annotation>> parentAnnotationsByType = executionContext.getMessage(PARENT_ANNOTATIONS_KEY);
                 if (parentAnnotationsByType == null || parentAnnotationsByType.isEmpty()) {
                     return cd;
                 }
-                List<TypeTree> parentTypes = new ArrayList<>();
-                if (cd.getExtends() != null && cd.getExtends().getType() != null) {
-                    parentTypes.add(cd.getExtends());
-                }
-                if (cd.getImplements() != null) {
-                    parentTypes.addAll(cd.getImplements());
-                }
-                List<J.Annotation> annotationsFromParentClass = new ArrayList<>();
-                for (TypeTree tt : parentTypes) {
-                    JavaType.FullyQualified fq = TypeUtils.asFullyQualified(tt.getType());
-                    if (fq != null && parentAnnotationsByType.containsKey(fq.getFullyQualifiedName())) {
-                        List<J.Annotation> parentAnnotations = parentAnnotationsByType.get(fq.getFullyQualifiedName()).stream()
-                                .filter(anno -> !annotationExists(classDecl.getLeadingAnnotations(), anno))
-                                .collect(Collectors.toList());
-                        annotationsFromParentClass.addAll(parentAnnotations);
+
+
+                //First collect the names of all super classes and interfaces.
+                Set<String> parentTypes = new HashSet<>();
+                JavaType.FullyQualified currentFq = cd.getType();
+
+                while (currentFq != null) {
+                    parentTypes.add(currentFq.getFullyQualifiedName());
+                    for (JavaType.FullyQualified i : currentFq.getInterfaces()) {
+                        parentTypes.add(i.getFullyQualifiedName());
+                    }
+                    currentFq = currentFq.getSupertype();
+                    if (currentFq != null && parentTypes.contains(currentFq.getFullyQualifiedName())) {
+                        break;
                     }
                 }
-                if (!annotationsFromParentClass.isEmpty()) {
-                    cd = maybeAutoFormat(cd, cd.withLeadingAnnotations(ListUtils.concatAll(cd.getLeadingAnnotations(), annotationsFromParentClass)), cd, executionContext, getCursor());
+
+                //Collect the annotation names already applied to the class.
+                Set<String> existingAnnotations = cd.getLeadingAnnotations().stream().map(a -> {
+                    JavaType.FullyQualified fq = TypeUtils.asFullyQualified(a.getType());
+                    return fq == null ? "" : fq.getFullyQualifiedName();
+                }).collect(Collectors.toSet());
+
+                List<J.Annotation> annotationsFromParentClass = new ArrayList<>();
+
+                for (String parentTypeFq : parentTypes) {
+                    List<J.Annotation> parentAnnotations = parentAnnotationsByType.get(parentTypeFq);
+                    if (parentAnnotations != null) {
+                        for (J.Annotation annotation : parentAnnotations) {
+                            JavaType.FullyQualified annotationName = TypeUtils.asFullyQualified(annotation.getType());
+
+                            if (annotationName != null && !existingAnnotations.contains(annotationName.getFullyQualifiedName())) {
+                                //If the annotation does not exist on the current class, add it.
+                                annotationsFromParentClass.add(annotation);
+                                existingAnnotations.add(annotationName.getFullyQualifiedName());
+                            }
+                        }
+                    }
+                }
+
+                List<J.Annotation> afterAnnotationList = ListUtils.concatAll(cd.getLeadingAnnotations(), annotationsFromParentClass);
+                if (afterAnnotationList != cd.getLeadingAnnotations()) {
+                    cd = cd.withLeadingAnnotations(afterAnnotationList);
+                    cd = autoFormat(cd, cd.getName(), executionContext, getCursor());
                     annotationsFromParentClass.stream().map(anno -> TypeUtils.asFullyQualified(anno.getType()))
                             .filter(Objects::nonNull)
                             .forEach(fq -> maybeAddImport(fq.getFullyQualifiedName()));
@@ -178,13 +202,5 @@ public class CopyNonInheritedAnnotationsFromSuperClass extends Recipe {
                 return cd;
             }
         };
-    }
-
-    private static boolean annotationExists(List<J.Annotation> annotations, J.Annotation proposedAnno) {
-        return annotations.stream()
-                .map(J.Annotation::getType)
-                .filter(type -> type instanceof JavaType.FullyQualified)
-                .map(JavaType.FullyQualified.class::cast)
-                .anyMatch(fq -> fq.isAssignableFrom(TypeUtils.asFullyQualified(proposedAnno.getType())));
     }
 }

@@ -21,12 +21,12 @@ import org.openrewrite.Recipe
 import org.openrewrite.java.JavaParser
 import org.openrewrite.java.JavaRecipeTest
 
-class CopyNonInheritedAnnotationsFromSuperClassTest : JavaRecipeTest {
+class CopyNonInheritedAnnotationsTest : JavaRecipeTest {
     override val parser: JavaParser
         get() = JavaParser.fromJavaVersion()
             .classpath("micronaut-core", "micronaut-context", "micronaut-http", "micronaut-http-client-core").build()
     override val recipe: Recipe
-        get() = CopyNonInheritedAnnotationsFromSuperClass()
+        get() = CopyNonInheritedAnnotations()
 
     @Test
     fun refreshableControllerExtends() = assertChanged(
@@ -199,6 +199,186 @@ class CopyNonInheritedAnnotationsFromSuperClassTest : JavaRecipeTest {
                     public String info() {
                         return "system info: ";
                     }
+                }
+            }
+        """
+    )
+
+    @Test
+    fun refreshableFromGrandparent() = assertChanged(
+        dependsOn = arrayOf(
+            """
+                package abc;
+                import io.micronaut.runtime.context.scope.Refreshable;
+                
+                @Refreshable
+                public abstract class BaseController {
+                }
+                
+                public abstract class MiddleController extends BaseController {
+                }
+            """
+        ),
+        before = """
+            package abc;
+            import io.micronaut.http.annotation.Controller;
+            import io.micronaut.http.annotation.Get;
+            
+            public class SuperClass {
+            
+                @Controller
+                public class MyController extends MiddleController {
+                    @Get
+                    public String info() {
+                        return "system info: ";
+                    }
+                }
+            }
+        """,
+        after = """
+            package abc;
+            import io.micronaut.http.annotation.Controller;
+            import io.micronaut.http.annotation.Get;
+            import io.micronaut.runtime.context.scope.Refreshable;
+            
+            public class SuperClass {
+            
+                @Controller
+                @Refreshable
+                public class MyController extends MiddleController {
+                    @Get
+                    public String info() {
+                        return "system info: ";
+                    }
+                }
+            }
+        """
+    )
+
+    @Test
+    fun noDuplicateAnnotations() = assertChanged(
+        dependsOn = arrayOf(
+            """
+                package abc;
+                import io.micronaut.runtime.context.scope.Refreshable;
+                
+                @Refreshable
+                public abstract class BaseController {
+                }
+                
+                @Refreshable
+                public interface BaseControllerInterface {
+                }
+            """
+        ),
+        before = """
+            package abc;
+            import io.micronaut.http.annotation.Controller;
+            import io.micronaut.http.annotation.Get;
+            
+            @Controller
+            public class MyController extends BaseController implements BaseControllerInterface {
+                @Get
+                public String info() {
+                    return "system info: ";
+                }
+            }
+        """,
+        after = """
+            package abc;
+            import io.micronaut.http.annotation.Controller;
+            import io.micronaut.http.annotation.Get;
+            import io.micronaut.runtime.context.scope.Refreshable;
+
+            @Controller
+            @Refreshable
+            public class MyController extends BaseController implements BaseControllerInterface {
+                @Get
+                public String info() {
+                    return "system info: ";
+                }
+            }
+        """
+    )
+
+    @Test
+    fun combineAnnotationsFromSuperAndInterface() = assertChanged(
+        dependsOn = arrayOf(
+            """
+                package abc;
+                import io.micronaut.core.version.annotation.Version;
+                import io.micronaut.runtime.context.scope.Refreshable;
+                
+                @Refreshable
+                public abstract class BaseController {
+                }
+                
+                @Refreshable
+                @Version("0.1")
+                public interface BaseControllerInterface {
+                }
+            """
+        ),
+        before = """
+            package abc;
+            import io.micronaut.http.annotation.Controller;
+            import io.micronaut.http.annotation.Get;
+            
+            @Controller
+            public class MyController extends BaseController implements BaseControllerInterface {
+                @Get
+                public String info() {
+                    return "system info: ";
+                }
+            }
+        """,
+        after = """
+            package abc;
+            import io.micronaut.core.version.annotation.Version;
+            import io.micronaut.http.annotation.Controller;
+            import io.micronaut.http.annotation.Get;
+            import io.micronaut.runtime.context.scope.Refreshable;
+
+            @Controller
+            @Refreshable
+            @Version("0.1")
+            public class MyController extends BaseController implements BaseControllerInterface {
+                @Get
+                public String info() {
+                    return "system info: ";
+                }
+            }
+        """
+    )
+
+    @Test
+    fun doNothingIfAnnotationsAlreadyInPlace() = assertUnchanged(
+        dependsOn = arrayOf(
+            """
+                package abc;
+                import io.micronaut.core.version.annotation.Version;
+                import io.micronaut.runtime.context.scope.Refreshable;
+                
+                @Refreshable
+                @Version("0.1")
+                public abstract class BaseController {
+                }
+            """
+        ),
+        before = """
+            package abc;
+            import io.micronaut.core.version.annotation.Version;
+            import io.micronaut.http.annotation.Controller;
+            import io.micronaut.http.annotation.Get;
+            import io.micronaut.runtime.context.scope.Refreshable;
+            
+            @Controller
+            @Refreshable
+            @Version("0.1")
+            public class MyController extends BaseController {
+                @Get
+                public String info() {
+                    return "system info: ";
                 }
             }
         """
