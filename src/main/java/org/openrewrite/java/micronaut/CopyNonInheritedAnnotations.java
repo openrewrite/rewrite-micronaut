@@ -18,20 +18,18 @@ package org.openrewrite.java.micronaut;
 import org.openrewrite.ExecutionContext;
 import org.openrewrite.Recipe;
 import org.openrewrite.SourceFile;
-import org.openrewrite.TreeVisitor;
 import org.openrewrite.internal.ListUtils;
 import org.openrewrite.java.JavaIsoVisitor;
 import org.openrewrite.java.search.UsesType;
 import org.openrewrite.java.tree.J;
 import org.openrewrite.java.tree.JavaType;
-import org.openrewrite.java.tree.TypeTree;
 import org.openrewrite.java.tree.TypeUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class CopyNonInheritedAnnotationsFromSuperClass extends Recipe {
+public class CopyNonInheritedAnnotations extends Recipe {
 
     private static final Set<String> NON_INHERITED_ANNOTATION_TYPES = Stream.of(
             "io.micronaut.aop.Around",
@@ -97,8 +95,6 @@ public class CopyNonInheritedAnnotationsFromSuperClass extends Recipe {
             "io.micronaut.websocket.annotation.WebSocketComponent"
     ).collect(Collectors.toSet());
 
-    private final String PARENT_ANNOTATIONS_KEY = "CopyNonInheritedAnnotationsFromSuperClass-Super-Annotations";
-
     @Override
     public String getDisplayName() {
         return "Copy non-inherited annotations from super class";
@@ -117,74 +113,103 @@ public class CopyNonInheritedAnnotationsFromSuperClass extends Recipe {
     @Override
     protected List<SourceFile> visit(List<SourceFile> before, ExecutionContext ctx) {
         Map<String, List<J.Annotation>> parentAnnotationsByType = new HashMap<>();
-        JavaIsoVisitor<Map<String, List<J.Annotation>>> visitor = new org.openrewrite.java.JavaIsoVisitor<Map<String, List<J.Annotation>>>() {
+        JavaIsoVisitor<Map<String, List<J.Annotation>>> parentAnnotationCollector = new org.openrewrite.java.JavaIsoVisitor<Map<String, List<J.Annotation>>>() {
             @Override
             public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, Map<String, List<J.Annotation>> classAnnos) {
                 J.ClassDeclaration cd = super.visitClassDeclaration(classDecl, classAnnos);
                 if (cd.getType() != null) {
                     String classFqn = cd.getType().getFullyQualifiedName();
-                    cd = cd.withLeadingAnnotations(ListUtils.map(cd.getLeadingAnnotations(), annotation -> {
+                    for (J.Annotation annotation : cd.getLeadingAnnotations()) {
                         JavaType.FullyQualified annoFq = TypeUtils.asFullyQualified(annotation.getType());
                         if (annoFq != null && NON_INHERITED_ANNOTATION_TYPES.stream().anyMatch(fqn -> fqn.equals(annoFq.getFullyQualifiedName()))) {
-                            classAnnos.computeIfAbsent(classFqn, v -> new ArrayList<>()).add(annotation.withId(UUID.randomUUID()));
-                            return null;
+                            classAnnos.computeIfAbsent(classFqn, v -> new ArrayList<>()).add(annotation);
                         }
-                        return annotation;
-                    }));
+                    }
                 }
                 return cd;
             }
         };
         for (SourceFile sourceFile : before) {
-            visitor.visit(sourceFile, parentAnnotationsByType);
+            parentAnnotationCollector.visit(sourceFile, parentAnnotationsByType);
         }
-        ctx.putMessage(PARENT_ANNOTATIONS_KEY, parentAnnotationsByType);
-        return before;
+
+        CopyAnnoVisitor copyAnnoVisitor = new CopyAnnoVisitor(parentAnnotationsByType);
+        return ListUtils.map(before, sourceFile -> {
+            if (sourceFile instanceof J.CompilationUnit) {
+                return (SourceFile) copyAnnoVisitor.visit((J.CompilationUnit) sourceFile,ctx);
+            }
+            return sourceFile;
+        });
     }
 
-    @Override
-    protected JavaIsoVisitor<ExecutionContext> getVisitor() {
-        return new JavaIsoVisitor<ExecutionContext>() {
-            @Override
-            public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext executionContext) {
-                J.ClassDeclaration cd = super.visitClassDeclaration(classDecl, executionContext);
-                Map<String, List<J.Annotation>> parentAnnotationsByType = executionContext.getMessage(PARENT_ANNOTATIONS_KEY);
-                if (parentAnnotationsByType == null || parentAnnotationsByType.isEmpty()) {
-                    return cd;
+    private static class CopyAnnoVisitor extends JavaIsoVisitor<ExecutionContext> {
+        private final Map<String, List<J.Annotation>> parentAnnotationsByType;
+
+        private CopyAnnoVisitor(Map<String, List<J.Annotation>> parentAnnotationsByType) {
+            this.parentAnnotationsByType = parentAnnotationsByType;
+        }
+
+        @Override
+        public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext executionContext) {
+            if (parentAnnotationsByType.isEmpty()) {
+                return classDecl;
+            }
+
+            J.ClassDeclaration cd = super.visitClassDeclaration(classDecl, executionContext);
+
+            //First collect the names of all super classes and interfaces.
+            Set<String> parentTypes = new HashSet<>();
+            JavaType.FullyQualified currentFq = cd.getType();
+
+            while (currentFq != null) {
+                parentTypes.add(currentFq.getFullyQualifiedName());
+                for (JavaType.FullyQualified i : currentFq.getInterfaces()) {
+                    parentTypes.add(i.getFullyQualifiedName());
                 }
-                List<TypeTree> parentTypes = new ArrayList<>();
-                if (cd.getExtends() != null && cd.getExtends().getType() != null) {
-                    parentTypes.add(cd.getExtends());
+                currentFq = currentFq.getSupertype();
+                if (currentFq != null && parentTypes.contains(currentFq.getFullyQualifiedName())) {
+                    break;
                 }
-                if (cd.getImplements() != null) {
-                    parentTypes.addAll(cd.getImplements());
+            }
+
+            //Collect the annotation names already applied to the class.
+            Set<String> existingAnnotations = new HashSet<>();
+            for (J.Annotation leadingAnnotation : cd.getLeadingAnnotations()) {
+                JavaType.FullyQualified fullyQualified = TypeUtils.asFullyQualified(leadingAnnotation.getType());
+                if (fullyQualified != null) {
+                    existingAnnotations.add(fullyQualified.getFullyQualifiedName());
                 }
-                List<J.Annotation> annotationsFromParentClass = new ArrayList<>();
-                for (TypeTree tt : parentTypes) {
-                    JavaType.FullyQualified fq = TypeUtils.asFullyQualified(tt.getType());
-                    if (fq != null && parentAnnotationsByType.containsKey(fq.getFullyQualifiedName())) {
-                        List<J.Annotation> parentAnnotations = parentAnnotationsByType.get(fq.getFullyQualifiedName()).stream()
-                                .filter(anno -> !annotationExists(classDecl.getLeadingAnnotations(), anno))
-                                .collect(Collectors.toList());
-                        annotationsFromParentClass.addAll(parentAnnotations);
+            }
+
+            List<J.Annotation> annotationsFromParentClass = new ArrayList<>();
+
+            for (String parentTypeFq : parentTypes) {
+                List<J.Annotation> parentAnnotations = parentAnnotationsByType.get(parentTypeFq);
+                if (parentAnnotations != null) {
+                    for (J.Annotation annotation : parentAnnotations) {
+                        JavaType.FullyQualified annotationName = TypeUtils.asFullyQualified(annotation.getType());
+
+                        if (annotationName != null && !existingAnnotations.contains(annotationName.getFullyQualifiedName())) {
+                            //If the annotation does not exist on the current class, add it.
+                            annotationsFromParentClass.add(annotation);
+                            existingAnnotations.add(annotationName.getFullyQualifiedName());
+                        }
                     }
                 }
-                if (!annotationsFromParentClass.isEmpty()) {
-                    cd = maybeAutoFormat(cd, cd.withLeadingAnnotations(ListUtils.concatAll(cd.getLeadingAnnotations(), annotationsFromParentClass)), cd, executionContext, getCursor());
-                    annotationsFromParentClass.stream().map(anno -> TypeUtils.asFullyQualified(anno.getType()))
-                            .filter(Objects::nonNull)
-                            .forEach(fq -> maybeAddImport(fq.getFullyQualifiedName()));
-                }
-                return cd;
             }
-        };
-    }
 
-    private static boolean annotationExists(List<J.Annotation> annotations, J.Annotation proposedAnno) {
-        return annotations.stream()
-                .map(J.Annotation::getType)
-                .filter(type -> type instanceof JavaType.FullyQualified)
-                .map(JavaType.FullyQualified.class::cast)
-                .anyMatch(fq -> fq.isAssignableFrom(TypeUtils.asFullyQualified(proposedAnno.getType())));
+            List<J.Annotation> afterAnnotationList = ListUtils.concatAll(cd.getLeadingAnnotations(), annotationsFromParentClass);
+            if (afterAnnotationList != cd.getLeadingAnnotations()) {
+                cd = cd.withLeadingAnnotations(afterAnnotationList);
+                cd = autoFormat(cd, cd.getName(), executionContext, getCursor());
+                for (J.Annotation annotation : annotationsFromParentClass) {
+                    JavaType.FullyQualified fullyQualified = TypeUtils.asFullyQualified(annotation.getType());
+                    if (fullyQualified != null) {
+                        maybeAddImport(fullyQualified.getFullyQualifiedName());
+                    }
+                }
+            }
+            return cd;
+        }
     }
 }
