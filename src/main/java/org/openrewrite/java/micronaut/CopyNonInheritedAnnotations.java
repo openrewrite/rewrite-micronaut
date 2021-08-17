@@ -136,7 +136,7 @@ public class CopyNonInheritedAnnotations extends Recipe {
         CopyAnnoVisitor copyAnnoVisitor = new CopyAnnoVisitor(parentAnnotationsByType);
         return ListUtils.map(before, sourceFile -> {
             if (sourceFile instanceof J.CompilationUnit) {
-                return (SourceFile) copyAnnoVisitor.visit((J.CompilationUnit) sourceFile,ctx);
+                return (SourceFile) copyAnnoVisitor.visit(sourceFile, ctx);
             }
             return sourceFile;
         });
@@ -182,13 +182,11 @@ public class CopyNonInheritedAnnotations extends Recipe {
             }
 
             List<J.Annotation> annotationsFromParentClass = new ArrayList<>();
-
             for (String parentTypeFq : parentTypes) {
                 List<J.Annotation> parentAnnotations = parentAnnotationsByType.get(parentTypeFq);
                 if (parentAnnotations != null) {
                     for (J.Annotation annotation : parentAnnotations) {
                         JavaType.FullyQualified annotationName = TypeUtils.asFullyQualified(annotation.getType());
-
                         if (annotationName != null && !existingAnnotations.contains(annotationName.getFullyQualifiedName())) {
                             //If the annotation does not exist on the current class, add it.
                             annotationsFromParentClass.add(annotation);

@@ -82,7 +82,7 @@ class OncePerRequestHttpServerFilterToHttpServerFilterTest : JavaRecipeTest {
                 
                 @Override
                 public Publisher<MutableHttpResponse<?>> doFilter(HttpRequest<?> request, ServerFilterChain chain) {
-                    /*TODO: Replace with custom attribute name*/ getKey(MyServerFilter.class);
+                    /*TODO: See `Server Filter Behavior` in https://docs.micronaut.io/3.0.x/guide/#breaks for details*/ getKey(MyServerFilter.class);
                 }
                 
                 @Override
@@ -105,7 +105,7 @@ class OncePerRequestHttpServerFilterToHttpServerFilterTest : JavaRecipeTest {
             import io.micronaut.http.filter.ServerFilterChain;
             import org.reactivestreams.Publisher;
             
-            protected class MyServerFilter extends OncePerRequestHttpServerFilter {
+            public class MyServerFilter extends OncePerRequestHttpServerFilter {
                 @Override
                 public int getOrder() {
                     return Ordered.LOWEST_PRECEDENCE;
@@ -140,7 +140,7 @@ class OncePerRequestHttpServerFilterToHttpServerFilterTest : JavaRecipeTest {
                 
                 @Override
                 public Publisher<MutableHttpResponse<?>> doFilter(HttpRequest<?> request, ServerFilterChain chain) {
-                    /*TODO: Replace with custom attribute name*/ getKey(MyServerFilter.class);
+                    /*TODO: See `Server Filter Behavior` in https://docs.micronaut.io/3.0.x/guide/#breaks for details*/ getKey(MyServerFilter.class);
                 }
                 
                 @Override

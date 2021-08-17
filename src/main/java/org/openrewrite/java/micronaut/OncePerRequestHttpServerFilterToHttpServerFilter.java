@@ -28,7 +28,7 @@ import org.openrewrite.marker.Markers;
 import java.util.UUID;
 
 public class OncePerRequestHttpServerFilterToHttpServerFilter extends Recipe {
-    private static final String ONCE_PER_REQUEST_FILTER_FQN = "io.micronaut.http.filter.OncePerRequestHttpServerFilter";
+    private static final String oncePerRequestHttpServerFilterFqn = "io.micronaut.http.filter.OncePerRequestHttpServerFilter";
 
     @Override
     public String getDisplayName() {
@@ -47,7 +47,7 @@ public class OncePerRequestHttpServerFilterToHttpServerFilter extends Recipe {
 
     @Override
     protected UsesType<ExecutionContext> getSingleSourceApplicableTest() {
-        return new UsesType<>(ONCE_PER_REQUEST_FILTER_FQN);
+        return new UsesType<>(oncePerRequestHttpServerFilterFqn);
     }
 
     @Override
@@ -56,13 +56,15 @@ public class OncePerRequestHttpServerFilterToHttpServerFilter extends Recipe {
     }
 
     private static class OncePerRequestHttpServerFilterToHttpServerFilterVisitor extends JavaIsoVisitor<ExecutionContext> {
-        private final MethodMatcher GET_KEY_METHOD = new MethodMatcher(ONCE_PER_REQUEST_FILTER_FQN + " getKey(Class)");
+
+        private static final MethodMatcher keyMethodMatcher = new MethodMatcher(oncePerRequestHttpServerFilterFqn + " getKey(Class)");
+        private static final MethodMatcher doFilterOnceMethodMatcher = new MethodMatcher("* doFilterOnce(io.micronaut.http.HttpRequest, io.micronaut.http.filter.ServerFilterChain)");
 
         @Override
         public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext executionContext) {
             J.ClassDeclaration cd = super.visitClassDeclaration(classDecl, executionContext);
             if (cd.getExtends() != null && cd.getExtends().getType() != null
-                    && TypeUtils.isOfClassType(cd.getExtends().getType(), ONCE_PER_REQUEST_FILTER_FQN)) {
+                    && TypeUtils.isOfClassType(cd.getExtends().getType(), oncePerRequestHttpServerFilterFqn)) {
                 cd = cd.withExtends(null);
                 J.Identifier newImplementsIdentifier = J.Identifier.build(UUID.randomUUID(), Space.format(" "), Markers.EMPTY,
                         "HttpServerFilter", JavaType.buildType("io.micronaut.http.filter.HttpServerFilter"));
@@ -70,27 +72,36 @@ public class OncePerRequestHttpServerFilterToHttpServerFilter extends Recipe {
                 //noinspection ConstantConditions
                 cd = maybeAutoFormat(cd, cd.withBody(null).withImplements(ListUtils.concat(cd.getImplements(), newImplementsIdentifier)), executionContext, getCursor());
                 cd = cd.withBody(body);
-                cd = cd.withModifiers(
-                        ListUtils.map(cd.getModifiers(), mod -> mod.getType() == J.Modifier.Type.Private ||
-                                mod.getType() == J.Modifier.Type.Protected ?
-                                mod.withType(J.Modifier.Type.Public) : mod)
-                );
                 if (cd.getType() != null) {
                     doAfterVisit(new ChangeMethodName(
                             cd.getType().getFullyQualifiedName() + " doFilterOnce(io.micronaut.http.HttpRequest, io.micronaut.http.filter.ServerFilterChain)",
                             "doFilter"));
                 }
                 maybeAddImport("io.micronaut.http.filter.HttpServerFilter");
-                maybeRemoveImport(ONCE_PER_REQUEST_FILTER_FQN);
+                maybeRemoveImport(oncePerRequestHttpServerFilterFqn);
             }
             return cd;
         }
 
         @Override
+        public J.MethodDeclaration visitMethodDeclaration(J.MethodDeclaration method, ExecutionContext executionContext) {
+            J.MethodDeclaration methodDeclaration = super.visitMethodDeclaration(method, executionContext);
+            J.ClassDeclaration classDeclaration = getCursor().firstEnclosing(J.ClassDeclaration.class);
+            if (classDeclaration != null && doFilterOnceMethodMatcher.matches(methodDeclaration, classDeclaration)) {
+                methodDeclaration = methodDeclaration.withModifiers(
+                        ListUtils.map(methodDeclaration.getModifiers(), mod -> mod.getType() == J.Modifier.Type.Private ||
+                                mod.getType() == J.Modifier.Type.Protected ?
+                                mod.withType(J.Modifier.Type.Public) : mod)
+                );
+            }
+            return methodDeclaration;
+        }
+
+        @Override
         public J.MethodInvocation visitMethodInvocation(J.MethodInvocation method, ExecutionContext executionContext) {
             J.MethodInvocation mi = super.visitMethodInvocation(method, executionContext);
-            String todoCommentText = "TODO: Replace with custom attribute name";
-            if (GET_KEY_METHOD.matches(mi) && mi.getComments().stream().noneMatch(c -> c.getText().equals(todoCommentText))) {
+            String todoCommentText = "TODO: See `Server Filter Behavior` in https://docs.micronaut.io/3.0.x/guide/#breaks for details";
+            if (keyMethodMatcher.matches(mi) && mi.getComments().stream().noneMatch(c -> c.getText().equals(todoCommentText))) {
                 mi = mi.withComments(ListUtils.concat(mi.getComments(), new Comment(Comment.Style.BLOCK, todoCommentText, " ", Markers.EMPTY)));
             }
             return mi;
