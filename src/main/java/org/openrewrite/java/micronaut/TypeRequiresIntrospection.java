@@ -26,20 +26,18 @@ import org.openrewrite.java.marker.JavaSearchResult;
 import org.openrewrite.java.search.UsesType;
 import org.openrewrite.java.tree.J;
 import org.openrewrite.java.tree.JavaType;
+import org.openrewrite.java.tree.TypeUtils;
 import org.openrewrite.marker.Marker;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Predicate;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.openrewrite.Tree.randomId;
 
 public class TypeRequiresIntrospection extends Recipe {
     private static final JavaType.FullyQualified INTROSPECTED_ANNOTATION = JavaType.Class.build("io.micronaut.core.annotation.Introspected");
     @SuppressWarnings("ConstantConditions")
-    private static final Marker FOUND_CHANGE_TO_MAKE = new JavaSearchResult(randomId(), null, null);
+    private static final Marker FOUND_REQUIRES_INTROSPECTION_TYPE = new JavaSearchResult(randomId(), null, null);
     private static final String CONTEXT_KEY = "classes-need-introspection";
 
     @Override
@@ -65,7 +63,7 @@ public class TypeRequiresIntrospection extends Recipe {
                 Set<JavaType.Class> classesToUpdate = executionContext.getMessage(CONTEXT_KEY);
                 if (classesToUpdate != null && classesToUpdate.stream()
                         .anyMatch(jc -> cu.getClasses().stream().map(J.ClassDeclaration::getType).anyMatch(jc::isAssignableFrom))) {
-                    return cu.withMarkers(cu.getMarkers().addIfAbsent(FOUND_CHANGE_TO_MAKE));
+                    return cu.withMarkers(cu.getMarkers().addIfAbsent(FOUND_REQUIRES_INTROSPECTION_TYPE));
                 } else {
                     doAfterVisit(new UsesType<>("io.micronaut.http.annotation.Controller"));
                     doAfterVisit(new UsesType<>("io.micronaut.http.client.annotation.Client"));
@@ -81,22 +79,29 @@ public class TypeRequiresIntrospection extends Recipe {
     }
 
     private static class RequiresIntrospectionVisitor extends JavaIsoVisitor<ExecutionContext> {
-        private static final List<Predicate<J.Annotation>> REQUIRES_INTROSPECTED_CLASSES_PREDICATES = Arrays.asList(
-                new AnnotationMatcher("@io.micronaut.http.annotation.Controller")::matches,
-                new AnnotationMatcher("@io.micronaut.http.client.annotation.Client")::matches);
+        private static final List<String> REQUIRES_ANNOTATION_TYPES = Arrays.asList("io.micronaut.http.annotation.Controller","io.micronaut.http.client.annotation.Client");
+        private static final List<AnnotationMatcher> REQUIRES_INTROSPECTED_ANNOTATION_MATCHERS = REQUIRES_ANNOTATION_TYPES.stream()
+                .map(fqn -> new AnnotationMatcher("@" + fqn))
+                .collect(Collectors.toList());
 
-        private static boolean requiresIntrospectedTypes(J.ClassDeclaration cd) {
-            return cd.getLeadingAnnotations().stream().anyMatch(anno -> REQUIRES_INTROSPECTED_CLASSES_PREDICATES.stream().anyMatch(p -> p.test(anno)));
+        private static boolean classRequiresIntrospectedTypes(J.ClassDeclaration cd) {
+            return cd.getLeadingAnnotations().stream().anyMatch(anno -> REQUIRES_INTROSPECTED_ANNOTATION_MATCHERS.stream().anyMatch(p -> p.matches(anno)));
         }
 
-        private static boolean needsIntrospectedAnnotation(@Nullable JavaType.Class jc) {
-            return jc != null && jc.getAnnotations().stream().noneMatch(fq -> fq.isAssignableFrom(INTROSPECTED_ANNOTATION));
+        private static void checkForIntrospectedAnnotation(@Nullable JavaType jc, ExecutionContext executionContext) {
+            if (jc instanceof JavaType.Class) {
+                JavaType.FullyQualified fullyQualified = TypeUtils.asFullyQualified(jc);
+                if (fullyQualified != null && fullyQualified.getAnnotations().stream()
+                        .noneMatch(annoFqn -> REQUIRES_ANNOTATION_TYPES.stream().anyMatch(fqn -> TypeUtils.isOfClassType(annoFqn, fqn)))) {
+                    executionContext.putMessageInSet(CONTEXT_KEY, jc);
+                }
+            }
         }
 
         @Override
         public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext executionContext) {
             J.ClassDeclaration cd = super.visitClassDeclaration(classDecl, executionContext);
-            if (requiresIntrospectedTypes(cd)) {
+            if (classRequiresIntrospectedTypes(cd)) {
                 new JavaIsoVisitor<ExecutionContext>() {
                     @Override
                     public J.MethodDeclaration visitMethodDeclaration(J.MethodDeclaration method, ExecutionContext executionContext) {
@@ -108,17 +113,16 @@ public class TypeRequiresIntrospection extends Recipe {
                                     .map(j -> ((J.VariableDeclarations) j).getVariables())
                                     .flatMap(List::stream)
                                     .map(J.VariableDeclarations.NamedVariable::getType)
-                                    .filter(JavaType.Class.class::isInstance)
-                                    .map(JavaType.Class.class::cast)
-                                    .filter(RequiresIntrospectionVisitor::needsIntrospectedAnnotation)
-                                    .forEach(jc -> executionContext.putMessageInSet(CONTEXT_KEY, jc));
+                                    .forEach(jt -> checkForIntrospectedAnnotation(jt,executionContext));
+
                             // return type needs introspection
-                            if (md.getReturnTypeExpression() instanceof J.Identifier) {
-                                J.Identifier ident = (J.Identifier) md.getReturnTypeExpression();
-                                JavaType.Class jc = ident.getType() != null && ident.getType() instanceof JavaType.Class ? (JavaType.Class) ident.getType() : null;
-                                if (needsIntrospectedAnnotation(jc)) {
-                                    executionContext.putMessageInSet(CONTEXT_KEY, jc);
+                            if (md.getReturnTypeExpression() instanceof J.ParameterizedType) {
+                                J.ParameterizedType parameterizedType = (J.ParameterizedType) md.getReturnTypeExpression();
+                                if (parameterizedType.getTypeParameters() != null) {
+                                    parameterizedType.getTypeParameters().forEach(jt -> checkForIntrospectedAnnotation(jt.getType(), executionContext));
                                 }
+                            } else if (md.getReturnTypeExpression() != null && md.getReturnTypeExpression().getType() != null) {
+                                checkForIntrospectedAnnotation(md.getReturnTypeExpression().getType(), executionContext);
                             }
                         }
                         return md;
@@ -156,7 +160,8 @@ public class TypeRequiresIntrospection extends Recipe {
                     J.ClassDeclaration cd = super.visitClassDeclaration(classDecl, executionContext);
                     if (cd.getLeadingAnnotations().stream().noneMatch(INTROSPECTION_ANNOTATION_MATCHER::matches)) {
                         Set<JavaType.Class> needsAnnotation = executionContext.getMessage(CONTEXT_KEY);
-                        if (needsAnnotation != null && needsAnnotation.stream().anyMatch(jc -> jc.isAssignableFrom(classDecl.getType()))) {
+                        JavaType.FullyQualified fullyQualified = TypeUtils.asFullyQualified(cd.getType());
+                        if (fullyQualified != null && needsAnnotation != null && needsAnnotation.stream().anyMatch(jc -> TypeUtils.isOfClassType(jc, fullyQualified.getFullyQualifiedName()))) {
                             cd = cd.withTemplate(templ, cd.getCoordinates().addAnnotation(Comparator.comparing(J.Annotation::getSimpleName)));
                             maybeAddImport(INTROSPECTED_ANNOTATION.getFullyQualifiedName());
                         }
