@@ -103,6 +103,71 @@ class TypeRequiresIntrospectionTest : JavaRecipeTest {
     )
 
     @Test
+    fun addsIntrospectionAnnotationForOptional() = assertChanged(
+        dependsOn = arrayOf(
+            """
+            package a.b;
+            import io.micronaut.http.annotation.Get;
+            import io.micronaut.http.client.annotation.Client;
+            import java.util.Optional;
+            
+            @Client
+            public interface AbcClient {
+                @Get
+                Optional<C> getC(long cId);
+            }
+        """
+        ),
+        before = """
+            package a.b;
+            
+            public class C {
+            }
+        """,
+        after = """
+            package a.b;
+            
+            import io.micronaut.core.annotation.Introspected;
+            
+            @Introspected
+            public class C {
+            }
+        """
+    )
+
+    @Test
+    fun doesNotChangeServiceOrController() = assertUnchanged(
+        dependsOn = arrayOf(
+            """
+                package a.b;
+                import io.micronaut.http.annotation.Controller;
+                
+                @Controller
+                public class AbController {
+                    AbcClient abcClient;
+                    
+                    public AbcClient client() {
+                        return abcClient;
+                    }
+                }
+            """
+        ),
+        before = """
+            package a.b;
+            import io.micronaut.http.annotation.Controller;
+            import io.micronaut.http.annotation.Get;
+            import io.micronaut.http.client.annotation.Client;
+            import java.util.Optional;
+            
+            @Client
+            public interface AbcClient {
+                @Get
+                Optional<C> getC(long cId);
+            }
+        """
+    )
+
+    @Test
     fun addsIntrospectionAnnotationFromReturnType() = assertChanged(
         dependsOn = arrayOf(
             pojoD,
@@ -145,7 +210,6 @@ class TypeRequiresIntrospectionTest : JavaRecipeTest {
         """
     )
 
-
     @Test
     fun serviceShouldNotBeIntrospected() = assertUnchanged(
         dependsOn = arrayOf(
@@ -165,16 +229,62 @@ class TypeRequiresIntrospectionTest : JavaRecipeTest {
         before = """
             package a.b;
 
-            import io.micronaut.http.client.RxHttpClient;
-            import jakarta.inject.Inject;
-            import jakarta.inject.Singleton;
+            import io.micronaut.http.client.annotation.Client;
             
-            @Singleton
+            @Client
             public class CdService {
-                @Inject
-                private RxHttpClient httpClient;
             }
         """
     )
 
+    @Test
+    fun serviceShouldNotBeIntrospectedBecauseOfTest() = assertUnchanged(
+        dependsOn = arrayOf(
+            """
+                package api.model;
+
+                import io.micronaut.core.annotation.Introspected;
+                
+                @Introspected
+                public class Event {
+                }
+            """,
+            """
+                package api.services.support;
+
+                import api.model.Event;
+                import api.services.EventsService;
+                import io.micronaut.http.annotation.Controller;
+                
+                @Controller
+                public class TrackEventFilter {
+                    private final EventsService eventsService;
+                
+                    public TrackEventFilter(EventsService eventsService) {
+                        this.eventsService = eventsService;
+                    }
+                
+                    private Event trackEventError(String event, Throwable throwable) {
+                        return eventsService.trackEvents("api", "id", new Event());
+                    }
+                }
+            """
+        ),
+        before = """
+            package api.services;
+
+            import api.model.Event;
+            import io.micronaut.http.annotation.Controller;
+            import io.micronaut.http.annotation.Post;
+            import io.micronaut.http.client.annotation.Client;
+            
+            @Controller("/api")
+            @Client("eventService")
+            public interface EventsService {
+                @Post("/events")
+                Boolean trackEvents(String source, String track, Event... events);
+            }
+
+        """
+    )
 }
