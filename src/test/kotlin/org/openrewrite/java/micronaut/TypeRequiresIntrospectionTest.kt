@@ -213,6 +213,40 @@ class TypeRequiresIntrospectionTest : JavaRecipeTest {
     )
 
     @Test
+    fun addsIntrospectionAnnotationForParameterizedParam() = assertChanged(
+        dependsOn = arrayOf(
+            pojoD,
+            """
+                package a.b;
+                import io.micronaut.http.annotation.Controller;
+                import io.micronaut.http.annotation.Post;import java.util.List;
+                
+                @Controller
+                public class AbController {
+                    @Post
+                    public void getC(List<C> cList) {
+                    }
+                }
+            """
+        ),
+        before = """
+            package a.b;
+            
+            public class C {
+            }
+        """,
+        after = """
+            package a.b;
+            
+            import io.micronaut.core.annotation.Introspected;
+            
+            @Introspected
+            public class C {
+            }
+        """
+    )
+
+    @Test
     fun serviceShouldNotBeIntrospected() = assertUnchanged(
         dependsOn = arrayOf(
             """

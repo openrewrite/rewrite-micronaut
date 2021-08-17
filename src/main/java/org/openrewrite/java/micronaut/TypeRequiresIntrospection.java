@@ -42,7 +42,7 @@ public class TypeRequiresIntrospection extends Recipe {
         return "In Micronaut 2.x a reflection-based strategy was used to retrieve that information if the class was not annotated with `@Introspected`. As of Micronaut 3.x it is required to annotate classes with `@Introspected` that are used in this way.";
     }
 
-    private boolean parentRequiresIntrospection(@Nullable JavaType.FullyQualified type) {
+    private static boolean parentRequiresIntrospection(@Nullable JavaType.FullyQualified type) {
         if (type == null) {
             return false;
         }
@@ -69,7 +69,7 @@ public class TypeRequiresIntrospection extends Recipe {
 
         Set<JavaType.FullyQualified> introspectableTypes = new HashSet<>();
 
-        FindParamsAndReturnTypes findParamsAndReturnTypes = new FindParamsAndReturnTypes();
+        FindParamsAndReturnTypes findParamsAndReturnTypes = new FindParamsAndReturnTypes(typesFromSources);
         for (SourceFile sourceFile : before) {
             if (sourceFile instanceof J.CompilationUnit) {
                 J.CompilationUnit cu = (J.CompilationUnit) sourceFile;
@@ -77,11 +77,7 @@ public class TypeRequiresIntrospection extends Recipe {
                     if (parentRequiresIntrospection(classDeclaration.getType())) {
                         Set<JavaType.FullyQualified> paramAndReturnTypes = new HashSet<>();
                         findParamsAndReturnTypes.visit(classDeclaration, paramAndReturnTypes);
-                        for (JavaType.FullyQualified paramOrReturnType : paramAndReturnTypes) {
-                            if (typesFromSources.contains(paramOrReturnType) && !parentRequiresIntrospection(paramOrReturnType)) {
-                                introspectableTypes.add(paramOrReturnType);
-                            }
-                        }
+                        introspectableTypes.addAll(paramAndReturnTypes);
                     }
                 }
             }
@@ -106,8 +102,20 @@ public class TypeRequiresIntrospection extends Recipe {
     }
 
     private static class FindParamsAndReturnTypes extends JavaIsoVisitor<Set<JavaType.FullyQualified>> {
+        private final Set<JavaType.FullyQualified> typesInSourceSet;
+
+        private FindParamsAndReturnTypes(Set<JavaType.FullyQualified> typesInSourceSet) {
+            this.typesInSourceSet = typesInSourceSet;
+        }
+
+        private void maybeAddType(@Nullable JavaType.FullyQualified type, Set<JavaType.FullyQualified> foundTypes) {
+            if (type != null && typesInSourceSet.contains(type) && !TypeRequiresIntrospection.parentRequiresIntrospection(type)) {
+                foundTypes.add(type);
+            }
+        }
+
         @Override
-        public J.MethodDeclaration visitMethodDeclaration(J.MethodDeclaration method, Set<JavaType.FullyQualified> fullyQualifieds) {
+        public J.MethodDeclaration visitMethodDeclaration(J.MethodDeclaration method, Set<JavaType.FullyQualified> foundTypes) {
             if (method.isConstructor()) {
                 return method;
             }
@@ -117,7 +125,13 @@ public class TypeRequiresIntrospection extends Recipe {
                 if (param instanceof J.VariableDeclarations) {
                     J.VariableDeclarations variableDeclarations = (J.VariableDeclarations) param;
                     for (J.VariableDeclarations.NamedVariable namedVariable : variableDeclarations.getVariables()) {
-                        fullyQualifieds.add(TypeUtils.asFullyQualified(namedVariable.getType()));
+                        if (namedVariable.getType() instanceof JavaType.Parameterized) {
+                            for (JavaType type : ((JavaType.Parameterized) namedVariable.getType()).getTypeParameters()) {
+                                maybeAddType(TypeUtils.asFullyQualified(type), foundTypes);
+                            }
+                        } else {
+                            maybeAddType(TypeUtils.asFullyQualified(namedVariable.getType()), foundTypes);
+                        }
                     }
                 }
             }
@@ -126,11 +140,11 @@ public class TypeRequiresIntrospection extends Recipe {
                 J.ParameterizedType parameterizedType = (J.ParameterizedType) method.getReturnTypeExpression();
                 if (parameterizedType.getTypeParameters() != null) {
                     for (Expression typeParam : parameterizedType.getTypeParameters()) {
-                        fullyQualifieds.add(TypeUtils.asFullyQualified(typeParam.getType()));
+                        maybeAddType(TypeUtils.asFullyQualified(typeParam.getType()), foundTypes);
                     }
                 }
             } else if (method.getReturnTypeExpression() != null && method.getReturnTypeExpression().getType() != null) {
-                fullyQualifieds.add(TypeUtils.asFullyQualified(method.getReturnTypeExpression().getType()));
+                maybeAddType(TypeUtils.asFullyQualified(method.getReturnTypeExpression().getType()), foundTypes);
             }
             return method;
         }
