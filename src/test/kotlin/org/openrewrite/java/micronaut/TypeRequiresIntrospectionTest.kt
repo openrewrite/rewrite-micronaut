@@ -21,9 +21,11 @@ import org.openrewrite.java.JavaParser
 import org.openrewrite.java.JavaRecipeTest
 
 class TypeRequiresIntrospectionTest : JavaRecipeTest {
+
     override val parser: JavaParser
         get() = JavaParser.fromJavaVersion()
             .classpath("micronaut-core", "micronaut-http", "micronaut-http-client-core").build()
+
     override val recipe: Recipe
         get() = TypeRequiresIntrospection()
 
