@@ -26,7 +26,6 @@ import org.openrewrite.semver.Semver;
 @Value
 @EqualsAndHashCode(callSuper = true)
 public class UpgradeMicronautMavenPropertyVersion extends Recipe {
-
     @Option(displayName = "New version",
             description = "An exact version number, or node-style semver selector used to select the version number.",
             example = "3.x")
@@ -44,7 +43,7 @@ public class UpgradeMicronautMavenPropertyVersion extends Recipe {
 
     @Override
     public String getDisplayName() {
-        return "Upgrade gradle.properties Micronaut version";
+        return "Upgrade `micronaut.version` Maven property";
     }
 
     @Override
