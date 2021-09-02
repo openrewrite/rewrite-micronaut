@@ -37,44 +37,44 @@ class ProviderImplementationsGenerateFactoriesTest : JavaRecipeTest {
     fun javaxProviderImplementation() = assertChanged(
         before = """
             package abc;
-            
+
             import io.micronaut.context.annotation.Bean;
             import io.micronaut.core.annotation.NonNull;
             import javax.inject.Provider;
             import javax.inject.Singleton;
-            
+
             @Bean
             @Singleton
             public class AProvider implements Provider<A> {
-            
+
                 @Override
                 public A get() {
                     return new AImpl();
                 }
-                
+
                 private void doSomething(@NonNull String arg) {
                 }
             }
         """,
         after = """
             package abc;
-            
+
             import io.micronaut.context.annotation.Bean;
             import io.micronaut.context.annotation.Factory;
             import io.micronaut.core.annotation.NonNull;
             import javax.inject.Provider;
             import javax.inject.Singleton;
-            
+
             @Factory
             public class AProvider implements Provider<A> {
-            
+
                 @Override
                 @Bean
                 @Singleton
                 public A get() {
                     return new AImpl();
                 }
-            
+
                 private void doSomething(@NonNull String arg) {
                 }
             }
@@ -88,15 +88,15 @@ class ProviderImplementationsGenerateFactoriesTest : JavaRecipeTest {
             import io.micronaut.context.annotation.Prototype;
             import io.micronaut.core.annotation.NonNull;
             import jakarta.inject.Provider;
-            
+
             @Prototype
             public class AProvider implements Provider<A> {
-                
+
                 @Override
                 public A get() {
                     return new AImpl();
                 }
-                
+
                 @NonNull
                 private String doSomething() {
                 }
@@ -108,16 +108,16 @@ class ProviderImplementationsGenerateFactoriesTest : JavaRecipeTest {
             import io.micronaut.context.annotation.Prototype;
             import io.micronaut.core.annotation.NonNull;
             import jakarta.inject.Provider;
-            
+
             @Factory
             public class AProvider implements Provider<A> {
-            
+
                 @Override
                 @Prototype
                 public A get() {
                     return new AImpl();
                 }
-            
+
                 @NonNull
                 private String doSomething() {
                 }

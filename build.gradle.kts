@@ -41,7 +41,7 @@ configure<nebula.plugin.release.git.base.ReleasePluginExtension> {
 }
 
 group = "org.openrewrite.recipe"
-description = "Migrate between Mirconaut versions. Automatically."
+description = "Migrate between Micronaut versions. Automatically."
 
 repositories {
     if (!project.hasProperty("releasing")) {

@@ -101,8 +101,8 @@ public class OncePerRequestHttpServerFilterToHttpServerFilter extends Recipe {
         public J.MethodInvocation visitMethodInvocation(J.MethodInvocation method, ExecutionContext executionContext) {
             J.MethodInvocation mi = super.visitMethodInvocation(method, executionContext);
             String todoCommentText = "TODO: See `Server Filter Behavior` in https://docs.micronaut.io/3.0.x/guide/#breaks for details";
-            if (keyMethodMatcher.matches(mi) && mi.getComments().stream().noneMatch(c -> c.getText().equals(todoCommentText))) {
-                mi = mi.withComments(ListUtils.concat(mi.getComments(), new Comment(Comment.Style.BLOCK, todoCommentText, " ", Markers.EMPTY)));
+            if (keyMethodMatcher.matches(mi) && mi.getComments().stream().noneMatch(c -> c instanceof TextComment && ((TextComment) c).getText().equals(todoCommentText))) {
+                mi = mi.withComments(ListUtils.concat(mi.getComments(), new TextComment(true, todoCommentText, " ", Markers.EMPTY)));
             }
             return mi;
         }
