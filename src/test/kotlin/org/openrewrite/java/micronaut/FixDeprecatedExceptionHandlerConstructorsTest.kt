@@ -21,11 +21,18 @@ import org.openrewrite.java.JavaParser
 import org.openrewrite.java.JavaRecipeTest
 
 class FixDeprecatedExceptionHandlerConstructorsTest : JavaRecipeTest {
-
     override val parser: JavaParser
         get() = JavaParser.fromJavaVersion()
             .logCompilationWarningsAndErrors(true)
-            .classpath("micronaut-core", "micronaut-http-server-netty", "micronaut-http", "micronaut-validation", "jakarta.inject-api", "validation-api").build()
+            .classpath(
+                "micronaut-core",
+                "micronaut-http-server-netty",
+                "micronaut-http",
+                "micronaut-validation",
+                "jakarta.inject-api",
+                "validation-api"
+            ).build()
+
     override val recipe: Recipe
         get() = FixDeprecatedExceptionHandlerConstructors()
 
@@ -52,7 +59,7 @@ class FixDeprecatedExceptionHandlerConstructorsTest : JavaRecipeTest {
                 private void someMethod(){}
             }
         """,
-        typeValidation = {methodInvocations = false}
+        typeValidation = { methodInvocations = false }
     )
 
     @Test
@@ -71,14 +78,13 @@ class FixDeprecatedExceptionHandlerConstructorsTest : JavaRecipeTest {
             import jakarta.inject.Inject;
             
             public class ApiClientValidationExceptionHandler extends ConstraintExceptionHandler {
-            
                 @Inject
                 public ApiClientValidationExceptionHandler(ErrorResponseProcessor errorResponseProcessor) {
                     super(errorResponseProcessor);
                 }
             }
         """,
-        typeValidation = {methodInvocations = false}
+        typeValidation = { methodInvocations = false }
     )
 
     @Test
@@ -100,7 +106,6 @@ class FixDeprecatedExceptionHandlerConstructorsTest : JavaRecipeTest {
             import jakarta.inject.Inject;
             
             public class ApiClientValidationExceptionHandler extends ConversionErrorHandler {
-            
                 @Inject
                 public ApiClientValidationExceptionHandler(ErrorResponseProcessor errorResponseProcessor) {
                     super(errorResponseProcessor);
@@ -140,6 +145,6 @@ class FixDeprecatedExceptionHandlerConstructorsTest : JavaRecipeTest {
                 }
             }
         """,
-        typeValidation = {methodInvocations = false}
+        typeValidation = { methodInvocations = false }
     )
 }
