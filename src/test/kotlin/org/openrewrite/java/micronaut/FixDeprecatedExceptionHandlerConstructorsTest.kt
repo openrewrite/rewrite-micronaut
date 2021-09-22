@@ -68,6 +68,7 @@ class FixDeprecatedExceptionHandlerConstructorsTest : JavaRecipeTest {
             package abc;
             import io.micronaut.validation.exceptions.ConstraintExceptionHandler;
             public class ApiClientValidationExceptionHandler extends ConstraintExceptionHandler {
+            
                 public ApiClientValidationExceptionHandler() {
                 }
             }
@@ -78,6 +79,7 @@ class FixDeprecatedExceptionHandlerConstructorsTest : JavaRecipeTest {
             import jakarta.inject.Inject;
             
             public class ApiClientValidationExceptionHandler extends ConstraintExceptionHandler {
+            
                 @Inject
                 public ApiClientValidationExceptionHandler(ErrorResponseProcessor errorResponseProcessor) {
                     super(errorResponseProcessor);
@@ -94,6 +96,7 @@ class FixDeprecatedExceptionHandlerConstructorsTest : JavaRecipeTest {
             
             import io.micronaut.http.server.exceptions.ConversionErrorHandler;
             public class ApiClientValidationExceptionHandler extends ConversionErrorHandler {
+            
                 public ApiClientValidationExceptionHandler() {
                     super();
                 }
@@ -106,6 +109,7 @@ class FixDeprecatedExceptionHandlerConstructorsTest : JavaRecipeTest {
             import jakarta.inject.Inject;
             
             public class ApiClientValidationExceptionHandler extends ConversionErrorHandler {
+            
                 @Inject
                 public ApiClientValidationExceptionHandler(ErrorResponseProcessor errorResponseProcessor) {
                     super(errorResponseProcessor);
