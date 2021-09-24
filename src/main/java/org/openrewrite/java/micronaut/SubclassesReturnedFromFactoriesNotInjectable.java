@@ -98,7 +98,7 @@ public class SubclassesReturnedFromFactoriesNotInjectable extends Recipe {
                     returnedType = methodType.getResolvedSignature() != null ? methodType.getResolvedSignature().getReturnType() : null;
                 }
                 if (returnedType != null) {
-                    methodDeclCursor.computeMessageIfAbsent("return-types", v -> new HashSet<JavaType>()).add(returnedType);
+                    methodDeclCursor.computeMessageIfAbsent("return-types", v -> new HashSet<>()).add(returnedType);
                 }
             }
             return rtn;

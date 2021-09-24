@@ -101,7 +101,7 @@ public class TypeRequiresIntrospection extends Recipe {
         return new UsesType<>("io.micronaut.*");
     }
 
-    private static class FindParamsAndReturnTypes extends JavaIsoVisitor<Set<JavaType.FullyQualified>> {
+    private static final class FindParamsAndReturnTypes extends JavaIsoVisitor<Set<JavaType.FullyQualified>> {
         private final Set<JavaType.FullyQualified> typesInSourceSet;
 
         private FindParamsAndReturnTypes(Set<JavaType.FullyQualified> typesInSourceSet) {

@@ -142,7 +142,7 @@ public class CopyNonInheritedAnnotations extends Recipe {
         });
     }
 
-    private static class CopyAnnoVisitor extends JavaIsoVisitor<ExecutionContext> {
+    private static final class CopyAnnoVisitor extends JavaIsoVisitor<ExecutionContext> {
         private final Map<String, List<J.Annotation>> parentAnnotationsByType;
 
         private CopyAnnoVisitor(Map<String, List<J.Annotation>> parentAnnotationsByType) {
