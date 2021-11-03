@@ -129,7 +129,7 @@ public class ProviderImplementationsToMicronautFactories extends Recipe {
             Cursor classDeclCursor = getCursor().dropParentUntil(J.ClassDeclaration.class::isInstance);
             MethodMatcher mm = classDeclCursor.getMessage("provider-get");
             List<J.Annotation> beanAnnotations = classDeclCursor.getMessage("class-bean-annotations");
-            if (mm != null && mm.matches(md.getType()) && beanAnnotations != null) {
+            if (mm != null && mm.matches(md.org.openrewrite.java.tree.J.MethodDeclaration getMethodType()()) && beanAnnotations != null) {
                 List<J.Annotation> newBeanAnnotations = beanAnnotations.stream().filter(anno -> !annotationExists(method.getLeadingAnnotations(), anno)).collect(Collectors.toList());
                 if (!newBeanAnnotations.isEmpty()) {
                     //noinspection ConstantConditions
