@@ -71,7 +71,7 @@ public class UpgradeMicronautMavenPropertyVersion extends Recipe {
                 String currentVersion = mvn.getModel().getProperties().get("micronaut.version");
                 if (currentVersion != null && !currentVersion.isEmpty()) {
                     MicronautVersionHelper.getNewerVersion(newVersion, currentVersion, ctx)
-                            .ifPresent(latestVersion -> doAfterVisit(new ChangePropertyValue("micronaut.version", latestVersion)));
+                            .ifPresent(latestVersion -> doAfterVisit(new ChangePropertyValue("micronaut.version", latestVersion, true)));
                 }
             }
             return mvn;
