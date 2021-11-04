@@ -92,11 +92,6 @@ public class SubclassesReturnedFromFactoriesNotInjectable extends Recipe {
                     && md.getLeadingAnnotations().stream().anyMatch(FactoryBeansAreTypeVisitor::isBeanAnnotation)) {
                 Cursor methodDeclCursor = getCursor().dropParentUntil(J.MethodDeclaration.class::isInstance);
                 JavaType returnedType = returnExpression.getType();
-                if (returnedType instanceof JavaType.Method) {
-                    JavaType.Method methodType = (JavaType.Method) returnedType;
-                    //noinspection AssignmentToNull
-                    returnedType = methodType.getResolvedSignature() != null ? methodType.getResolvedSignature().getReturnType() : null;
-                }
                 if (returnedType != null) {
                     methodDeclCursor.computeMessageIfAbsent("return-types", v -> new HashSet<>()).add(returnedType);
                 }
