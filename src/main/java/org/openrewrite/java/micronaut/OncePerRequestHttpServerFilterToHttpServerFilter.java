@@ -66,8 +66,8 @@ public class OncePerRequestHttpServerFilterToHttpServerFilter extends Recipe {
             if (cd.getExtends() != null && cd.getExtends().getType() != null
                     && TypeUtils.isOfClassType(cd.getExtends().getType(), oncePerRequestHttpServerFilterFqn)) {
                 cd = cd.withExtends(null);
-                J.Identifier newImplementsIdentifier = J.Identifier.build(UUID.randomUUID(), Space.format(" "), Markers.EMPTY,
-                        "HttpServerFilter", JavaType.buildType("io.micronaut.http.filter.HttpServerFilter"));
+                J.Identifier newImplementsIdentifier = new J.Identifier(UUID.randomUUID(), Space.format(" "), Markers.EMPTY,
+                        "HttpServerFilter", JavaType.buildType("io.micronaut.http.filter.HttpServerFilter"), null);
                 J.Block body = cd.getBody();
                 //noinspection ConstantConditions
                 cd = maybeAutoFormat(cd, cd.withBody(null).withImplements(ListUtils.concat(cd.getImplements(), newImplementsIdentifier)), executionContext, getCursor());

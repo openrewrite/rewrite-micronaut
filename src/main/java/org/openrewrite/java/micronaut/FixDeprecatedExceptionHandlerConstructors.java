@@ -96,7 +96,7 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
                 J.ClassDeclaration cd = getCursor().firstEnclosing(J.ClassDeclaration.class);
                 if (cd != null && "super".equals(mi.getSimpleName()) && isClassExceptionHandler(cd)) {
                     if (mi.getArguments().stream().noneMatch(exp -> TypeUtils.isOfClassType(exp.getType(), errorResponseProcessorFqn))) {
-                        mi = mi.withArguments(Collections.singletonList(J.Identifier.build(UUID.randomUUID(), Space.EMPTY, Markers.EMPTY, "errorResponseProcessor", JavaType.buildType(errorResponseProcessorFqn))));
+                        mi = mi.withArguments(Collections.singletonList(new J.Identifier(UUID.randomUUID(), Space.EMPTY, Markers.EMPTY, "errorResponseProcessor", JavaType.buildType(errorResponseProcessorFqn), null)));
                     }
                     if (mi.getArguments().stream().anyMatch(exp -> TypeUtils.isOfClassType(exp.getType(), errorResponseProcessorFqn))) {
                         getCursor().dropParentUntil(J.MethodDeclaration.class::isInstance).putMessage("super-invocation-exists", Boolean.TRUE);
