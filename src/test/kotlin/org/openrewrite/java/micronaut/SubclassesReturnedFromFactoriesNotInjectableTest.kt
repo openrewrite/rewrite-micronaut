@@ -265,9 +265,9 @@ class SubclassesReturnedFromFactoriesNotInjectableTest : JavaRecipeTest {
             """
                 package abc;
                 public class Kq<T> implements Qi<T> {
-                    String n;
-                    public Kq(String n) {
-                        this.n = n;
+                    T t;
+                    public Kq(T t) {
+                        this.t = t;
                     }
                 }
             """
