@@ -51,4 +51,7 @@ public class MicronautVersionHelper {
                 .filter(v -> LATEST_RELEASE.compare(currentVersion, v) < 0)
                 .max(LATEST_RELEASE);
     }
+
+    private MicronautVersionHelper() {
+    }
 }
