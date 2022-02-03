@@ -68,14 +68,14 @@ public class SubclassesReturnedFromFactoriesNotInjectable extends Recipe {
     private static class FactoryBeansAreTypeVisitor extends JavaIsoVisitor<ExecutionContext> {
 
         private static final List<AnnotationMatcher> BEAN_ANNOTATION_MATCHERS = Stream.concat(
-                        Stream.of("io.micronaut.context.annotation.Context",
-                                        "io.micronaut.context.annotation.Prototype",
-                                        "io.micronaut.context.annotation.Infrastructure",
-                                        "io.micronaut.runtime.context.scope.Refreshable",
-                                        "io.micronaut.runtime.http.scope.RequestScope")
-                                .map(it -> new AnnotationMatcher("@" + it)),
-                        Stream.of("@javax.inject", "@jakarta.inject")
-                                .map(it -> new AnnotationMatcher(it + ".Singleton")))
+                Stream.of("io.micronaut.context.annotation.Context",
+                        "io.micronaut.context.annotation.Prototype",
+                        "io.micronaut.context.annotation.Infrastructure",
+                        "io.micronaut.runtime.context.scope.Refreshable",
+                        "io.micronaut.runtime.http.scope.RequestScope")
+                        .map(it -> new AnnotationMatcher("@" + it)),
+                Stream.of("@javax.inject", "@jakarta.inject")
+                        .map(it -> new AnnotationMatcher(it + ".Singleton")))
                 .map(AnnotationMatcher.class::cast).collect(Collectors.toList());
 
         private static boolean isBeanAnnotation(J.Annotation annotation) {
