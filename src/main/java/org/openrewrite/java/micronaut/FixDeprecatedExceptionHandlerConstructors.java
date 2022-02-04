@@ -44,11 +44,11 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
 
     private static final ThreadLocal<JavaParser> JAVA_PARSER = ThreadLocal.withInitial(() ->
             JavaParser.fromJavaVersion().dependsOn(
-                            "package jakarta.inject; public @interface Inject {}",
-                            "package io.micronaut.http.server.exceptions.response; public interface ErrorContext {}",
-                            "package io.micronaut.http; public interface MutableHttpResponse<B> {}",
-                            "package io.micronaut.http.server.exceptions.response; public interface ErrorResponseProcessor<T> {MutableHttpResponse<T> processResponse(ErrorContext errorContext, MutableHttpResponse<?> baseResponse);}",
-                            "package io.micronaut.validation.exceptions; public class ConstraintExceptionHandler { public ConstraintExceptionHandler(ErrorResponseProcessor<?> responseProcessor){}}")
+                    "package jakarta.inject; public @interface Inject {}",
+                    "package io.micronaut.http.server.exceptions.response; public interface ErrorContext {}",
+                    "package io.micronaut.http; public interface MutableHttpResponse<B> {}",
+                    "package io.micronaut.http.server.exceptions.response; public interface ErrorResponseProcessor<T> {MutableHttpResponse<T> processResponse(ErrorContext errorContext, MutableHttpResponse<?> baseResponse);}",
+                    "package io.micronaut.validation.exceptions; public class ConstraintExceptionHandler { public ConstraintExceptionHandler(ErrorResponseProcessor<?> responseProcessor){}}")
                     .build());
     private static final AnnotationMatcher javax_matcher = new AnnotationMatcher("@javax.inject.Inject");
     private static final AnnotationMatcher jakarta_matcher = new AnnotationMatcher("@jakarta.inject.Inject");
@@ -84,7 +84,7 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
     protected JavaIsoVisitor<ExecutionContext> getVisitor() {
         return new JavaIsoVisitor<ExecutionContext>() {
             final JavaTemplate injectTemplate = JavaTemplate.builder(this::getCursor,
-                            "@Inject").javaParser(JAVA_PARSER::get)
+                    "@Inject").javaParser(JAVA_PARSER::get)
                     .imports("jakarta.inject.Inject")
                     .build();
 
@@ -152,8 +152,8 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
                 if (cdFq != null && exception_handlers.stream().anyMatch(fqn -> TypeUtils.isOfClassType(cdFq, fqn))) {
                     if (!Boolean.TRUE.equals(getCursor().pollMessage("constructor-exists"))) {
                         JavaTemplate template = JavaTemplate.builder(this::getCursor,
-                                        "@Inject\npublic " + cd.getSimpleName() + "(ErrorResponseProcessor errorResponseProcessor) {" +
-                                                "super(errorResponseProcessor);}")
+                                "@Inject\npublic " + cd.getSimpleName() + "(ErrorResponseProcessor errorResponseProcessor) {" +
+                                        "super(errorResponseProcessor);}")
                                 .imports(errorResponseProcessorFqn, "jakarta.inject.Inject", cdFq.getFullyQualifiedName())
                                 .javaParser(JAVA_PARSER::get).build();
                         cd = cd.withTemplate(template, cd.getBody().getCoordinates().lastStatement());
