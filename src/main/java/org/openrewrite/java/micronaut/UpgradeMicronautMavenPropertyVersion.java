@@ -19,9 +19,11 @@ import lombok.EqualsAndHashCode;
 import lombok.Value;
 import org.openrewrite.*;
 import org.openrewrite.maven.ChangePropertyValue;
+import org.openrewrite.maven.MavenIsoVisitor;
 import org.openrewrite.maven.MavenVisitor;
-import org.openrewrite.maven.tree.Maven;
+import org.openrewrite.maven.tree.MavenResolutionResult;
 import org.openrewrite.semver.Semver;
+import org.openrewrite.xml.tree.Xml;
 
 @Value
 @EqualsAndHashCode(callSuper = true)
@@ -53,28 +55,18 @@ public class UpgradeMicronautMavenPropertyVersion extends Recipe {
 
     @Override
     protected TreeVisitor<?, ExecutionContext> getVisitor() {
-        return new UpgradeMicronautMavenVersionVisitor(newVersion);
-    }
-
-    private static class UpgradeMicronautMavenVersionVisitor extends MavenVisitor {
-        private final String newVersion;
-
-        public UpgradeMicronautMavenVersionVisitor(String newVersion) {
-            this.newVersion = newVersion;
-        }
-
-        @Override
-        public Maven visitMaven(Maven maven, ExecutionContext ctx) {
-            Maven mvn = super.visitMaven(maven, ctx);
-            //noinspection ConstantConditions
-            if (mvn.getModel() != null && mvn.getModel().getProperties() != null) {
-                String currentVersion = mvn.getModel().getProperties().get("micronaut.version");
+        return new MavenIsoVisitor<ExecutionContext>() {
+            @Override
+            public Xml.Document visitDocument(Xml.Document document, ExecutionContext ctx) {
+                Xml.Document d = super.visitDocument(document, ctx);
+                MavenResolutionResult model = getResolutionResult();
+                String currentVersion = model.getPom().getProperties().get("micronaut.version");
                 if (currentVersion != null && !currentVersion.isEmpty()) {
                     MicronautVersionHelper.getNewerVersion(newVersion, currentVersion, ctx)
-                            .ifPresent(latestVersion -> doAfterVisit(new ChangePropertyValue("micronaut.version", latestVersion, true)));
+                            .ifPresent(latestVersion -> doAfterVisit(new ChangePropertyValue("micronaut.version", latestVersion, false)));
                 }
+                return d;
             }
-            return mvn;
-        }
+        };
     }
 }

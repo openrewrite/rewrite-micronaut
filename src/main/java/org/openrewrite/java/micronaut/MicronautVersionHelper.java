@@ -16,13 +16,16 @@
 package org.openrewrite.java.micronaut;
 
 import org.openrewrite.ExecutionContext;
+import org.openrewrite.internal.lang.Nullable;
 import org.openrewrite.maven.cache.MavenPomCache;
-import org.openrewrite.maven.internal.MavenMetadata;
 import org.openrewrite.maven.internal.MavenPomDownloader;
+import org.openrewrite.maven.tree.GroupArtifact;
+import org.openrewrite.maven.tree.MavenMetadata;
 import org.openrewrite.semver.LatestRelease;
 import org.openrewrite.semver.Semver;
 import org.openrewrite.semver.VersionComparator;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -40,15 +43,18 @@ public class MicronautVersionHelper {
         VersionComparator versionComparator = Semver.validate(versionPattern, null).getValue();
         assert versionComparator != null;
 
-        MavenMetadata mavenMetadata = new MavenPomDownloader(MavenPomCache.NOOP,
-                emptyMap(), ctx).downloadMetadata(GROUP_ID, ARTIFACT_ID, emptyList());
+        MavenMetadata mavenMetadata = new MavenPomDownloader(emptyMap(), ctx)
+                .downloadMetadata(new GroupArtifact(GROUP_ID, ARTIFACT_ID), null, emptyList());
 
-        Collection<String> availableVersions = mavenMetadata.getVersioning().getVersions().stream()
-                .filter(versionComparator::isValid)
-                .collect(Collectors.toList());
+        Collection<String> availableVersions = new ArrayList<>();
+        for (String v : mavenMetadata.getVersioning().getVersions()) {
+            if (versionComparator.isValid(null, v)) {
+                availableVersions.add(v);
+            }
+        }
 
         return availableVersions.stream()
-                .filter(v -> LATEST_RELEASE.compare(currentVersion, v) < 0)
+                .filter(v -> LATEST_RELEASE.compare(null, currentVersion, v) < 0)
                 .max(LATEST_RELEASE);
     }
 
