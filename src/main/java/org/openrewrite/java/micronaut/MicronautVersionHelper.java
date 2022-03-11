@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 
-public class MicronautVersionHelper {
+public final class MicronautVersionHelper {
 
     private static final String GROUP_ID = "io.micronaut";
     private static final String ARTIFACT_ID = "micronaut-parent";
