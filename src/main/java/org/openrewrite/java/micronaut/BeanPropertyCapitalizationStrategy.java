@@ -23,6 +23,8 @@ import org.openrewrite.java.MethodMatcher;
 import org.openrewrite.java.search.UsesType;
 import org.openrewrite.java.tree.J;
 
+import java.time.Duration;
+
 public class BeanPropertyCapitalizationStrategy extends Recipe {
 
     @Override
@@ -33,6 +35,11 @@ public class BeanPropertyCapitalizationStrategy extends Recipe {
     @Override
     public String getDescription() {
         return "As of Micronaut 3.x property names for getters like `getXForwarded()` are de-capitalized from `XForwarded` to `xForwarded`.";
+    }
+
+    @Override
+    public Duration getEstimatedEffortPerOccurrence() {
+        return Duration.ofMinutes(5);
     }
 
     @Override

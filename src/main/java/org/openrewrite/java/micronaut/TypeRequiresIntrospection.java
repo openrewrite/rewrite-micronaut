@@ -27,6 +27,7 @@ import org.openrewrite.java.JavaTemplate;
 import org.openrewrite.java.search.UsesType;
 import org.openrewrite.java.tree.*;
 
+import java.time.Duration;
 import java.util.*;
 
 public class TypeRequiresIntrospection extends Recipe {
@@ -40,6 +41,11 @@ public class TypeRequiresIntrospection extends Recipe {
     @Override
     public String getDescription() {
         return "In Micronaut 2.x a reflection-based strategy was used to retrieve that information if the class was not annotated with `@Introspected`. As of Micronaut 3.x it is required to annotate classes with `@Introspected` that are used in this way.";
+    }
+
+    @Override
+    public Duration getEstimatedEffortPerOccurrence() {
+        return Duration.ofMinutes(5);
     }
 
     private static boolean parentRequiresIntrospection(@Nullable JavaType.FullyQualified type) {

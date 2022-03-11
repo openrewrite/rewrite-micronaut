@@ -25,6 +25,7 @@ import org.openrewrite.java.search.UsesType;
 import org.openrewrite.java.tree.*;
 import org.openrewrite.marker.Markers;
 
+import java.time.Duration;
 import java.util.UUID;
 
 public class OncePerRequestHttpServerFilterToHttpServerFilter extends Recipe {
@@ -33,6 +34,11 @@ public class OncePerRequestHttpServerFilterToHttpServerFilter extends Recipe {
     @Override
     public String getDisplayName() {
         return "Convert `OncePerRequestServerFilter` extensions to `HttpServerFilter`";
+    }
+
+    @Override
+    public Duration getEstimatedEffortPerOccurrence() {
+        return Duration.ofMinutes(5);
     }
 
     @Override

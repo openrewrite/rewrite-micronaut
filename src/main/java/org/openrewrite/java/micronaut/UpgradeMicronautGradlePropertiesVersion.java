@@ -22,6 +22,8 @@ import org.openrewrite.properties.PropertiesVisitor;
 import org.openrewrite.properties.tree.Properties;
 import org.openrewrite.semver.Semver;
 
+import java.time.Duration;
+
 @Value
 @EqualsAndHashCode(callSuper = true)
 public class UpgradeMicronautGradlePropertiesVersion extends Recipe {
@@ -57,6 +59,11 @@ public class UpgradeMicronautGradlePropertiesVersion extends Recipe {
     @Override
     protected TreeVisitor<?, ExecutionContext> getSingleSourceApplicableTest() {
         return new HasSourcePath<>(FILE_MATCHER);
+    }
+
+    @Override
+    public Duration getEstimatedEffortPerOccurrence() {
+        return Duration.ofMinutes(5);
     }
 
     @Override

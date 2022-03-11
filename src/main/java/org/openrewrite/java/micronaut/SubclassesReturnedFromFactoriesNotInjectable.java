@@ -24,6 +24,7 @@ import org.openrewrite.java.search.UsesType;
 import org.openrewrite.java.tree.*;
 import org.openrewrite.marker.Markers;
 
+import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -49,6 +50,11 @@ public class SubclassesReturnedFromFactoriesNotInjectable extends Recipe {
     @Override
     protected UsesType<ExecutionContext> getSingleSourceApplicableTest() {
         return new UsesType<>("io.micronaut.context.annotation.Factory");
+    }
+
+    @Override
+    public Duration getEstimatedEffortPerOccurrence() {
+        return Duration.ofMinutes(5);
     }
 
     @Override

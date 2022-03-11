@@ -25,6 +25,8 @@ import org.openrewrite.maven.tree.MavenResolutionResult;
 import org.openrewrite.semver.Semver;
 import org.openrewrite.xml.tree.Xml;
 
+import java.time.Duration;
+
 @Value
 @EqualsAndHashCode(callSuper = true)
 public class UpgradeMicronautMavenPropertyVersion extends Recipe {
@@ -51,6 +53,11 @@ public class UpgradeMicronautMavenPropertyVersion extends Recipe {
     @Override
     public String getDescription() {
         return "Set the maven micronaut.version property according to a node-style semver selector or to a specific version number.";
+    }
+
+    @Override
+    public Duration getEstimatedEffortPerOccurrence() {
+        return Duration.ofMinutes(5);
     }
 
     @Override
