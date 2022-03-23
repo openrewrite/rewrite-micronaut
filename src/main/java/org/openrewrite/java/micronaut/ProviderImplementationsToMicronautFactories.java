@@ -65,7 +65,7 @@ public class ProviderImplementationsToMicronautFactories extends Recipe {
 
     @Override
     protected JavaIsoVisitor<ExecutionContext> getApplicableTest() {
-        return new UsesType<>("io.micronaut.*");
+        return new UsesType<>("io.micronaut..*");
     }
 
     @Override

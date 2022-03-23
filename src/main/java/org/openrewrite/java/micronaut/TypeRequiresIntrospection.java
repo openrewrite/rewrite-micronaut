@@ -104,7 +104,7 @@ public class TypeRequiresIntrospection extends Recipe {
 
     @Override
     protected JavaIsoVisitor<ExecutionContext> getApplicableTest() {
-        return new UsesType<>("io.micronaut.*");
+        return new UsesType<>("io.micronaut..*");
     }
 
     private static final class FindParamsAndReturnTypes extends JavaIsoVisitor<Set<JavaType.FullyQualified>> {
