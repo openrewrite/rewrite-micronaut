@@ -35,7 +35,7 @@ recipeList:
       groupId: io.micronaut
       artifactId: micronaut-bom
       newVersion: 3.x
-      trustParent: true
+      overrideManagedVersion: true
   - org.openrewrite.java.micronaut.UpgradeMicronautGradlePropertiesVersion:
       newVersion: 3.x
   - org.openrewrite.java.micronaut.UpgradeMicronautMavenPropertyVersion:
