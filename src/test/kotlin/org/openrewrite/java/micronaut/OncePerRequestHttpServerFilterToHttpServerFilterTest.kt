@@ -39,11 +39,11 @@ class OncePerRequestHttpServerFilterToHttpServerFilterTest : JavaRecipeTest {
     fun simpleConversionWithExistingImplements() = assertChanged(
         before = """
             package a.b;
-            
-            import io.micronaut.http.filter.OncePerRequestHttpServerFilter;
+
             import io.micronaut.core.order.Ordered;
             import io.micronaut.http.HttpRequest;
             import io.micronaut.http.MutableHttpResponse;
+            import io.micronaut.http.filter.OncePerRequestHttpServerFilter;
             import io.micronaut.http.filter.ServerFilterChain;
             import org.reactivestreams.Publisher;
             
@@ -97,11 +97,11 @@ class OncePerRequestHttpServerFilterToHttpServerFilterTest : JavaRecipeTest {
     fun simpleConversion() = assertChanged(
         before = """
             package a.b;
-            
-            import io.micronaut.http.filter.OncePerRequestHttpServerFilter;
+
             import io.micronaut.core.order.Ordered;
             import io.micronaut.http.HttpRequest;
             import io.micronaut.http.MutableHttpResponse;
+            import io.micronaut.http.filter.OncePerRequestHttpServerFilter;
             import io.micronaut.http.filter.ServerFilterChain;
             import org.reactivestreams.Publisher;
             

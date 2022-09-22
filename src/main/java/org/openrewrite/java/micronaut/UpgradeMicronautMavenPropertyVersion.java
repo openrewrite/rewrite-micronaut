@@ -20,7 +20,6 @@ import lombok.Value;
 import org.openrewrite.*;
 import org.openrewrite.maven.ChangePropertyValue;
 import org.openrewrite.maven.MavenIsoVisitor;
-import org.openrewrite.maven.MavenVisitor;
 import org.openrewrite.maven.tree.MavenResolutionResult;
 import org.openrewrite.semver.Semver;
 import org.openrewrite.xml.tree.Xml;
@@ -70,7 +69,7 @@ public class UpgradeMicronautMavenPropertyVersion extends Recipe {
                 String currentVersion = model.getPom().getProperties().get("micronaut.version");
                 if (currentVersion != null && !currentVersion.isEmpty()) {
                     MicronautVersionHelper.getNewerVersion(newVersion, currentVersion, ctx)
-                            .ifPresent(latestVersion -> doAfterVisit(new ChangePropertyValue("micronaut.version", latestVersion, false)));
+                            .ifPresent(latestVersion -> doAfterVisit(new ChangePropertyValue("micronaut.version", latestVersion, false, true)));
                 }
                 return d;
             }
