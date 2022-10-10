@@ -16,28 +16,26 @@
 package org.openrewrite.java.micronaut
 
 import org.junit.jupiter.api.Test
-import org.openrewrite.Recipe
+import org.openrewrite.java.Assertions.java
 import org.openrewrite.java.JavaParser
-import org.openrewrite.java.JavaRecipeTest
+import org.openrewrite.test.RecipeSpec
+import org.openrewrite.test.RewriteTest
 
-class OncePerRequestHttpServerFilterToHttpServerFilterTest : JavaRecipeTest {
-    override val recipe: Recipe
-        get() = OncePerRequestHttpServerFilterToHttpServerFilter()
-    override val parser: JavaParser
-        get() = JavaParser.fromJavaVersion()
-            .classpath("micronaut-http", "micronaut-core")
-            .dependsOn(
-                """
+class OncePerRequestHttpServerFilterToHttpServerFilterTest : RewriteTest {
+    override fun defaults(spec: RecipeSpec) {
+        spec.recipe(OncePerRequestHttpServerFilterToHttpServerFilter())
+            .parser(JavaParser.fromJavaVersion().classpath("micronaut-http", "micronaut-core", "reactive-streams"))
+    }
+
+    @Test
+    fun simpleConversionWithExistingImplements() = rewriteRun(
+        java("""
                 package a.b;
                 public interface C {
                     String getCName();
                 }
-            """
-            ).build()
-
-    @Test
-    fun simpleConversionWithExistingImplements() = assertChanged(
-        before = """
+            """),
+        java("""
             package a.b;
 
             import io.micronaut.core.order.Ordered;
@@ -64,7 +62,7 @@ class OncePerRequestHttpServerFilterToHttpServerFilterTest : JavaRecipeTest {
                 }
             }
         """,
-        after = """
+        """
             package a.b;
             
             import io.micronaut.core.order.Ordered;
@@ -90,12 +88,12 @@ class OncePerRequestHttpServerFilterToHttpServerFilterTest : JavaRecipeTest {
                     return "cname";
                 }
             }
-        """
+        """)
     )
 
     @Test
-    fun simpleConversion() = assertChanged(
-        before = """
+    fun simpleConversion() = rewriteRun(
+        java("""
             package a.b;
 
             import io.micronaut.core.order.Ordered;
@@ -122,7 +120,7 @@ class OncePerRequestHttpServerFilterToHttpServerFilterTest : JavaRecipeTest {
                 }
             }
         """,
-        after = """
+        """
             package a.b;
             
             import io.micronaut.core.order.Ordered;
@@ -148,6 +146,6 @@ class OncePerRequestHttpServerFilterToHttpServerFilterTest : JavaRecipeTest {
                     return "cname";
                 }
             }
-        """
+        """)
     )
 }

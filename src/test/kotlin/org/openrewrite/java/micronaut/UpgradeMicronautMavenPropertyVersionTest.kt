@@ -16,15 +16,18 @@
 package org.openrewrite.java.micronaut
 
 import org.junit.jupiter.api.Test
-import org.openrewrite.maven.MavenRecipeTest
+import org.openrewrite.maven.Assertions.pomXml
+import org.openrewrite.test.RecipeSpec
+import org.openrewrite.test.RewriteTest
 
-class UpgradeMicronautMavenPropertyVersionTest : MavenRecipeTest {
-
-    override val recipe = UpgradeMicronautMavenPropertyVersion("~2.1")
+class UpgradeMicronautMavenPropertyVersionTest : RewriteTest {
+    override fun defaults(spec: RecipeSpec) {
+        spec.recipe(UpgradeMicronautMavenPropertyVersion("~2.1"))
+    }
 
     @Test
-    fun changeMavenMicronautVersion() = assertChanged(
-        before = """
+    fun changeMavenMicronautVersion() = rewriteRun(
+        pomXml("""
             <project>
                 <modelVersion>4.0.0</modelVersion>
                 <groupId>com.mycompany.app</groupId>
@@ -35,7 +38,7 @@ class UpgradeMicronautMavenPropertyVersionTest : MavenRecipeTest {
                 </properties>
             </project>
         """,
-        after = """
+        """
             <project>
                 <modelVersion>4.0.0</modelVersion>
                 <groupId>com.mycompany.app</groupId>
@@ -45,6 +48,6 @@ class UpgradeMicronautMavenPropertyVersionTest : MavenRecipeTest {
                     <micronaut.version>2.1.4</micronaut.version>
                 </properties>
             </project>
-        """
+        """)
     )
 }
