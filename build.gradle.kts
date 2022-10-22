@@ -95,7 +95,7 @@ dependencies {
     implementation("org.openrewrite:rewrite-java:${rewriteVersion}")
     implementation("org.openrewrite:rewrite-maven:${rewriteVersion}")
     implementation("org.openrewrite:rewrite-properties:${rewriteVersion}")
-    runtimeOnly("org.openrewrite:rewrite-java-11:${rewriteVersion}")
+    runtimeOnly("org.openrewrite:rewrite-java-17:${rewriteVersion}")
     runtimeOnly("org.openrewrite.recipe:rewrite-migrate-java:${rewriteVersion}")
 
     // eliminates "unknown enum constant DeprecationLevel.WARNING" warnings from the build log
@@ -115,8 +115,7 @@ dependencies {
 
     testImplementation("com.google.guava:guava:29.0-jre")
 
-    testRuntimeOnly("org.openrewrite:rewrite-java-11:${rewriteVersion}")
-    testRuntimeOnly("org.openrewrite:rewrite-java-8:${rewriteVersion}")
+    testRuntimeOnly("org.openrewrite:rewrite-java-17:${rewriteVersion}")
 
     testRuntimeOnly("io.micronaut:micronaut-core:2.+")
     testRuntimeOnly("io.micronaut:micronaut-inject-java:2.+")
