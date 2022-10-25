@@ -17,6 +17,7 @@ package org.openrewrite.java.micronaut;
 
 import org.openrewrite.ExecutionContext;
 import org.openrewrite.internal.lang.Nullable;
+import org.openrewrite.maven.MavenDownloadingException;
 import org.openrewrite.maven.cache.MavenPomCache;
 import org.openrewrite.maven.internal.MavenPomDownloader;
 import org.openrewrite.maven.tree.GroupArtifact;
@@ -39,7 +40,7 @@ public final class MicronautVersionHelper {
     private static final String ARTIFACT_ID = "micronaut-parent";
     private static final LatestRelease LATEST_RELEASE = new LatestRelease(null);
 
-    public static Optional<String> getNewerVersion(String versionPattern, String currentVersion, ExecutionContext ctx) {
+    public static Optional<String> getNewerVersion(String versionPattern, String currentVersion, ExecutionContext ctx) throws MavenDownloadingException {
         VersionComparator versionComparator = Semver.validate(versionPattern, null).getValue();
         assert versionComparator != null;
 

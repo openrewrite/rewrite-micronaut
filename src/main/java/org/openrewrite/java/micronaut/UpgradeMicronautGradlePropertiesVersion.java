@@ -18,6 +18,8 @@ package org.openrewrite.java.micronaut;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 import org.openrewrite.*;
+import org.openrewrite.marker.Markup;
+import org.openrewrite.maven.MavenDownloadingException;
 import org.openrewrite.properties.PropertiesVisitor;
 import org.openrewrite.properties.tree.Properties;
 import org.openrewrite.semver.Semver;
@@ -83,7 +85,12 @@ public class UpgradeMicronautGradlePropertiesVersion extends Recipe {
         public Properties visitEntry(Properties.Entry entry, ExecutionContext ctx) {
             if (entry.getKey().equals(PROPERTY_KEY)) {
                 String currentVersion = entry.getValue().getText();
-                String latestVersion = MicronautVersionHelper.getNewerVersion(newVersion, currentVersion, ctx).orElse(null);
+                String latestVersion = null;
+                try {
+                    latestVersion = MicronautVersionHelper.getNewerVersion(newVersion, currentVersion, ctx).orElse(null);
+                } catch (MavenDownloadingException e) {
+                    return Markup.warn(entry, e);
+                }
                 if (latestVersion != null && !currentVersion.equals(latestVersion)) {
                     entry = entry.withValue(entry.getValue().withText(latestVersion));
                 }

@@ -92,10 +92,13 @@ dependencies {
     compileOnly("org.projectlombok:lombok:latest.release")
     annotationProcessor("org.projectlombok:lombok:latest.release")
 
-    implementation("org.openrewrite:rewrite-java:${rewriteVersion}")
-    implementation("org.openrewrite:rewrite-maven:${rewriteVersion}")
-    implementation("org.openrewrite:rewrite-properties:${rewriteVersion}")
-    runtimeOnly("org.openrewrite:rewrite-java-17:${rewriteVersion}")
+    implementation(platform("org.openrewrite:rewrite-bom:${rewriteVersion}"))
+    implementation("org.openrewrite:rewrite-java")
+    implementation("org.openrewrite:rewrite-maven")
+    implementation("org.openrewrite:rewrite-properties")
+    runtimeOnly("org.openrewrite:rewrite-java-8")
+    runtimeOnly("org.openrewrite:rewrite-java-11")
+    runtimeOnly("org.openrewrite:rewrite-java-17")
     runtimeOnly("org.openrewrite.recipe:rewrite-migrate-java:${rewriteVersion}")
 
     // eliminates "unknown enum constant DeprecationLevel.WARNING" warnings from the build log
@@ -109,13 +112,11 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params:latest.release")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:latest.release")
 
-    testImplementation("org.openrewrite:rewrite-test:${rewriteVersion}")
-    testImplementation("org.openrewrite:rewrite-java-tck:${rewriteVersion}")
+    testImplementation("org.openrewrite:rewrite-test")
+    testImplementation("org.openrewrite:rewrite-java-tck")
     testImplementation("org.assertj:assertj-core:latest.release")
 
     testImplementation("com.google.guava:guava:29.0-jre")
-
-    testRuntimeOnly("org.openrewrite:rewrite-java-17:${rewriteVersion}")
 
     testRuntimeOnly("io.micronaut:micronaut-core:2.+")
     testRuntimeOnly("io.micronaut:micronaut-inject-java:2.+")

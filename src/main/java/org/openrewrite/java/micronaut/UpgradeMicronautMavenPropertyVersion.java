@@ -18,7 +18,9 @@ package org.openrewrite.java.micronaut;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
 import org.openrewrite.*;
+import org.openrewrite.marker.Markup;
 import org.openrewrite.maven.ChangePropertyValue;
+import org.openrewrite.maven.MavenDownloadingException;
 import org.openrewrite.maven.MavenIsoVisitor;
 import org.openrewrite.maven.tree.MavenResolutionResult;
 import org.openrewrite.semver.Semver;
@@ -68,8 +70,12 @@ public class UpgradeMicronautMavenPropertyVersion extends Recipe {
                 MavenResolutionResult model = getResolutionResult();
                 String currentVersion = model.getPom().getProperties().get("micronaut.version");
                 if (currentVersion != null && !currentVersion.isEmpty()) {
-                    MicronautVersionHelper.getNewerVersion(newVersion, currentVersion, ctx)
-                            .ifPresent(latestVersion -> doAfterVisit(new ChangePropertyValue("micronaut.version", latestVersion, false, true)));
+                    try {
+                        MicronautVersionHelper.getNewerVersion(newVersion, currentVersion, ctx)
+                                .ifPresent(latestVersion -> doAfterVisit(new ChangePropertyValue("micronaut.version", latestVersion, false, true)));
+                    } catch (MavenDownloadingException e) {
+                        return Markup.warn(document, e);
+                    }
                 }
                 return d;
             }
