@@ -71,7 +71,7 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
 
     @Override
     protected JavaIsoVisitor<ExecutionContext> getApplicableTest() {
-        return new UsesType<>("io.micronaut..*", null);
+        return new UsesType<>("io.micronaut..*", false);
     }
 
     @Override
@@ -80,7 +80,7 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
             @Override
             public J.CompilationUnit visitCompilationUnit(J.CompilationUnit cu, ExecutionContext executionContext) {
                 J.CompilationUnit c = super.visitCompilationUnit(cu, executionContext);
-                exception_handlers.forEach(fqn -> doAfterVisit(new UsesType<>(fqn, null)));
+                exception_handlers.forEach(fqn -> doAfterVisit(new UsesType<>(fqn, false)));
                 return c;
             }
         };

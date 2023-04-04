@@ -48,12 +48,12 @@ public class OncePerRequestHttpServerFilterToHttpServerFilter extends Recipe {
 
     @Override
     protected JavaIsoVisitor<ExecutionContext> getApplicableTest() {
-        return new UsesType<>("io.micronaut..*", null);
+        return new UsesType<>("io.micronaut..*", false);
     }
 
     @Override
     protected UsesType<ExecutionContext> getSingleSourceApplicableTest() {
-        return new UsesType<>(oncePerRequestHttpServerFilterFqn, null);
+        return new UsesType<>(oncePerRequestHttpServerFilterFqn, false);
     }
 
     @Override

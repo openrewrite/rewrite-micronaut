@@ -65,7 +65,7 @@ public class ProviderImplementationsToMicronautFactories extends Recipe {
 
     @Override
     protected JavaIsoVisitor<ExecutionContext> getApplicableTest() {
-        return new UsesType<>("io.micronaut..*", null);
+        return new UsesType<>("io.micronaut..*", false);
     }
 
     @Override
@@ -73,8 +73,8 @@ public class ProviderImplementationsToMicronautFactories extends Recipe {
         return new JavaIsoVisitor<ExecutionContext>() {
             @Override
             public J.CompilationUnit visitCompilationUnit(J.CompilationUnit cu, ExecutionContext executionContext) {
-                doAfterVisit(new UsesType<>("javax.inject.Provider", null));
-                doAfterVisit(new UsesType<>("jakarta.inject.Provider", null));
+                doAfterVisit(new UsesType<>("javax.inject.Provider", false));
+                doAfterVisit(new UsesType<>("jakarta.inject.Provider", false));
                 return cu;
             }
         };

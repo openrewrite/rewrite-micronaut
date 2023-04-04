@@ -44,12 +44,12 @@ public class BeanPropertyCapitalizationStrategy extends Recipe {
 
     @Override
     protected JavaIsoVisitor<ExecutionContext> getApplicableTest() {
-        return new UsesType<>("io.micronaut..*", null);
+        return new UsesType<>("io.micronaut..*", false);
     }
 
     @Override
     protected UsesType<ExecutionContext> getSingleSourceApplicableTest() {
-        return new UsesType<>("io.micronaut.core.beans.BeanIntrospection", null);
+        return new UsesType<>("io.micronaut.core.beans.BeanIntrospection", false);
     }
 
     @Override
