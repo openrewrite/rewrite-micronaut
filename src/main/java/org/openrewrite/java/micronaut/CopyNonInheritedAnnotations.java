@@ -113,7 +113,7 @@ public class CopyNonInheritedAnnotations extends Recipe {
 
     @Override
     protected JavaIsoVisitor<ExecutionContext> getApplicableTest() {
-        return new UsesType<>("io.micronaut..*");
+        return new UsesType<>("io.micronaut..*", null);
     }
 
     @Override

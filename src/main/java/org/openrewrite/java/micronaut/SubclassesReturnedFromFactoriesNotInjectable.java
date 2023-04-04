@@ -44,12 +44,12 @@ public class SubclassesReturnedFromFactoriesNotInjectable extends Recipe {
 
     @Override
     protected JavaIsoVisitor<ExecutionContext> getApplicableTest() {
-        return new UsesType<>("io.micronaut..*");
+        return new UsesType<>("io.micronaut..*", null);
     }
 
     @Override
     protected UsesType<ExecutionContext> getSingleSourceApplicableTest() {
-        return new UsesType<>("io.micronaut.context.annotation.Factory");
+        return new UsesType<>("io.micronaut.context.annotation.Factory", null);
     }
 
     @Override
