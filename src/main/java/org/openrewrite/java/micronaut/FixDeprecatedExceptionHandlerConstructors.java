@@ -16,7 +16,9 @@
 package org.openrewrite.java.micronaut;
 
 import org.openrewrite.ExecutionContext;
+import org.openrewrite.Preconditions;
 import org.openrewrite.Recipe;
+import org.openrewrite.TreeVisitor;
 import org.openrewrite.java.AnnotationMatcher;
 import org.openrewrite.java.JavaIsoVisitor;
 import org.openrewrite.java.JavaParser;
@@ -25,7 +27,6 @@ import org.openrewrite.java.search.UsesType;
 import org.openrewrite.java.tree.*;
 import org.openrewrite.marker.Markers;
 
-import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -42,20 +43,18 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
             "io.micronaut.validation.exceptions.ConstraintExceptionHandler",
             "io.micronaut.validation.exceptions.ValidationExceptionHandler"
     );
+    @SuppressWarnings("unchecked")
+    private static final TreeVisitor<?, ExecutionContext> precondition =
+            Preconditions.or(exception_handlers.stream().map(fqn -> new UsesType<>(fqn, false)).toArray(TreeVisitor[]::new));
 
-    private static final ThreadLocal<JavaParser> JAVA_PARSER = ThreadLocal.withInitial(() ->
+    private static final JavaParser.Builder<?, ?> JAVA_PARSER =
             JavaParser.fromJavaVersion().dependsOn(
-                            "package jakarta.inject; public @interface Inject {}",
-                            "package io.micronaut.http.server.exceptions.response; public interface ErrorContext {}",
-                            "package io.micronaut.http; public interface MutableHttpResponse<B> {}",
-                            "package io.micronaut.http.server.exceptions.response; public interface ErrorResponseProcessor<T> {MutableHttpResponse<T> processResponse(ErrorContext errorContext, MutableHttpResponse<?> baseResponse);}",
-                            "package io.micronaut.validation.exceptions; public class ConstraintExceptionHandler { public ConstraintExceptionHandler(ErrorResponseProcessor<?> responseProcessor){}}")
-                    .build());
+                    "package jakarta.inject; public @interface Inject {}",
+                    "package io.micronaut.http.server.exceptions.response; public interface ErrorContext {}",
+                    "package io.micronaut.http; public interface MutableHttpResponse<B> {}",
+                    "package io.micronaut.http.server.exceptions.response; public interface ErrorResponseProcessor<T> {MutableHttpResponse<T> processResponse(ErrorContext errorContext, MutableHttpResponse<?> baseResponse);}",
+                    "package io.micronaut.validation.exceptions; public class ConstraintExceptionHandler { public ConstraintExceptionHandler(ErrorResponseProcessor<?> responseProcessor){}}");
 
-    @Override
-    public Duration getEstimatedEffortPerOccurrence() {
-        return Duration.ofMinutes(5);
-    }
     private static final AnnotationMatcher javax_matcher = new AnnotationMatcher("@javax.inject.Inject");
     private static final AnnotationMatcher jakarta_matcher = new AnnotationMatcher("@jakarta.inject.Inject");
 
@@ -70,27 +69,10 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
     }
 
     @Override
-    protected JavaIsoVisitor<ExecutionContext> getApplicableTest() {
-        return new UsesType<>("io.micronaut..*", false);
-    }
-
-    @Override
-    protected JavaIsoVisitor<ExecutionContext> getSingleSourceApplicableTest() {
-        return new JavaIsoVisitor<ExecutionContext>() {
-            @Override
-            public J.CompilationUnit visitCompilationUnit(J.CompilationUnit cu, ExecutionContext executionContext) {
-                J.CompilationUnit c = super.visitCompilationUnit(cu, executionContext);
-                exception_handlers.forEach(fqn -> doAfterVisit(new UsesType<>(fqn, false)));
-                return c;
-            }
-        };
-    }
-
-    @Override
-    protected JavaIsoVisitor<ExecutionContext> getVisitor() {
-        return new JavaIsoVisitor<ExecutionContext>() {
+    public TreeVisitor<?, ExecutionContext> getVisitor() {
+        return Preconditions.check(precondition, new JavaIsoVisitor<ExecutionContext>() {
             final JavaTemplate injectTemplate = JavaTemplate.builder(this::getCursor,
-                            "@Inject").javaParser(JAVA_PARSER::get)
+                            "@Inject").javaParser(JAVA_PARSER)
                     .imports("jakarta.inject.Inject")
                     .build();
 
@@ -128,7 +110,7 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
                             params.add("ErrorResponseProcessor errorResponseProcessor");
                             JavaTemplate paramsTemplate = JavaTemplate.builder(this::getCursor, params.stream().map(p -> "#{}").collect(Collectors.joining(", ")))
                                     .imports(errorResponseProcessorFqn)
-                                    .javaParser(JAVA_PARSER::get).build();
+                                    .javaParser(JAVA_PARSER).build();
                             md = md.withTemplate(paramsTemplate, md.getCoordinates().replaceParameters(), params.toArray());
                         }
 
@@ -140,7 +122,7 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
                             if (errorResponseVar.isPresent() && md.getBody() != null && getCursor().getParent() != null) {
                                 JavaTemplate superInvocationTemplate = JavaTemplate.builder(this::getCursor, "super(#{any(" + errorResponseProcessorFqn + ")});")
                                         .imports(errorResponseProcessorFqn)
-                                        .javaParser(JAVA_PARSER::get).build();
+                                        .javaParser(JAVA_PARSER).build();
                                 md = maybeAutoFormat(md, md.withTemplate(superInvocationTemplate, md.getBody().getCoordinates().lastStatement(), errorResponseVar.get()), executionContext, getCursor().getParent());
                                 assert md.getBody() != null;
                                 md = md.withBody(moveLastStatementToFirst(md.getBody()));
@@ -161,7 +143,7 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
                                         "@Inject\npublic " + cd.getSimpleName() + "(ErrorResponseProcessor errorResponseProcessor) {" +
                                                 "super(errorResponseProcessor);}")
                                 .imports(errorResponseProcessorFqn, "jakarta.inject.Inject", cdFq.getFullyQualifiedName())
-                                .javaParser(JAVA_PARSER::get).build();
+                                .javaParser(JAVA_PARSER).build();
                         cd = cd.withTemplate(template, cd.getBody().getCoordinates().lastStatement());
                         cd = cd.withBody(moveLastStatementToFirst(cd.getBody()));
                         maybeAddImport("jakarta.inject.Inject");
@@ -190,6 +172,6 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
                 }
                 return block;
             }
-        };
+        });
     }
 }

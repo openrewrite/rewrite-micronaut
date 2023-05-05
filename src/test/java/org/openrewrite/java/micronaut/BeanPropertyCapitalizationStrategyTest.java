@@ -13,37 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.openrewrite.java.micronaut
+package org.openrewrite.java.micronaut;
 
-import org.junit.jupiter.api.Test
-import org.openrewrite.Recipe
-import org.openrewrite.java.JavaParser
-import org.openrewrite.java.JavaRecipeTest
+import org.junit.jupiter.api.Test;
+import org.openrewrite.java.JavaParser;
+import org.openrewrite.test.RecipeSpec;
+import org.openrewrite.test.RewriteTest;
 
-class BeanPropertyCapitalizationStrategyTest : JavaRecipeTest {
-    override val parser: JavaParser
-        get() = JavaParser.fromJavaVersion()
-            .classpath("micronaut-core")
-            .dependsOn(
-                """
-                package a.b;
-                public class C {
-                    public String getCName() {
-                        return "";
-                    }
-                }
-            """
-            ).build()
-    override val recipe: Recipe
-        get() = BeanPropertyCapitalizationStrategy()
+import static org.openrewrite.java.Assertions.java;
+
+class BeanPropertyCapitalizationStrategyTest implements RewriteTest {
+
+    @Override
+    public void defaults(RecipeSpec spec) {
+        spec.parser(JavaParser.fromJavaVersion().classpath("micronaut-core").dependsOn("""
+              package a.b;
+              public class C {
+                  public String getCName() {
+                      return "";
+                  }
+              }
+          """)).recipe(new BeanPropertyCapitalizationStrategy());
+    }
 
     @Test
-    fun deCapitalizeProperty() = assertChanged(
-        before = """
+    void deCapitalizeProperty() {
+        rewriteRun(java(
+          """
             package a.b;
             import io.micronaut.core.beans.BeanIntrospection;
             import io.micronaut.core.beans.BeanProperty;
-            
+            import org.checkerframework.checker.units.qual.C;
+                
             class T {
                 void p() {
                     BeanIntrospection<C> introspection = BeanIntrospection.getIntrospection(C.class);
@@ -52,11 +53,12 @@ class BeanPropertyCapitalizationStrategyTest : JavaRecipeTest {
                     Optional<BeanProperty<C, Object>> p3 = introspection.getProperty("CName");
                 }
             }
-        """,
-        after = """
+            """,
+          """
             package a.b;
             import io.micronaut.core.beans.BeanIntrospection;
             import io.micronaut.core.beans.BeanProperty;
+            import org.checkerframework.checker.units.qual.C;
             
             class T {
                 void p() {
@@ -66,6 +68,6 @@ class BeanPropertyCapitalizationStrategyTest : JavaRecipeTest {
                     Optional<BeanProperty<C, Object>> p3 = introspection.getProperty("cName");
                 }
             }
-        """
-    )
+            """));
+    }
 }

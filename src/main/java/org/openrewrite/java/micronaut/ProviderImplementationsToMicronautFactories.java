@@ -15,9 +15,7 @@
  */
 package org.openrewrite.java.micronaut;
 
-import org.openrewrite.Cursor;
-import org.openrewrite.ExecutionContext;
-import org.openrewrite.Recipe;
+import org.openrewrite.*;
 import org.openrewrite.internal.ListUtils;
 import org.openrewrite.java.*;
 import org.openrewrite.java.search.UsesType;
@@ -25,15 +23,14 @@ import org.openrewrite.java.tree.J;
 import org.openrewrite.java.tree.JavaType;
 import org.openrewrite.java.tree.TypeUtils;
 
-import java.time.Duration;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ProviderImplementationsToMicronautFactories extends Recipe {
-    private static final ThreadLocal<JavaParser> JAVA_PARSER = ThreadLocal.withInitial(() ->
-            JavaParser.fromJavaVersion().dependsOn("package io.micronaut.context.annotation; public @interface Factory {}").build());
+    private static final JavaParser.Builder<?, ?> JAVA_PARSER =
+            JavaParser.fromJavaVersion().dependsOn("package io.micronaut.context.annotation; public @interface Factory {}");
 
     private static final List<AnnotationMatcher> BEAN_ANNOTATION_MATCHERS = Stream.concat(
             Stream.of("io.micronaut.context.annotation.Bean",
@@ -54,35 +51,16 @@ public class ProviderImplementationsToMicronautFactories extends Recipe {
     }
 
     @Override
-    public Duration getEstimatedEffortPerOccurrence() {
-        return Duration.ofMinutes(5);
-    }
-
-    @Override
     public String getDescription() {
         return "As of Micronaut 3.x the `@Factory` annotation is required for creating beans from `javax.inject.Provider get()` implementations.";
     }
 
     @Override
-    protected JavaIsoVisitor<ExecutionContext> getApplicableTest() {
-        return new UsesType<>("io.micronaut..*", false);
-    }
-
-    @Override
-    protected JavaIsoVisitor<ExecutionContext> getSingleSourceApplicableTest() {
-        return new JavaIsoVisitor<ExecutionContext>() {
-            @Override
-            public J.CompilationUnit visitCompilationUnit(J.CompilationUnit cu, ExecutionContext executionContext) {
-                doAfterVisit(new UsesType<>("javax.inject.Provider", false));
-                doAfterVisit(new UsesType<>("jakarta.inject.Provider", false));
-                return cu;
-            }
-        };
-    }
-
-    @Override
-    protected JavaIsoVisitor<ExecutionContext> getVisitor() {
-        return new JavaIsoVisitor<ExecutionContext>() {
+    public TreeVisitor<?, ExecutionContext> getVisitor() {
+        return Preconditions.check(Preconditions.or(
+                new UsesType<>("javax.inject.Provider", false),
+                new UsesType<>("jakarta.inject.Provider", false)
+        ), new JavaIsoVisitor<ExecutionContext>() {
             @Override
             public J.CompilationUnit visitCompilationUnit(J.CompilationUnit cu, ExecutionContext executionContext) {
                 if (cu.getClasses().stream().anyMatch(cd -> isProvider(cd) && cd.getLeadingAnnotations().stream().anyMatch(ProviderImplementationsToMicronautFactories::isBeanAnnotation))) {
@@ -90,7 +68,7 @@ public class ProviderImplementationsToMicronautFactories extends Recipe {
                 }
                 return cu;
             }
-        };
+        });
     }
 
     private static boolean isBeanAnnotation(J.Annotation annotation) {
@@ -123,7 +101,7 @@ public class ProviderImplementationsToMicronautFactories extends Recipe {
 
             cd = cd.withTemplate(JavaTemplate.builder(this::getCursor, "@Factory")
                             .imports("io.micronaut.context.annotation.Factory")
-                            .javaParser(JAVA_PARSER::get).build(),
+                            .javaParser(JAVA_PARSER).build(),
                     cd.getCoordinates().addAnnotation(Comparator.comparing(J.Annotation::getSimpleName)));
             maybeAddImport("io.micronaut.context.annotation.Factory");
             return cd;

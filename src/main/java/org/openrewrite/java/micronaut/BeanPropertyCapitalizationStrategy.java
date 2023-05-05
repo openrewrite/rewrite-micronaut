@@ -16,14 +16,14 @@
 package org.openrewrite.java.micronaut;
 
 import org.openrewrite.ExecutionContext;
+import org.openrewrite.Preconditions;
 import org.openrewrite.Recipe;
+import org.openrewrite.TreeVisitor;
 import org.openrewrite.java.ChangeLiteral;
 import org.openrewrite.java.JavaIsoVisitor;
 import org.openrewrite.java.MethodMatcher;
 import org.openrewrite.java.search.UsesType;
 import org.openrewrite.java.tree.J;
-
-import java.time.Duration;
 
 public class BeanPropertyCapitalizationStrategy extends Recipe {
 
@@ -38,23 +38,8 @@ public class BeanPropertyCapitalizationStrategy extends Recipe {
     }
 
     @Override
-    public Duration getEstimatedEffortPerOccurrence() {
-        return Duration.ofMinutes(5);
-    }
-
-    @Override
-    protected JavaIsoVisitor<ExecutionContext> getApplicableTest() {
-        return new UsesType<>("io.micronaut..*", false);
-    }
-
-    @Override
-    protected UsesType<ExecutionContext> getSingleSourceApplicableTest() {
-        return new UsesType<>("io.micronaut.core.beans.BeanIntrospection", false);
-    }
-
-    @Override
-    protected BeanPropertyCapitalizationStrategyVisitor getVisitor() {
-        return new BeanPropertyCapitalizationStrategyVisitor();
+    public TreeVisitor<?, ExecutionContext> getVisitor() {
+        return Preconditions.check(new UsesType<>("io.micronaut.core.beans.BeanIntrospection", false), new BeanPropertyCapitalizationStrategyVisitor());
     }
 
     private static class BeanPropertyCapitalizationStrategyVisitor extends JavaIsoVisitor<ExecutionContext> {
