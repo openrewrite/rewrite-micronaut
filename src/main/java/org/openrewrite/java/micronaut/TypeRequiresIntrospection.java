@@ -143,7 +143,7 @@ public class TypeRequiresIntrospection extends ScanningRecipe<TypeRequiresIntros
     private static class AddIntrospectionAnnotationVisitor extends JavaIsoVisitor<Set<JavaType.FullyQualified>> {
         final String introspectedAnnotationFqn = "io.micronaut.core.annotation.Introspected";
         final AnnotationMatcher INTROSPECTION_ANNOTATION_MATCHER = new AnnotationMatcher("@" + introspectedAnnotationFqn);
-        final JavaTemplate templ = JavaTemplate.builder(this::getCursor, "@Introspected")
+        final JavaTemplate templ = JavaTemplate.builder("@Introspected")
                 .imports(introspectedAnnotationFqn)
                 .javaParser(JavaParser.fromJavaVersion().dependsOn("package io.micronaut.core.annotation; public @interface Introspected {}"))
                 .build();
@@ -156,7 +156,7 @@ public class TypeRequiresIntrospection extends ScanningRecipe<TypeRequiresIntros
 
             J.ClassDeclaration cd = super.visitClassDeclaration(classDecl, introspectableTypes);
             if (cd.getLeadingAnnotations().stream().noneMatch(INTROSPECTION_ANNOTATION_MATCHER::matches)) {
-                cd = cd.withTemplate(templ, cd.getCoordinates().addAnnotation(Comparator.comparing(J.Annotation::getSimpleName)));
+                cd = cd.withTemplate(templ, getCursor(), cd.getCoordinates().addAnnotation(Comparator.comparing(J.Annotation::getSimpleName)));
                 maybeAddImport(introspectedAnnotationFqn);
             }
             return cd;

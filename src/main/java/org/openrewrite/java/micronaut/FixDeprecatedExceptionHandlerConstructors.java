@@ -71,8 +71,7 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
     @Override
     public TreeVisitor<?, ExecutionContext> getVisitor() {
         return Preconditions.check(precondition, new JavaIsoVisitor<ExecutionContext>() {
-            final JavaTemplate injectTemplate = JavaTemplate.builder(this::getCursor,
-                            "@Inject").javaParser(JAVA_PARSER)
+            final JavaTemplate injectTemplate = JavaTemplate.builder("@Inject").javaParser(JAVA_PARSER)
                     .imports("jakarta.inject.Inject")
                     .build();
 
@@ -101,17 +100,18 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
                     if (md.isConstructor()) {
                         getCursor().dropParentUntil(J.ClassDeclaration.class::isInstance).putMessage("constructor-exists", Boolean.TRUE);
                         if (md.getLeadingAnnotations().stream().noneMatch(anno -> jakarta_matcher.matches(anno) || javax_matcher.matches(anno))) {
-                            md = md.withTemplate(injectTemplate, md.getCoordinates().addAnnotation(Comparator.comparing(J.Annotation::getSimpleName)));
+                            md = md.withTemplate(injectTemplate, getCursor(), md.getCoordinates().addAnnotation(Comparator.comparing(J.Annotation::getSimpleName)));
                         }
                         maybeAddImport("jakarta.inject.Inject");
 
                         if (md.getParameters().stream().noneMatch(this::isErrorProcessorParameter)) {
                             List<Object> params = md.getParameters().stream().filter(j -> !(j instanceof J.Empty)).collect(Collectors.toList());
                             params.add("ErrorResponseProcessor errorResponseProcessor");
-                            JavaTemplate paramsTemplate = JavaTemplate.builder(this::getCursor, params.stream().map(p -> "#{}").collect(Collectors.joining(", ")))
+                            JavaTemplate paramsTemplate = JavaTemplate.builder(params.stream().map(p -> "#{}").collect(Collectors.joining(", ")))
+                                    .context(getCursor())
                                     .imports(errorResponseProcessorFqn)
                                     .javaParser(JAVA_PARSER).build();
-                            md = md.withTemplate(paramsTemplate, md.getCoordinates().replaceParameters(), params.toArray());
+                            md = md.withTemplate(paramsTemplate, getCursor(), md.getCoordinates().replaceParameters(), params.toArray());
                         }
 
                         if (getCursor().pollMessage("super-invocation-exists") == null) {
@@ -120,10 +120,15 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
                                     .filter(v -> TypeUtils.isOfClassType(v.getType(), errorResponseProcessorFqn))
                                     .map(v -> v.getVariables().get(0).getName()).findFirst();
                             if (errorResponseVar.isPresent() && md.getBody() != null && getCursor().getParent() != null) {
-                                JavaTemplate superInvocationTemplate = JavaTemplate.builder(this::getCursor, "super(#{any(" + errorResponseProcessorFqn + ")});")
+                                JavaTemplate superInvocationTemplate = JavaTemplate.builder("super(#{any(" + errorResponseProcessorFqn + ")});")
+                                        .context(getCursor())
                                         .imports(errorResponseProcessorFqn)
                                         .javaParser(JAVA_PARSER).build();
-                                md = maybeAutoFormat(md, md.withTemplate(superInvocationTemplate, md.getBody().getCoordinates().lastStatement(), errorResponseVar.get()), executionContext, getCursor().getParent());
+                                md = maybeAutoFormat(md,
+                                        md.withTemplate(superInvocationTemplate,
+                                                getCursor(),
+                                                md.getBody().getCoordinates().lastStatement(), errorResponseVar.get()
+                                        ), executionContext, getCursor().getParent());
                                 assert md.getBody() != null;
                                 md = md.withBody(moveLastStatementToFirst(md.getBody()));
                             }
@@ -139,12 +144,13 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
                 JavaType.FullyQualified cdFq = cd.getExtends() != null ? TypeUtils.asFullyQualified(cd.getExtends().getType()) : null;
                 if (cdFq != null && exception_handlers.stream().anyMatch(fqn -> TypeUtils.isOfClassType(cdFq, fqn))) {
                     if (!Boolean.TRUE.equals(getCursor().pollMessage("constructor-exists"))) {
-                        JavaTemplate template = JavaTemplate.builder(this::getCursor,
+                        JavaTemplate template = JavaTemplate.builder(
                                         "@Inject\npublic " + cd.getSimpleName() + "(ErrorResponseProcessor errorResponseProcessor) {" +
                                                 "super(errorResponseProcessor);}")
+                                .context(getCursor())
                                 .imports(errorResponseProcessorFqn, "jakarta.inject.Inject", cdFq.getFullyQualifiedName())
                                 .javaParser(JAVA_PARSER).build();
-                        cd = cd.withTemplate(template, cd.getBody().getCoordinates().lastStatement());
+                        cd = cd.withTemplate(template, getCursor(), cd.getBody().getCoordinates().lastStatement());
                         cd = cd.withBody(moveLastStatementToFirst(cd.getBody()));
                         maybeAddImport("jakarta.inject.Inject");
                     }
