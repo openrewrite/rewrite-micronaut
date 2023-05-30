@@ -108,7 +108,7 @@ public class CopyNonInheritedAnnotations extends ScanningRecipe<CopyNonInherited
     }
 
     @Override
-    public Accumulator getInitialValue() {
+    public Accumulator getInitialValue(ExecutionContext ctx) {
         return new Accumulator();
     }
 
