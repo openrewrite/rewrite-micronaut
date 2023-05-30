@@ -43,4 +43,16 @@ class UpgradeMicronautGradlePropertiesVersionTest implements RewriteTest {
           )
         );
     }
+
+    @Test
+    void upgradeToMicronaut4() {
+        rewriteRun(
+          spec -> spec.recipe(new UpgradeMicronautGradlePropertiesVersion("4.0.0-M2")),
+          properties(
+            "micronautVersion=3.9.0",
+            "micronautVersion=4.0.0-M2",
+            s -> s.path("gradle.properties")
+          )
+        );
+    }
 }

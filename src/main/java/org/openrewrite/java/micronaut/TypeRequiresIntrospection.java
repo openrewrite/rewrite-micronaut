@@ -55,7 +55,7 @@ public class TypeRequiresIntrospection extends ScanningRecipe<TypeRequiresIntros
     }
 
     @Override
-    public Accumulator getInitialValue() {
+    public Accumulator getInitialValue(ExecutionContext ctx) {
         return new Accumulator();
     }
 

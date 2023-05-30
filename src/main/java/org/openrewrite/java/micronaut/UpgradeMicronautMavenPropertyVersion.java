@@ -31,7 +31,7 @@ import org.openrewrite.xml.tree.Xml;
 public class UpgradeMicronautMavenPropertyVersion extends Recipe {
     @Option(displayName = "New version",
             description = "An exact version number, or node-style semver selector used to select the version number.",
-            example = "3.x")
+            example = "4.x")
     String newVersion;
 
     @Override

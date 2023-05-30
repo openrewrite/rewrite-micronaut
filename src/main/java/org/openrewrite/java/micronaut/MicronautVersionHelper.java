@@ -34,6 +34,7 @@ import static java.util.Collections.emptyMap;
 public final class MicronautVersionHelper {
 
     private static final String GROUP_ID = "io.micronaut";
+    private static final String V4_GROUP_ID = "io.micronaut.platform";
     private static final String ARTIFACT_ID = "micronaut-parent";
     private static final LatestRelease LATEST_RELEASE = new LatestRelease(null);
 
@@ -41,8 +42,10 @@ public final class MicronautVersionHelper {
         VersionComparator versionComparator = Semver.validate(versionPattern, null).getValue();
         assert versionComparator != null;
 
+        String groupId = Semver.majorVersion(versionPattern).equals("4") ? V4_GROUP_ID : GROUP_ID;
+
         MavenMetadata mavenMetadata = new MavenPomDownloader(emptyMap(), ctx)
-                .downloadMetadata(new GroupArtifact(GROUP_ID, ARTIFACT_ID), null, emptyList());
+                .downloadMetadata(new GroupArtifact(groupId, ARTIFACT_ID), null, emptyList());
 
         Collection<String> availableVersions = new ArrayList<>();
         for (String v : mavenMetadata.getVersioning().getVersions()) {
