@@ -15,22 +15,23 @@
  */
 package org.openrewrite.java.micronaut;
 
+import lombok.Data;
 import org.openrewrite.ExecutionContext;
-import org.openrewrite.Recipe;
-import org.openrewrite.SourceFile;
+import org.openrewrite.ScanningRecipe;
+import org.openrewrite.Tree;
+import org.openrewrite.TreeVisitor;
 import org.openrewrite.internal.ListUtils;
+import org.openrewrite.internal.lang.Nullable;
 import org.openrewrite.java.JavaIsoVisitor;
-import org.openrewrite.java.search.UsesType;
 import org.openrewrite.java.tree.J;
 import org.openrewrite.java.tree.JavaType;
 import org.openrewrite.java.tree.TypeUtils;
 
-import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class CopyNonInheritedAnnotations extends Recipe {
+public class CopyNonInheritedAnnotations extends ScanningRecipe<CopyNonInheritedAnnotations.Accumulator> {
 
     private static final Set<String> NON_INHERITED_ANNOTATION_TYPES = Stream.of(
             "io.micronaut.aop.Around",
@@ -107,45 +108,46 @@ public class CopyNonInheritedAnnotations extends Recipe {
     }
 
     @Override
-    public Duration getEstimatedEffortPerOccurrence() {
-        return Duration.ofMinutes(5);
+    public Accumulator getInitialValue(ExecutionContext ctx) {
+        return new Accumulator();
     }
 
     @Override
-    protected JavaIsoVisitor<ExecutionContext> getApplicableTest() {
-        return new UsesType<>("io.micronaut..*", false);
-    }
-
-    @Override
-    protected List<SourceFile> visit(List<SourceFile> before, ExecutionContext ctx) {
-        Map<String, List<J.Annotation>> parentAnnotationsByType = new HashMap<>();
-        JavaIsoVisitor<Map<String, List<J.Annotation>>> parentAnnotationCollector = new org.openrewrite.java.JavaIsoVisitor<Map<String, List<J.Annotation>>>() {
+    public TreeVisitor<?, ExecutionContext> getScanner(Accumulator acc) {
+        return new JavaIsoVisitor<ExecutionContext>() {
             @Override
-            public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, Map<String, List<J.Annotation>> classAnnos) {
-                J.ClassDeclaration cd = super.visitClassDeclaration(classDecl, classAnnos);
+            public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext ctx) {
+                J.ClassDeclaration cd = super.visitClassDeclaration(classDecl, ctx);
                 if (cd.getType() != null) {
                     String classFqn = cd.getType().getFullyQualifiedName();
                     for (J.Annotation annotation : cd.getLeadingAnnotations()) {
                         JavaType.FullyQualified annoFq = TypeUtils.asFullyQualified(annotation.getType());
                         if (annoFq != null && NON_INHERITED_ANNOTATION_TYPES.stream().anyMatch(fqn -> fqn.equals(annoFq.getFullyQualifiedName()))) {
-                            classAnnos.computeIfAbsent(classFqn, v -> new ArrayList<>()).add(annotation);
+                            acc.getParentAnnotationsByType().computeIfAbsent(classFqn, v -> new ArrayList<>()).add(annotation);
                         }
                     }
                 }
                 return cd;
             }
         };
-        for (SourceFile sourceFile : before) {
-            parentAnnotationCollector.visit(sourceFile, parentAnnotationsByType);
+    }
+
+    @Override
+    public TreeVisitor<?, ExecutionContext> getVisitor(Accumulator acc) {
+        if (acc.getParentAnnotationsByType().isEmpty()) {
+            return TreeVisitor.noop();
         }
 
-        CopyAnnoVisitor copyAnnoVisitor = new CopyAnnoVisitor(parentAnnotationsByType);
-        return ListUtils.map(before, sourceFile -> {
-            if (sourceFile instanceof J.CompilationUnit) {
-                return (SourceFile) copyAnnoVisitor.visit(sourceFile, ctx);
+        CopyAnnoVisitor copyAnnoVisitor = new CopyAnnoVisitor(acc.getParentAnnotationsByType());
+        return new TreeVisitor<Tree, ExecutionContext>() {
+            @Override
+            public @Nullable Tree visit(@Nullable Tree tree, ExecutionContext ctx) {
+                if (tree instanceof J.CompilationUnit) {
+                    return copyAnnoVisitor.visit(tree, ctx);
+                }
+                return tree;
             }
-            return sourceFile;
-        });
+        };
     }
 
     private static final class CopyAnnoVisitor extends JavaIsoVisitor<ExecutionContext> {
@@ -157,10 +159,6 @@ public class CopyNonInheritedAnnotations extends Recipe {
 
         @Override
         public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext executionContext) {
-            if (parentAnnotationsByType.isEmpty()) {
-                return classDecl;
-            }
-
             J.ClassDeclaration cd = super.visitClassDeclaration(classDecl, executionContext);
 
             //First collect the names of all super classes and interfaces.
@@ -215,5 +213,10 @@ public class CopyNonInheritedAnnotations extends Recipe {
             }
             return cd;
         }
+    }
+
+    @Data
+    static class Accumulator {
+        final Map<String, List<J.Annotation>> parentAnnotationsByType = new HashMap<>();
     }
 }

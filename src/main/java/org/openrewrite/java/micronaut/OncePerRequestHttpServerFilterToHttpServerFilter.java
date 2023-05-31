@@ -16,7 +16,9 @@
 package org.openrewrite.java.micronaut;
 
 import org.openrewrite.ExecutionContext;
+import org.openrewrite.Preconditions;
 import org.openrewrite.Recipe;
+import org.openrewrite.TreeVisitor;
 import org.openrewrite.internal.ListUtils;
 import org.openrewrite.java.ChangeMethodName;
 import org.openrewrite.java.JavaIsoVisitor;
@@ -25,7 +27,6 @@ import org.openrewrite.java.search.UsesType;
 import org.openrewrite.java.tree.*;
 import org.openrewrite.marker.Markers;
 
-import java.time.Duration;
 import java.util.UUID;
 
 public class OncePerRequestHttpServerFilterToHttpServerFilter extends Recipe {
@@ -37,28 +38,13 @@ public class OncePerRequestHttpServerFilterToHttpServerFilter extends Recipe {
     }
 
     @Override
-    public Duration getEstimatedEffortPerOccurrence() {
-        return Duration.ofMinutes(5);
-    }
-
-    @Override
     public String getDescription() {
         return "Starting in Micronaut 3.0 all filters are executed once per request. Directly implement `HttpServerFilter` instead of extending `OncePerRequestHttpServerFilter` and replace any usages of `micronaut.once` attributes with a custom attribute name.";
     }
 
     @Override
-    protected JavaIsoVisitor<ExecutionContext> getApplicableTest() {
-        return new UsesType<>("io.micronaut..*", false);
-    }
-
-    @Override
-    protected UsesType<ExecutionContext> getSingleSourceApplicableTest() {
-        return new UsesType<>(oncePerRequestHttpServerFilterFqn, false);
-    }
-
-    @Override
-    protected OncePerRequestHttpServerFilterToHttpServerFilterVisitor getVisitor() {
-        return new OncePerRequestHttpServerFilterToHttpServerFilterVisitor();
+    public TreeVisitor<?, ExecutionContext> getVisitor() {
+        return Preconditions.check(new UsesType<>(oncePerRequestHttpServerFilterFqn, false), new OncePerRequestHttpServerFilterToHttpServerFilterVisitor());
     }
 
     private static class OncePerRequestHttpServerFilterToHttpServerFilterVisitor extends JavaIsoVisitor<ExecutionContext> {
@@ -81,7 +67,7 @@ public class OncePerRequestHttpServerFilterToHttpServerFilter extends Recipe {
                 if (cd.getType() != null) {
                     doAfterVisit(new ChangeMethodName(
                             cd.getType().getFullyQualifiedName() + " doFilterOnce(io.micronaut.http.HttpRequest, io.micronaut.http.filter.ServerFilterChain)",
-                            "doFilter", true, false));
+                            "doFilter", true, false).getVisitor());
                 }
                 maybeAddImport("io.micronaut.http.filter.HttpServerFilter");
                 maybeRemoveImport(oncePerRequestHttpServerFilterFqn);

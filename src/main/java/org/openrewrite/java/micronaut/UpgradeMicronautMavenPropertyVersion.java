@@ -26,8 +26,6 @@ import org.openrewrite.maven.tree.MavenResolutionResult;
 import org.openrewrite.semver.Semver;
 import org.openrewrite.xml.tree.Xml;
 
-import java.time.Duration;
-
 @Value
 @EqualsAndHashCode(callSuper = true)
 public class UpgradeMicronautMavenPropertyVersion extends Recipe {
@@ -57,12 +55,7 @@ public class UpgradeMicronautMavenPropertyVersion extends Recipe {
     }
 
     @Override
-    public Duration getEstimatedEffortPerOccurrence() {
-        return Duration.ofMinutes(5);
-    }
-
-    @Override
-    protected TreeVisitor<?, ExecutionContext> getVisitor() {
+    public TreeVisitor<?, ExecutionContext> getVisitor() {
         return new MavenIsoVisitor<ExecutionContext>() {
             @Override
             public Xml.Document visitDocument(Xml.Document document, ExecutionContext ctx) {
@@ -72,7 +65,7 @@ public class UpgradeMicronautMavenPropertyVersion extends Recipe {
                 if (currentVersion != null && !currentVersion.isEmpty()) {
                     try {
                         MicronautVersionHelper.getNewerVersion(newVersion, currentVersion, ctx)
-                                .ifPresent(latestVersion -> doAfterVisit(new ChangePropertyValue("micronaut.version", latestVersion, false, true)));
+                                .ifPresent(latestVersion -> doAfterVisit(new ChangePropertyValue("micronaut.version", latestVersion, false, true).getVisitor()));
                     } catch (MavenDownloadingException e) {
                         return Markup.warn(document, e);
                     }

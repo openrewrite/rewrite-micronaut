@@ -24,8 +24,6 @@ import org.openrewrite.properties.PropertiesVisitor;
 import org.openrewrite.properties.tree.Properties;
 import org.openrewrite.semver.Semver;
 
-import java.time.Duration;
-
 @Value
 @EqualsAndHashCode(callSuper = true)
 public class UpgradeMicronautGradlePropertiesVersion extends Recipe {
@@ -59,18 +57,8 @@ public class UpgradeMicronautGradlePropertiesVersion extends Recipe {
     }
 
     @Override
-    protected TreeVisitor<?, ExecutionContext> getSingleSourceApplicableTest() {
-        return new HasSourcePath<>(FILE_MATCHER);
-    }
-
-    @Override
-    public Duration getEstimatedEffortPerOccurrence() {
-        return Duration.ofMinutes(5);
-    }
-
-    @Override
-    protected TreeVisitor<?, ExecutionContext> getVisitor() {
-        return new ChangePropertyValueVisitor(newVersion);
+    public TreeVisitor<?, ExecutionContext> getVisitor() {
+        return Preconditions.check(new HasSourcePath<>(FILE_MATCHER), new ChangePropertyValueVisitor(newVersion));
     }
 
     private static class ChangePropertyValueVisitor extends PropertiesVisitor<ExecutionContext> {
@@ -85,7 +73,7 @@ public class UpgradeMicronautGradlePropertiesVersion extends Recipe {
         public Properties visitEntry(Properties.Entry entry, ExecutionContext ctx) {
             if (entry.getKey().equals(PROPERTY_KEY)) {
                 String currentVersion = entry.getValue().getText();
-                String latestVersion = null;
+                String latestVersion;
                 try {
                     latestVersion = MicronautVersionHelper.getNewerVersion(newVersion, currentVersion, ctx).orElse(null);
                 } catch (MavenDownloadingException e) {
