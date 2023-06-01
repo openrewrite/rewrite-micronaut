@@ -16,6 +16,7 @@
 package org.openrewrite.java.micronaut;
 
 import org.junit.jupiter.api.Test;
+import org.openrewrite.InMemoryExecutionContext;
 import org.openrewrite.java.JavaParser;
 import org.openrewrite.test.RecipeSpec;
 import org.openrewrite.test.RewriteTest;
@@ -25,8 +26,8 @@ import static org.openrewrite.java.Assertions.java;
 class OncePerRequestHttpServerFilterToHttpServerFilterTest implements RewriteTest {
     @Override
     public void defaults(RecipeSpec spec) {
-        spec.parser(JavaParser.fromJavaVersion().classpath(
-            "micronaut-http", "micronaut-core", "reactive-streams"))
+        spec.parser(JavaParser.fromJavaVersion().classpathFromResources(new InMemoryExecutionContext(),
+            "micronaut-http-2.5.13", "micronaut-core-2.5.13", "reactive-streams-1.*"))
           .recipe(new OncePerRequestHttpServerFilterToHttpServerFilter());
     }
 

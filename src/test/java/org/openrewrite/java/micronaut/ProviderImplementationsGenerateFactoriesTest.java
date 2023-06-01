@@ -16,6 +16,7 @@
 package org.openrewrite.java.micronaut;
 
 import org.junit.jupiter.api.Test;
+import org.openrewrite.InMemoryExecutionContext;
 import org.openrewrite.java.JavaParser;
 import org.openrewrite.test.RecipeSpec;
 import org.openrewrite.test.RewriteTest;
@@ -25,8 +26,8 @@ import static org.openrewrite.java.Assertions.java;
 class ProviderImplementationsGenerateFactoriesTest implements RewriteTest {
     @Override
     public void defaults(RecipeSpec spec) {
-        spec.parser(JavaParser.fromJavaVersion().classpath(
-              "micronaut-core", "micronaut-inject", "javax.inject", "jakarta.inject-api")
+        spec.parser(JavaParser.fromJavaVersion().classpathFromResources(new InMemoryExecutionContext(),
+              "micronaut-core-2.5.13", "micronaut-inject-2.5.13", "javax.inject-1", "jakarta.inject-api-2.*")
             .dependsOn(
               //language=java
               """

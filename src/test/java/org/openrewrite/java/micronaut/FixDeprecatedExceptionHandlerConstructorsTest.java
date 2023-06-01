@@ -16,6 +16,7 @@
 package org.openrewrite.java.micronaut;
 
 import org.junit.jupiter.api.Test;
+import org.openrewrite.InMemoryExecutionContext;
 import org.openrewrite.java.JavaParser;
 import org.openrewrite.test.RecipeSpec;
 import org.openrewrite.test.RewriteTest;
@@ -26,13 +27,14 @@ import static org.openrewrite.java.Assertions.java;
 class FixDeprecatedExceptionHandlerConstructorsTest implements RewriteTest {
     @Override
     public void defaults(RecipeSpec spec) {
-        spec.parser(JavaParser.fromJavaVersion().classpath(
-            "micronaut-core",
-            "micronaut-http-server",
-            "micronaut-http",
-            "micronaut-validation",
-            "jakarta.inject-api",
-            "validation-api"))
+        spec.parser(JavaParser.fromJavaVersion().classpathFromResources(new InMemoryExecutionContext(),
+            "micronaut-core-2.5.13",
+            "micronaut-http-server-2.5.13",
+            "micronaut-http-server-netty-2.5.13",
+            "micronaut-http-2.5.13",
+            "micronaut-validation-2.5.13",
+            "jakarta.inject-api-2.*",
+            "validation-api-2.*"))
           .recipe(new FixDeprecatedExceptionHandlerConstructors());
     }
 

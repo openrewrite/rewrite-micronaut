@@ -17,6 +17,7 @@ package org.openrewrite.java.micronaut;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.openrewrite.InMemoryExecutionContext;
 import org.openrewrite.java.JavaParser;
 import org.openrewrite.test.RecipeSpec;
 import org.openrewrite.test.RewriteTest;
@@ -26,7 +27,7 @@ import static org.openrewrite.java.Assertions.java;
 class CopyNonInheritedAnnotationsTest implements RewriteTest {
     @Override
     public void defaults(RecipeSpec spec) {
-        spec.parser(JavaParser.fromJavaVersion().classpath("micronaut-core", "micronaut-context", "micronaut-http", "micronaut-http-client-core")
+        spec.parser(JavaParser.fromJavaVersion().classpathFromResources(new InMemoryExecutionContext(), "micronaut-core-2.5.13", "micronaut-context-2.5.13", "micronaut-http-2.5.13", "micronaut-http-client-core-2.5.13")
           //language=java
           .dependsOn("""
                 package a.b;
