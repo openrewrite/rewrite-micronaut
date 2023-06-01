@@ -99,11 +99,11 @@ public class ProviderImplementationsToMicronautFactories extends Recipe {
                 return anno;
             }));
 
-            cd = cd.withTemplate(JavaTemplate.builder("@Factory")
-                            .imports("io.micronaut.context.annotation.Factory")
-                            .javaParser(JAVA_PARSER).build(),
-                    getCursor(),
-                    cd.getCoordinates().addAnnotation(Comparator.comparing(J.Annotation::getSimpleName)));
+            cd = JavaTemplate.builder("@Factory")
+                    .imports("io.micronaut.context.annotation.Factory")
+                    .javaParser(JAVA_PARSER).build()
+                    .apply(new Cursor(getCursor().getParent(), cd),
+                            cd.getCoordinates().addAnnotation(Comparator.comparing(J.Annotation::getSimpleName)));
             maybeAddImport("io.micronaut.context.annotation.Factory");
             return cd;
         }

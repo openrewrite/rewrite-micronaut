@@ -15,10 +15,7 @@
  */
 package org.openrewrite.java.micronaut;
 
-import org.openrewrite.ExecutionContext;
-import org.openrewrite.Preconditions;
-import org.openrewrite.Recipe;
-import org.openrewrite.TreeVisitor;
+import org.openrewrite.*;
 import org.openrewrite.java.AnnotationMatcher;
 import org.openrewrite.java.JavaIsoVisitor;
 import org.openrewrite.java.JavaParser;
@@ -100,7 +97,8 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
                     if (md.isConstructor()) {
                         getCursor().dropParentUntil(J.ClassDeclaration.class::isInstance).putMessage("constructor-exists", Boolean.TRUE);
                         if (md.getLeadingAnnotations().stream().noneMatch(anno -> jakarta_matcher.matches(anno) || javax_matcher.matches(anno))) {
-                            md = md.withTemplate(injectTemplate, getCursor(), md.getCoordinates().addAnnotation(Comparator.comparing(J.Annotation::getSimpleName)));
+                            md = injectTemplate.apply(new Cursor(getCursor().getParent(), md),
+                                    md.getCoordinates().addAnnotation(Comparator.comparing(J.Annotation::getSimpleName)));
                         }
                         maybeAddImport("jakarta.inject.Inject");
 
@@ -108,10 +106,13 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
                             List<Object> params = md.getParameters().stream().filter(j -> !(j instanceof J.Empty)).collect(Collectors.toList());
                             params.add("ErrorResponseProcessor errorResponseProcessor");
                             JavaTemplate paramsTemplate = JavaTemplate.builder(params.stream().map(p -> "#{}").collect(Collectors.joining(", ")))
-                                    .context(getCursor())
+                                    .contextSensitive()
                                     .imports(errorResponseProcessorFqn)
                                     .javaParser(JAVA_PARSER).build();
-                            md = md.withTemplate(paramsTemplate, getCursor(), md.getCoordinates().replaceParameters(), params.toArray());
+                            md = paramsTemplate.apply(
+                                    new Cursor(getCursor().getParent(), md),
+                                    md.getCoordinates().replaceParameters(),
+                                    params.toArray());
                         }
 
                         if (getCursor().pollMessage("super-invocation-exists") == null) {
@@ -121,14 +122,14 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
                                     .map(v -> v.getVariables().get(0).getName()).findFirst();
                             if (errorResponseVar.isPresent() && md.getBody() != null && getCursor().getParent() != null) {
                                 JavaTemplate superInvocationTemplate = JavaTemplate.builder("super(#{any(" + errorResponseProcessorFqn + ")});")
-                                        .context(getCursor())
+                                        .contextSensitive()
                                         .imports(errorResponseProcessorFqn)
                                         .javaParser(JAVA_PARSER).build();
-                                md = maybeAutoFormat(md,
-                                        md.withTemplate(superInvocationTemplate,
+                                md = maybeAutoFormat(md, superInvocationTemplate.apply(
                                                 getCursor(),
-                                                md.getBody().getCoordinates().lastStatement(), errorResponseVar.get()
-                                        ), executionContext, getCursor().getParent());
+                                                md.getBody().getCoordinates().lastStatement(),
+                                                errorResponseVar.get()),
+                                        executionContext, getCursor().getParent());
                                 assert md.getBody() != null;
                                 md = md.withBody(moveLastStatementToFirst(md.getBody()));
                             }
@@ -146,11 +147,12 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
                     if (!Boolean.TRUE.equals(getCursor().pollMessage("constructor-exists"))) {
                         JavaTemplate template = JavaTemplate.builder(
                                         "@Inject\npublic " + cd.getSimpleName() + "(ErrorResponseProcessor errorResponseProcessor) {" +
-                                                "super(errorResponseProcessor);}")
-                                .context(getCursor())
+                                        "super(errorResponseProcessor);}")
+                                .contextSensitive()
                                 .imports(errorResponseProcessorFqn, "jakarta.inject.Inject", cdFq.getFullyQualifiedName())
                                 .javaParser(JAVA_PARSER).build();
-                        cd = cd.withTemplate(template, getCursor(), cd.getBody().getCoordinates().lastStatement());
+                        cd = template.apply(getCursor(),
+                                cd.getBody().getCoordinates().lastStatement());
                         cd = cd.withBody(moveLastStatementToFirst(cd.getBody()));
                         maybeAddImport("jakarta.inject.Inject");
                     }
@@ -160,7 +162,7 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
 
             private boolean isErrorProcessorParameter(Statement statement) {
                 return statement instanceof J.VariableDeclarations
-                        && TypeUtils.isOfClassType(((J.VariableDeclarations) statement).getType(), errorResponseProcessorFqn);
+                       && TypeUtils.isOfClassType(((J.VariableDeclarations) statement).getType(), errorResponseProcessorFqn);
             }
 
             private boolean isClassExceptionHandler(J.ClassDeclaration cd) {
