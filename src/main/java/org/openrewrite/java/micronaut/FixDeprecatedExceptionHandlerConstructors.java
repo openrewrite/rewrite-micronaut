@@ -134,6 +134,7 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
                                 md = md.withBody(moveLastStatementToFirst(md.getBody()));
                             }
                         }
+                        maybeAddImport(errorResponseProcessorFqn);
                     }
                 }
                 return md;

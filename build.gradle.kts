@@ -43,9 +43,7 @@ dependencies {
     testRuntimeOnly("io.micronaut:micronaut-http-server-netty:2.+")
     testRuntimeOnly("io.micronaut:micronaut-http-client:2.+")
     testRuntimeOnly("io.micronaut:micronaut-http-client-core:2.+")
-    testRuntimeOnly("io.micronaut:micronaut-validation:2.+")
     testRuntimeOnly("jakarta.inject:jakarta.inject-api:2.+")
-    testRuntimeOnly("javax.validation:validation-api:2.+")
     testRuntimeOnly("org.reactivestreams:reactive-streams:1.0.4")
 
     testRuntimeOnly("io.micronaut:micronaut-context:4.0.0-M2")
