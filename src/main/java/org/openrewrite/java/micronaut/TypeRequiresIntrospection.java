@@ -156,7 +156,7 @@ public class TypeRequiresIntrospection extends ScanningRecipe<TypeRequiresIntros
 
             J.ClassDeclaration cd = super.visitClassDeclaration(classDecl, introspectableTypes);
             if (cd.getLeadingAnnotations().stream().noneMatch(INTROSPECTION_ANNOTATION_MATCHER::matches)) {
-                cd = cd.withTemplate(templ, getCursor(), cd.getCoordinates().addAnnotation(Comparator.comparing(J.Annotation::getSimpleName)));
+                cd = templ.apply(getCursor(), cd.getCoordinates().addAnnotation(Comparator.comparing(J.Annotation::getSimpleName)));
                 maybeAddImport(introspectedAnnotationFqn);
             }
             return cd;
