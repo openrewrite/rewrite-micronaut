@@ -118,10 +118,7 @@ name: org.openrewrite.java.micronaut.UpdateJakartaAnnotations
 displayName: Update jakarta annotations dependency
 description: This recipe will remove jakarta annotations dependency as it is a transitive dependency of micronaut-inject, and migrate from javax.annotation if needed.
 recipeList:
-  - org.openrewrite.java.ChangePackage:
-      oldPackageName: javax.annotation
-      newPackageName: jakarta.annotation
-      recursive: true
+  - org.openrewrite.java.migrate.jakarta.JavaxAnnotationPackageToJakarta
   - org.openrewrite.gradle.RemoveDependency:
       groupId: jakarta.annotation
       artifactId: jakarta.annotation-api

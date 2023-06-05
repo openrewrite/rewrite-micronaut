@@ -32,13 +32,13 @@ public class UpdateJakartaAnnotationsTest implements RewriteTest {
     @Override
     public void defaults(RecipeSpec spec) {
         spec.parser(JavaParser.fromJavaVersion().classpathFromResources(new InMemoryExecutionContext(), "jakarta.inject-api-2.*", "jakarta.annotation-api-2.*", "javax.annotation-api-1.3.2"));
-        spec.recipeFromResource("/META-INF/rewrite/micronaut3-to-4.yml", "org.openrewrite.java.micronaut.UpdateJakartaAnnotations");
+        spec.recipe(RewriteTest.fromRuntimeClasspath("org.openrewrite.java.micronaut.UpdateJakartaAnnotations"));
     }
 
     @Language("java")
     private final String annotatedJavaxClass = """
-            import jakarta.inject.Singleton;
             import javax.annotation.PostConstruct;
+            import jakarta.inject.Singleton;
             
             @Singleton
             public class FooService {
@@ -52,8 +52,8 @@ public class UpdateJakartaAnnotationsTest implements RewriteTest {
 
     @Language("java")
     private final String annotatedJakartaClass = """
-            import jakarta.inject.Singleton;
             import jakarta.annotation.PostConstruct;
+            import jakarta.inject.Singleton;
             
             @Singleton
             public class FooService {
