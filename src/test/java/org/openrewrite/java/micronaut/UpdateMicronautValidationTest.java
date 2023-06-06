@@ -31,7 +31,8 @@ public class UpdateMicronautValidationTest implements RewriteTest {
     @Override
     public void defaults(RecipeSpec spec) {
         spec.parser(JavaParser.fromJavaVersion().classpathFromResources(new InMemoryExecutionContext(), "validation-api-2.*", "jakarta.validation-api-3.*", "jakarta.inject-api-2.*"));
-        spec.recipeFromResource("/META-INF/rewrite/micronaut3-to-4.yml", "org.openrewrite.java.micronaut.UpdateMicronautPlatformBom", "org.openrewrite.java.micronaut.UpdateMicronautValidation");
+        //spec.recipeFromResource("/META-INF/rewrite/micronaut3-to-4.yml", "org.openrewrite.java.micronaut.UpdateMicronautPlatformBom", "org.openrewrite.java.micronaut.UpdateMicronautValidation");
+        spec.recipes(RewriteTest.fromRuntimeClasspath("org.openrewrite.java.micronaut.UpdateMicronautPlatformBom"), RewriteTest.fromRuntimeClasspath("org.openrewrite.java.micronaut.UpdateMicronautValidation"));
     }
 
     @Language("java")
@@ -179,6 +180,10 @@ public class UpdateMicronautValidationTest implements RewriteTest {
                         <groupId>io.micronaut.validation</groupId>
                         <artifactId>micronaut-validation</artifactId>
                         <scope>compile</scope>
+                    </dependency>
+                    <dependency>
+                        <groupId>jakarta.validation</groupId>
+                        <artifactId>jakarta.validation-api</artifactId>
                     </dependency>
                     <dependency>
                         <groupId>ch.qos.logback</groupId>

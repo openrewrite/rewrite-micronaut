@@ -128,10 +128,7 @@ name: org.openrewrite.java.micronaut.UpdateMicronautValidation
 displayName: Update to Micronaut Validation 4.x
 description: This recipe will add jakarta validation dependency if needed, migrate from javax.validation if needed, and update micronaut validation dependencies.
 recipeList:
-  - org.openrewrite.java.ChangePackage:
-      oldPackageName: javax.validation
-      newPackageName: jakarta.validation
-      recursive: true
+  - org.openrewrite.java.migrate.jakarta.JavaxValidationMigrationToJakartaValidation
   - org.openrewrite.gradle.ChangeDependencyGroupId:
       groupId: io.micronaut
       artifactId: micronaut-validation
