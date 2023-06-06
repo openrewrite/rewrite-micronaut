@@ -41,14 +41,7 @@ name: org.openrewrite.java.micronaut.UpdateBuildToJava17
 displayName: Update the Gradle or Maven build to a Java 17 baseline
 description: This recipe will update the Java version to 17 for a Gradle or Maven build.
 recipeList:
-  - org.openrewrite.gradle.UpdateJavaCompatibility:
-      version: 17
-  - org.openrewrite.maven.ChangePropertyValue:
-      key: jdk.version
-      newValue: 17
-  - org.openrewrite.maven.ChangePropertyValue:
-      key: release.version
-      newValue: 17
+  - org.openrewrite.java.migrate.JavaVersion17
 ---
 type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.UpdateBuildToMicronaut4Version

@@ -27,7 +27,7 @@ public class UpdateBuildToJava17Test implements RewriteTest {
 
     @Override
     public void defaults(RecipeSpec spec) {
-        spec.recipeFromResource("/META-INF/rewrite/micronaut3-to-4.yml", "org.openrewrite.java.micronaut.UpdateBuildToJava17");
+        spec.recipe(RewriteTest.fromRuntimeClasspath("org.openrewrite.java.micronaut.UpdateBuildToJava17"));
     }
 
     @Test
