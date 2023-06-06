@@ -70,7 +70,7 @@ public class ChangeAnnotationProcessorPath extends Recipe {
     String newVersion;
 
     @Option(displayName = "Exclusions",
-            description = "A list of exclustions to apply to the annotation processor path in the format groupId:artifactId",
+            description = "A list of exclusions to apply to the annotation processor path in the format groupId:artifactId",
             example = "io.micronaut:micronaut-inject",
             required = false)
     @Nullable
