@@ -58,10 +58,15 @@ public class AddSnakeYamlDependencyIfNeeded extends ScanningRecipe<AddSnakeYamlD
 
     @Override
     public TreeVisitor<?, ExecutionContext> getVisitor(YamlAccumulator acc) {
-        if (!acc.usingYamlConfig && !recipeList.isEmpty()) {
-            recipeList.clear();
-        }
-        return super.getVisitor(acc);
+        return Preconditions.check(!acc.usingYamlConfig, new TreeVisitor<Tree, ExecutionContext>() {
+            @Override
+            public @Nullable Tree visit(@Nullable Tree tree, ExecutionContext executionContext) {
+                if (!recipeList.isEmpty()) {
+                    recipeList.clear();
+                }
+                return super.visit(tree, executionContext);
+            }
+        });
     }
 
     @Override

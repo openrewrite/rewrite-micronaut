@@ -21,6 +21,7 @@ import org.openrewrite.InMemoryExecutionContext;
 import org.openrewrite.java.JavaParser;
 import org.openrewrite.test.RecipeSpec;
 import org.openrewrite.test.RewriteTest;
+import org.openrewrite.test.SourceSpecs;
 
 import static org.openrewrite.gradle.Assertions.buildGradle;
 import static org.openrewrite.gradle.Assertions.withToolingApi;
@@ -60,13 +61,13 @@ public class AddSnakeYamlDependencyIfNeededTest implements RewriteTest {
             micronaut.application.name=testApp
         """;
 
+    private final SourceSpecs gradleProperties = properties("micronautVersion=4.0.0-M2", s -> s.path("gradle.properties"));
+
     @Language("groovy")
     private final String buildGradleNoDependency = """
             plugins {
                 id("io.micronaut.application") version "4.0.0-M2"
             }
-            
-            micronaut { version '4.0.0-M2'}
             
             repositories {
                 mavenCentral()
@@ -78,8 +79,6 @@ public class AddSnakeYamlDependencyIfNeededTest implements RewriteTest {
             plugins {
                 id("io.micronaut.application") version "4.0.0-M2"
             }
-            
-            micronaut { version '4.0.0-M2'}
             
             repositories {
                 mavenCentral()
@@ -128,8 +127,9 @@ public class AddSnakeYamlDependencyIfNeededTest implements RewriteTest {
     @Test
     void testAddGradleDependencyForApplicationYml() {
         rewriteRun(spec -> spec.beforeRecipe(withToolingApi()).recipe(new AddSnakeYamlDependencyIfNeeded()), mavenProject("project",
-                        srcMainJava(java(micronautApplication)),
-                        srcMainResources(yaml(micronautConfig, s -> s.path("application.yml"))),
+                srcMainJava(java(micronautApplication)),
+                srcMainResources(yaml(micronautConfig, s -> s.path("application.yml"))),
+                gradleProperties,
                 buildGradle(buildGradleNoDependency, buildGradleWithDependency)));
     }
 
@@ -146,6 +146,7 @@ public class AddSnakeYamlDependencyIfNeededTest implements RewriteTest {
         rewriteRun(spec -> spec.beforeRecipe(withToolingApi()).recipe(new AddSnakeYamlDependencyIfNeeded()), mavenProject("project",
                 srcMainJava(java(micronautApplication)),
                 srcMainResources(yaml(micronautConfig, s -> s.path("application.yaml"))),
+                gradleProperties,
                 buildGradle(buildGradleNoDependency, buildGradleWithDependency)));
     }
 
@@ -163,6 +164,7 @@ public class AddSnakeYamlDependencyIfNeededTest implements RewriteTest {
         rewriteRun(spec -> spec.beforeRecipe(withToolingApi()).recipe(new AddSnakeYamlDependencyIfNeeded()), mavenProject("project",
                 srcMainJava(java(micronautApplication)),
                 srcMainResources(yaml(micronautConfig, s -> s.path("foo.yml"))),
+                gradleProperties,
                 buildGradle(buildGradleNoDependency)));
     }
 
@@ -179,6 +181,7 @@ public class AddSnakeYamlDependencyIfNeededTest implements RewriteTest {
         rewriteRun(spec -> spec.beforeRecipe(withToolingApi()).recipe(new AddSnakeYamlDependencyIfNeeded()), mavenProject("project",
                 srcMainJava(java(micronautApplication)),
                 srcMainResources(properties(micronautPropertiesConfig, s -> s.path("application.properties"))),
+                gradleProperties,
                 buildGradle(buildGradleNoDependency)));
     }
 
@@ -195,6 +198,7 @@ public class AddSnakeYamlDependencyIfNeededTest implements RewriteTest {
         rewriteRun(spec -> spec.beforeRecipe(withToolingApi()).recipe(new AddSnakeYamlDependencyIfNeeded()), mavenProject("project",
                 srcMainJava(java(micronautApplication)),
                 srcMainResources(yaml(micronautConfig, s -> s.path("application.yml"))),
+                gradleProperties,
                 buildGradle(buildGradleWithDependency)));
     }
 
@@ -211,6 +215,7 @@ public class AddSnakeYamlDependencyIfNeededTest implements RewriteTest {
         rewriteRun(spec -> spec.beforeRecipe(withToolingApi()).recipe(new AddSnakeYamlDependencyIfNeeded()), mavenProject("project",
                 srcMainJava(java(micronautApplication)),
                 srcMainResources(yaml(micronautConfig, s -> s.path("application-foo.yml"))),
+                gradleProperties,
                 buildGradle(buildGradleNoDependency, buildGradleWithDependency)));
     }
 
@@ -227,6 +232,7 @@ public class AddSnakeYamlDependencyIfNeededTest implements RewriteTest {
         rewriteRun(spec -> spec.beforeRecipe(withToolingApi()).recipe(new AddSnakeYamlDependencyIfNeeded()), mavenProject("project",
                 srcMainJava(java(micronautApplication)),
                 srcTestResources(yaml(micronautConfig, s -> s.path("application-test.yml"))),
+                gradleProperties,
                 buildGradle(buildGradleNoDependency, buildGradleWithDependency)));
     }
 
@@ -243,6 +249,7 @@ public class AddSnakeYamlDependencyIfNeededTest implements RewriteTest {
         rewriteRun(spec -> spec.beforeRecipe(withToolingApi()).recipe(new AddSnakeYamlDependencyIfNeeded()), mavenProject("project",
                 srcMainJava(java(micronautApplication)),
                 srcMainResources(yaml(micronautConfig, s -> s.path("bootstrap.yml"))),
+                gradleProperties,
                 buildGradle(buildGradleNoDependency, buildGradleWithDependency)));
     }
 
@@ -259,6 +266,7 @@ public class AddSnakeYamlDependencyIfNeededTest implements RewriteTest {
         rewriteRun(spec -> spec.beforeRecipe(withToolingApi()).recipe(new AddSnakeYamlDependencyIfNeeded()), mavenProject("project",
                 srcMainJava(java(micronautApplication)),
                 srcMainResources(yaml(micronautConfig, s -> s.path("bootstrap-foo.yml"))),
+                gradleProperties,
                 buildGradle(buildGradleNoDependency, buildGradleWithDependency)));
     }
 
