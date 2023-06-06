@@ -21,11 +21,13 @@ import org.openrewrite.InMemoryExecutionContext;
 import org.openrewrite.java.JavaParser;
 import org.openrewrite.test.RecipeSpec;
 import org.openrewrite.test.RewriteTest;
+import org.openrewrite.test.SourceSpecs;
 
 import static org.openrewrite.gradle.Assertions.buildGradle;
 import static org.openrewrite.gradle.Assertions.withToolingApi;
 import static org.openrewrite.java.Assertions.*;
 import static org.openrewrite.maven.Assertions.pomXml;
+import static org.openrewrite.properties.Assertions.properties;
 
 public class UpdateJakartaAnnotationsTest implements RewriteTest {
 
@@ -65,13 +67,13 @@ public class UpdateJakartaAnnotationsTest implements RewriteTest {
             }
         """;
 
+    private final SourceSpecs gradleProperties = properties("micronautVersion=4.0.0-M2", s -> s.path("gradle.properties"));
+
     @Language("groovy")
     private final String buildGradleWithDependency = """
             plugins {
                 id("io.micronaut.application") version "4.0.0-M2"
             }
-            
-            micronaut { version '4.0.0-M2'}
             
             repositories {
                 mavenCentral()
@@ -91,8 +93,6 @@ public class UpdateJakartaAnnotationsTest implements RewriteTest {
             plugins {
                 id("io.micronaut.application") version "4.0.0-M2"
             }
-            
-            micronaut { version '4.0.0-M2'}
             
             repositories {
                 mavenCentral()
@@ -186,7 +186,7 @@ public class UpdateJakartaAnnotationsTest implements RewriteTest {
     @Test
     void updateJavaCodeAndRemoveGradleDependency() {
         rewriteRun(spec -> spec.beforeRecipe(withToolingApi()), mavenProject("project", srcMainJava(java(annotatedJavaxClass, annotatedJakartaClass)),
-                buildGradle(buildGradleWithDependency, buildGradleWithoutDependency)));
+                gradleProperties, buildGradle(buildGradleWithDependency, buildGradleWithoutDependency)));
 
     }
 
