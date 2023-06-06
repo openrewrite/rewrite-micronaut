@@ -193,15 +193,10 @@ name: org.openrewrite.java.micronaut.AddMicronautWebsocketDependencyIfNeeded
 displayName: Update the Micronaut Websocket support
 description: This recipe will add the explicit Micronaut Websocket dependency if needed
 recipeList:
-  - org.openrewrite.gradle.AddDependency:
+  - org.openrewrite.java.dependencies.AddDependency:
       groupId: io.micronaut
       artifactId: micronaut-websocket
       configuration: implementation
-      onlyIfUsing: io.micronaut.websocket..*
-  - org.openrewrite.maven.AddDependency:
-      groupId: io.micronaut
-      artifactId: micronaut-websocket
-      version: LATEST
       scope: compile
       onlyIfUsing: io.micronaut.websocket..*
 ---
@@ -226,15 +221,10 @@ name: org.openrewrite.java.micronaut.AddMicronautRetryDependencyIfNeeded
 displayName: Update the Micronaut Retry support
 description: This recipe will add the explicit Micronaut Retry dependency if needed
 recipeList:
-  - org.openrewrite.gradle.AddDependency:
+  - org.openrewrite.java.dependencies.AddDependency:
       groupId: io.micronaut
       artifactId: micronaut-retry
       configuration: implementation
-      onlyIfUsing: io.micronaut.retry.annotation.*
-  - org.openrewrite.maven.AddDependency:
-      groupId: io.micronaut
-      artifactId: micronaut-retry
-      version: LATEST
       scope: compile
       onlyIfUsing: io.micronaut.retry.annotation.*
 ---

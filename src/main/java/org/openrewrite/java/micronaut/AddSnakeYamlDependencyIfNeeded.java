@@ -16,8 +16,8 @@
 package org.openrewrite.java.micronaut;
 
 import org.openrewrite.*;
-import org.openrewrite.gradle.AddDependency;
 import org.openrewrite.internal.lang.Nullable;
+import org.openrewrite.java.dependencies.AddDependency;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,10 +33,8 @@ public class AddSnakeYamlDependencyIfNeeded extends ScanningRecipe<AddSnakeYamlD
     }
 
     public AddSnakeYamlDependencyIfNeeded() {
-        recipeList.add(new AddDependency("org.yaml", "snakeyaml", null, null, "runtimeOnly", "io.micronaut.runtime.Micronaut",
-                null, null, null, null));
-        recipeList.add(new org.openrewrite.maven.AddDependency("org.yaml", "snakeyaml", "LATEST", null, "runtime", null, "io.micronaut.runtime.Micronaut",
-                null, null, null, null, null));
+        recipeList.add(new AddDependency("org.yaml", "snakeyaml", null, null, "io.micronaut.runtime.Micronaut",
+                null, null, null, "runtimeOnly", "runtime", null, null, null, null));
     }
 
     @Override

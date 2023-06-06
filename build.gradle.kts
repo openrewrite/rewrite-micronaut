@@ -21,7 +21,8 @@ dependencies {
     implementation("org.openrewrite:rewrite-gradle")
     implementation("org.openrewrite:rewrite-properties")
     implementation("org.openrewrite:rewrite-yaml")
-    implementation("org.openrewrite.recipe:rewrite-migrate-java:1.+")
+    implementation("org.openrewrite.recipe:rewrite-migrate-java:2.+")
+    implementation("org.openrewrite.recipe:rewrite-java-dependencies:1.+")
 
     runtimeOnly("org.openrewrite:rewrite-java-8")
     runtimeOnly("org.openrewrite:rewrite-java-11")
