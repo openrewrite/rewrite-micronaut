@@ -22,14 +22,17 @@ import org.openrewrite.java.JavaParser;
 import org.openrewrite.test.RecipeSpec;
 import org.openrewrite.test.RewriteTest;
 
+import static org.openrewrite.gradle.Assertions.buildGradle;
 import static org.openrewrite.java.Assertions.*;
+import static org.openrewrite.maven.Assertions.pomXml;
+import static org.openrewrite.properties.Assertions.properties;
 
 public class UpdateJakartaPersistenceTest implements RewriteTest {
 
     @Override
     public void defaults(RecipeSpec spec) {
         spec.parser(JavaParser.fromJavaVersion().classpathFromResources(new InMemoryExecutionContext(), "jakarta.persistence-api-3.*", "javax.persistence-api-2.*"));
-        spec.recipeFromResource("/META-INF/rewrite/micronaut3-to-4.yml", "org.openrewrite.java.micronaut.UpdateJakartaPersistence");
+        spec.recipe(RewriteTest.fromRuntimeClasspath("org.openrewrite.java.micronaut.UpdateJakartaPersistence"));
     }
 
     @Language("java")
@@ -63,7 +66,84 @@ public class UpdateJakartaPersistenceTest implements RewriteTest {
         """;
 
     @Test
-    void updateJavaCode() {
-        rewriteRun(mavenProject("project", srcMainJava(java(annotatedJavaxClass, annotatedJakartaClass))));
+    void updateJavaCodeWithGradleBuild() {
+        rewriteRun(mavenProject("project", srcMainJava(java(annotatedJavaxClass, annotatedJakartaClass)),
+                properties("micronautVersion=3.9.2", s -> s.path("gradle.properties")),
+                //language=groovy
+                buildGradle("""
+                            plugins {
+                                id("io.micronaut.application") version "3.7.9"
+                            }
+                            
+                            repositories {
+                                mavenCentral()
+                            }
+                            
+                            dependencies {
+                                 annotationProcessor("io.micronaut.data:micronaut-data-processor")
+                                 annotationProcessor("io.micronaut:micronaut-http-validation")
+                                 implementation("io.micronaut:micronaut-http-client")
+                                 implementation("io.micronaut:micronaut-jackson-databind")
+                                 implementation("io.micronaut.data:micronaut-data-hibernate-jpa")
+                                 implementation("io.micronaut.sql:micronaut-jdbc-hikari")
+                                 runtimeOnly("ch.qos.logback:logback-classic")
+                                 runtimeOnly("com.h2database:h2")
+                             }
+                        """)));
+    }
+
+    @Test
+    void updateJavaCodeWithMavenBuild() {
+        rewriteRun(mavenProject("project", srcMainJava(java(annotatedJavaxClass, annotatedJakartaClass)),
+                //language=xml
+                pomXml("""
+                            <project>
+                                <groupId>com.mycompany.app</groupId>
+                                <artifactId>my-app</artifactId>
+                                <version>1</version>
+                                <parent>
+                                    <groupId>io.micronaut</groupId>
+                                    <artifactId>micronaut-parent</artifactId>
+                                    <version>3.9.2</version>
+                                </parent>
+                                <dependencies>
+                                    <dependency>
+                                        <groupId>io.micronaut</groupId>
+                                        <artifactId>micronaut-http-client</artifactId>
+                                        <scope>compile</scope>
+                                    </dependency>
+                                    <dependency>
+                                        <groupId>io.micronaut</groupId>
+                                        <artifactId>micronaut-http-server-netty</artifactId>
+                                        <scope>compile</scope>
+                                    </dependency>
+                                    <dependency>
+                                        <groupId>io.micronaut</groupId>
+                                        <artifactId>micronaut-jackson-databind</artifactId>
+                                        <scope>compile</scope>
+                                    </dependency>
+                                    <dependency>
+                                        <groupId>io.micronaut.data</groupId>
+                                        <artifactId>micronaut-data-hibernate-jpa</artifactId>
+                                        <scope>compile</scope>
+                                    </dependency>
+                                    <dependency>
+                                        <groupId>io.micronaut.sql</groupId>
+                                        <artifactId>micronaut-jdbc-hikari</artifactId>
+                                        <scope>compile</scope>
+                                    </dependency>
+                                    <dependency>
+                                        <groupId>ch.qos.logback</groupId>
+                                        <artifactId>logback-classic</artifactId>
+                                        <scope>runtime</scope>
+                                    </dependency>
+                                    <dependency>
+                                        <groupId>com.h2database</groupId>
+                                        <artifactId>h2</artifactId>
+                                        <scope>runtime</scope>
+                                    </dependency>
+                                </dependencies>
+                            </project>
+                        """)));
     }
 }

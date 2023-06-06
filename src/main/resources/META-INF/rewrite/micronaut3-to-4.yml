@@ -121,10 +121,7 @@ name: org.openrewrite.java.micronaut.UpdateJakartaPersistence
 displayName: Update jakarta persistence
 description: This recipe will migrate from javax.persistence annotations if needed.
 recipeList:
-  - org.openrewrite.java.ChangePackage:
-      oldPackageName: javax.persistence
-      newPackageName: jakarta.persistence
-      recursive: true
+  - org.openrewrite.java.migrate.jakarta.JavaxPersistenceToJakartaPersistence
 ---
 type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.UpdateMicronautValidation
