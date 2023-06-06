@@ -148,4 +148,14 @@ public class UpdateMicronautSecurityTest implements RewriteTest {
     void noJwtConfig() {
         rewriteRun(mavenProject("project", srcMainResources(yaml(noJwtConfig, s -> s.path("application.yml")))));
     }
+
+    @Test
+    void notMicronautConfigYaml() {
+        rewriteRun(mavenProject("project", srcMainResources(yaml(initialSecurityYaml, s -> s.path("foo.yml")))));
+    }
+
+    @Test
+    void notMicronautConfigProperties() {
+        rewriteRun(mavenProject("project", srcMainResources(properties(initialSecurityProps, s -> s.path("foo.properties")))));
+    }
 }

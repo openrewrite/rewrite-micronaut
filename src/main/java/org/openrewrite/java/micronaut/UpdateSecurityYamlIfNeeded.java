@@ -15,10 +15,8 @@
  */
 package org.openrewrite.java.micronaut;
 
-import org.openrewrite.ExecutionContext;
-import org.openrewrite.Preconditions;
-import org.openrewrite.Recipe;
-import org.openrewrite.TreeVisitor;
+import org.openrewrite.*;
+import org.openrewrite.internal.lang.Nullable;
 import org.openrewrite.yaml.CopyValue;
 import org.openrewrite.yaml.DeleteKey;
 import org.openrewrite.yaml.MergeYaml;
@@ -78,6 +76,14 @@ public class UpdateSecurityYamlIfNeeded extends Recipe {
 
     @Override
     public TreeVisitor<?, ExecutionContext> getVisitor() {
-        return Preconditions.check(new FindYamlConfig(), super.getVisitor());
+        return Preconditions.check(Preconditions.not(new FindYamlConfig().getVisitor()), new TreeVisitor<Tree, ExecutionContext>() {
+            @Override
+            public @Nullable Tree visit(@Nullable Tree tree, ExecutionContext executionContext) {
+                if (!recipeList.isEmpty()) {
+                    recipeList.clear();
+                }
+                return super.visit(tree, executionContext);
+            }
+        });
     }
 }
