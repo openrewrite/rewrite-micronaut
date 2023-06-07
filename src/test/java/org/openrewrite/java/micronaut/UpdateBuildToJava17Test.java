@@ -16,6 +16,7 @@
 package org.openrewrite.java.micronaut;
 
 import org.junit.jupiter.api.Test;
+import org.openrewrite.config.Environment;
 import org.openrewrite.test.RecipeSpec;
 import org.openrewrite.test.RewriteTest;
 
@@ -27,7 +28,10 @@ public class UpdateBuildToJava17Test implements RewriteTest {
 
     @Override
     public void defaults(RecipeSpec spec) {
-        spec.recipe(RewriteTest.fromRuntimeClasspath("org.openrewrite.java.migrate.JavaVersion17"));
+        spec.recipe(Environment.builder()
+          .scanRuntimeClasspath("org.openrewrite.java.migrate")
+          .build()
+          .activateRecipes("org.openrewrite.java.migrate.JavaVersion17"));
     }
 
     @Test

@@ -18,6 +18,7 @@ package org.openrewrite.java.micronaut;
 import org.intellij.lang.annotations.Language;
 import org.junit.jupiter.api.Test;
 import org.openrewrite.InMemoryExecutionContext;
+import org.openrewrite.config.Environment;
 import org.openrewrite.java.JavaParser;
 import org.openrewrite.test.RecipeSpec;
 import org.openrewrite.test.RewriteTest;
@@ -32,7 +33,10 @@ public class UpdateJakartaPersistenceTest implements RewriteTest {
     @Override
     public void defaults(RecipeSpec spec) {
         spec.parser(JavaParser.fromJavaVersion().classpathFromResources(new InMemoryExecutionContext(), "jakarta.persistence-api-3.*", "javax.persistence-api-2.*"));
-        spec.recipe(RewriteTest.fromRuntimeClasspath("org.openrewrite.java.migrate.jakarta.JavaxPersistenceToJakartaPersistence"));
+        spec.recipe(Environment.builder()
+          .scanRuntimeClasspath("org.openrewrite.java.migrate.jakarta")
+          .build()
+          .activateRecipes("org.openrewrite.java.migrate.jakarta.JavaxPersistenceToJakartaPersistence"));
     }
 
     @Language("java")
