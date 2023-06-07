@@ -20,7 +20,7 @@ name: org.openrewrite.java.micronaut.Micronaut3to4Migration
 displayName: Migrate from Micronaut 3.x to 4.x
 description: This recipe will apply changes required for migrating from Micronaut 3 to Micronaut 4.
 recipeList:
-  - org.openrewrite.java.micronaut.UpdateBuildToJava17
+  - org.openrewrite.java.migrate.JavaVersion17
   - org.openrewrite.gradle.UpdateGradleWrapper:
       version: 8.x
   - org.openrewrite.java.micronaut.UpdateBuildToMicronaut4Version
@@ -28,20 +28,13 @@ recipeList:
   - org.openrewrite.java.micronaut.UpdateBuildPlugins
   - org.openrewrite.java.micronaut.AddSnakeYamlDependencyIfNeeded
   - org.openrewrite.java.micronaut.UpdateJakartaAnnotations
-  - org.openrewrite.java.micronaut.UpdateJakartaPersistence
+  - org.openrewrite.java.migrate.jakarta.JavaxPersistenceToJakartaPersistence
   - org.openrewrite.java.micronaut.UpdateMicronautValidation
   - org.openrewrite.java.micronaut.UpdateMicronautEmail
   - org.openrewrite.java.micronaut.AddMicronautWebsocketDependencyIfNeeded
   - org.openrewrite.java.micronaut.UpdateMicronautSession
   - org.openrewrite.java.micronaut.AddMicronautRetryDependencyIfNeeded
   - org.openrewrite.java.micronaut.UpdateMicronautSecurity
----
-type: specs.openrewrite.org/v1beta/recipe
-name: org.openrewrite.java.micronaut.UpdateBuildToJava17
-displayName: Update the Gradle or Maven build to a Java 17 baseline
-description: This recipe will update the Java version to 17 for a Gradle or Maven build.
-recipeList:
-  - org.openrewrite.java.migrate.JavaVersion17
 ---
 type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.UpdateBuildToMicronaut4Version
@@ -115,13 +108,6 @@ recipeList:
   - org.openrewrite.java.dependencies.RemoveDependency:
       groupId: jakarta.annotation
       artifactId: jakarta.annotation-api
----
-type: specs.openrewrite.org/v1beta/recipe
-name: org.openrewrite.java.micronaut.UpdateJakartaPersistence
-displayName: Update jakarta persistence
-description: This recipe will migrate from javax.persistence annotations if needed.
-recipeList:
-  - org.openrewrite.java.migrate.jakarta.JavaxPersistenceToJakartaPersistence
 ---
 type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.UpdateMicronautValidation
