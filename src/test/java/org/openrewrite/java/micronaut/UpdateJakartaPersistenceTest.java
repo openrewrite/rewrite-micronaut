@@ -32,7 +32,7 @@ public class UpdateJakartaPersistenceTest implements RewriteTest {
     @Override
     public void defaults(RecipeSpec spec) {
         spec.parser(JavaParser.fromJavaVersion().classpathFromResources(new InMemoryExecutionContext(), "jakarta.persistence-api-3.*", "javax.persistence-api-2.*"));
-        spec.recipe(RewriteTest.fromRuntimeClasspath("org.openrewrite.java.micronaut.UpdateJakartaPersistence"));
+        spec.recipe(RewriteTest.fromRuntimeClasspath("org.openrewrite.java.migrate.jakarta.JavaxPersistenceToJakartaPersistence"));
     }
 
     @Language("java")
