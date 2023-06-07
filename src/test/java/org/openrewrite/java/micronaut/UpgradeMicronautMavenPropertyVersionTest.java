@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 the original author or authors.
+ * Copyright 2023 the original author or authors.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +49,35 @@ class UpgradeMicronautMavenPropertyVersionTest implements RewriteTest {
                       <version>1</version>
                       <properties>
                           <micronaut.version>2.1.4</micronaut.version>
+                      </properties>
+                  </project>
+              """)
+        );
+    }
+
+    @Test
+    void changeMavenMicronautVersion4() {
+        rewriteRun(
+          spec -> spec.recipe(new UpgradeMicronautMavenPropertyVersion("4.0.0-M2")),
+          pomXml("""
+                  <project>
+                      <modelVersion>4.0.0</modelVersion>
+                      <groupId>com.mycompany.app</groupId>
+                      <artifactId>my-app</artifactId>
+                      <version>1</version>
+                      <properties>
+                          <micronaut.version>3.9.1</micronaut.version>
+                      </properties>
+                  </project>
+              """,
+            """
+                  <project>
+                      <modelVersion>4.0.0</modelVersion>
+                      <groupId>com.mycompany.app</groupId>
+                      <artifactId>my-app</artifactId>
+                      <version>1</version>
+                      <properties>
+                          <micronaut.version>4.0.0-M2</micronaut.version>
                       </properties>
                   </project>
               """)

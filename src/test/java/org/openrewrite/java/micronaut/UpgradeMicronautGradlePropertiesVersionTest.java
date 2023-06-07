@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 the original author or authors.
+ * Copyright 2023 the original author or authors.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,18 @@ class UpgradeMicronautGradlePropertiesVersionTest implements RewriteTest {
             "micronautVersion=2.0.3",
             "micronautVersion=2.1.4",
             source -> source.path("gradle.properties")
+          )
+        );
+    }
+
+    @Test
+    void upgradeToMicronaut4() {
+        rewriteRun(
+          spec -> spec.recipe(new UpgradeMicronautGradlePropertiesVersion("4.0.0-M2")),
+          properties(
+            "micronautVersion=3.9.0",
+            "micronautVersion=4.0.0-M2",
+            s -> s.path("gradle.properties")
           )
         );
     }

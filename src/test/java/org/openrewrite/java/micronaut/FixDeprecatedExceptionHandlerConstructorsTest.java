@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 the original author or authors.
+ * Copyright 2023 the original author or authors.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package org.openrewrite.java.micronaut;
 
 import org.junit.jupiter.api.Test;
+import org.openrewrite.InMemoryExecutionContext;
 import org.openrewrite.java.JavaParser;
 import org.openrewrite.test.RecipeSpec;
 import org.openrewrite.test.RewriteTest;
@@ -26,13 +27,14 @@ import static org.openrewrite.java.Assertions.java;
 class FixDeprecatedExceptionHandlerConstructorsTest implements RewriteTest {
     @Override
     public void defaults(RecipeSpec spec) {
-        spec.parser(JavaParser.fromJavaVersion().classpath(
-            "micronaut-core",
-            "micronaut-http-server-netty",
-            "micronaut-http",
-            "micronaut-validation",
-            "jakarta.inject-api",
-            "validation-api"))
+        spec.parser(JavaParser.fromJavaVersion().classpathFromResources(new InMemoryExecutionContext(),
+            "micronaut-core-2.5.13",
+            "micronaut-http-server-2.5.13",
+            "micronaut-http-server-netty-2.5.13",
+            "micronaut-http-2.5.13",
+            "micronaut-validation-2.5.13",
+            "jakarta.inject-api-2.*",
+            "validation-api-2.*"))
           .recipe(new FixDeprecatedExceptionHandlerConstructors());
     }
 
@@ -43,13 +45,17 @@ class FixDeprecatedExceptionHandlerConstructorsTest implements RewriteTest {
           java(
             """
                   package abc;
+                  
                   import io.micronaut.validation.exceptions.ConstraintExceptionHandler;
+                  
                   public class ApiClientValidationExceptionHandler extends ConstraintExceptionHandler {
                       private void someMethod(){}
                   }
               """,
             """
                   package abc;
+                  
+                  import io.micronaut.http.server.exceptions.response.ErrorResponseProcessor;
                   import io.micronaut.validation.exceptions.ConstraintExceptionHandler;
                   import jakarta.inject.Inject;
                   
@@ -72,7 +78,9 @@ class FixDeprecatedExceptionHandlerConstructorsTest implements RewriteTest {
           java(
             """
                   package abc;
+                  
                   import io.micronaut.validation.exceptions.ConstraintExceptionHandler;
+                  
                   public class ApiClientValidationExceptionHandler extends ConstraintExceptionHandler {
                   
                       public ApiClientValidationExceptionHandler() {
@@ -81,6 +89,8 @@ class FixDeprecatedExceptionHandlerConstructorsTest implements RewriteTest {
               """,
             """
                   package abc;
+                  
+                  import io.micronaut.http.server.exceptions.response.ErrorResponseProcessor;
                   import io.micronaut.validation.exceptions.ConstraintExceptionHandler;
                   import jakarta.inject.Inject;
                   
@@ -103,6 +113,7 @@ class FixDeprecatedExceptionHandlerConstructorsTest implements RewriteTest {
                   package abc;
                   
                   import io.micronaut.http.server.exceptions.ConversionErrorHandler;
+                  
                   public class ApiClientValidationExceptionHandler extends ConversionErrorHandler {
                   
                       public ApiClientValidationExceptionHandler() {
@@ -114,6 +125,7 @@ class FixDeprecatedExceptionHandlerConstructorsTest implements RewriteTest {
                   package abc;
                   
                   import io.micronaut.http.server.exceptions.ConversionErrorHandler;
+                  import io.micronaut.http.server.exceptions.response.ErrorResponseProcessor;
                   import jakarta.inject.Inject;
                   
                   public class ApiClientValidationExceptionHandler extends ConversionErrorHandler {
@@ -149,6 +161,7 @@ class FixDeprecatedExceptionHandlerConstructorsTest implements RewriteTest {
               """,
             """
                   package abc;
+                  import io.micronaut.http.server.exceptions.response.ErrorResponseProcessor;
                   import io.micronaut.validation.exceptions.ConstraintExceptionHandler;
                   import jakarta.inject.Inject;
                   

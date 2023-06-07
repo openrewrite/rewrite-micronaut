@@ -1,0 +1,306 @@
+#
+# Copyright 2023 the original author or authors.
+# <p>
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# <p>
+# https://www.apache.org/licenses/LICENSE-2.0
+# <p>
+# <p>
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: org.openrewrite.java.micronaut.Micronaut3to4Migration
+displayName: Migrate from Micronaut 3.x to 4.x
+description: This recipe will apply changes required for migrating from Micronaut 3 to Micronaut 4.
+recipeList:
+  - org.openrewrite.java.migrate.JavaVersion17
+  - org.openrewrite.gradle.UpdateGradleWrapper:
+      version: 8.x
+  - org.openrewrite.java.micronaut.UpdateBuildToMicronaut4Version
+  - org.openrewrite.java.micronaut.UpdateMicronautPlatformBom
+  - org.openrewrite.java.micronaut.UpdateBuildPlugins
+  - org.openrewrite.java.micronaut.AddSnakeYamlDependencyIfNeeded
+  - org.openrewrite.java.micronaut.UpdateJakartaAnnotations
+  - org.openrewrite.java.migrate.jakarta.JavaxPersistenceToJakartaPersistence
+  - org.openrewrite.java.micronaut.UpdateMicronautValidation
+  - org.openrewrite.java.micronaut.UpdateMicronautEmail
+  - org.openrewrite.java.micronaut.AddMicronautWebsocketDependencyIfNeeded
+  - org.openrewrite.java.micronaut.UpdateMicronautSession
+  - org.openrewrite.java.micronaut.AddMicronautRetryDependencyIfNeeded
+  - org.openrewrite.java.micronaut.UpdateMicronautSecurity
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: org.openrewrite.java.micronaut.UpdateBuildToMicronaut4Version
+displayName: Update the Micronaut version to 4.x
+description: This recipe will update the Micronaut version to 4.x for a Gradle or Maven build.
+recipeList:
+  - org.openrewrite.java.micronaut.UpgradeMicronautMavenPropertyVersion:
+      newVersion: 4.0.0-M2
+  - org.openrewrite.java.micronaut.UpgradeMicronautGradlePropertiesVersion:
+      newVersion: 4.0.0-M2
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: org.openrewrite.java.micronaut.UpdateBuildPlugins
+displayName: Add Micronaut build plugins to 4.x
+description: This recipe will update the shadow jar plugin to 8.x and the Micronaut build plugins to 4.x for a Gradle build.
+recipeList:
+  - org.openrewrite.gradle.plugins.UpgradePluginVersion:
+      pluginIdPattern: com.github.johnrengelman.shadow
+      newVersion: 8.x
+  - org.openrewrite.gradle.plugins.UpgradePluginVersion:
+      pluginIdPattern: io.micronaut.aot
+      newVersion: 4.0.0-M2
+  - org.openrewrite.gradle.plugins.UpgradePluginVersion:
+      pluginIdPattern: io.micronaut.application
+      newVersion: 4.0.0-M2
+  - org.openrewrite.gradle.plugins.UpgradePluginVersion:
+      pluginIdPattern: io.micronaut.crac
+      newVersion: 4.0.0-M2
+  - org.openrewrite.gradle.plugins.UpgradePluginVersion:
+      pluginIdPattern: io.micronaut.docker
+      newVersion: 4.0.0-M2
+  - org.openrewrite.gradle.plugins.UpgradePluginVersion:
+      pluginIdPattern: io.micronaut.graalvm
+      newVersion: 4.0.0-M2
+  - org.openrewrite.gradle.plugins.UpgradePluginVersion:
+      pluginIdPattern: io.micronaut.library
+      newVersion: 4.0.0-M2
+  - org.openrewrite.gradle.plugins.UpgradePluginVersion:
+      pluginIdPattern: io.micronaut.minimal.application
+      newVersion: 4.0.0-M2
+  - org.openrewrite.gradle.plugins.UpgradePluginVersion:
+      pluginIdPattern: io.micronaut.minimal.library
+      newVersion: 4.0.0-M2
+  - org.openrewrite.gradle.plugins.UpgradePluginVersion:
+      pluginIdPattern: io.micronaut.test-resources
+      newVersion: 4.0.0-M2
+  - org.openrewrite.gradle.plugins.UpgradePluginVersion:
+      pluginIdPattern: io.micronaut.test-resources-consumer
+      newVersion: 4.0.0-M2
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: org.openrewrite.java.micronaut.UpdateMicronautPlatformBom
+displayName: Update to Micronaut 4.x platform BOM
+description: This recipe will update a Gradle or Maven build to reference the Micronaut 4 platform BOM.
+recipeList:
+  - org.openrewrite.maven.ChangeParentPom:
+      oldGroupId: io.micronaut
+      oldArtifactId: micronaut-parent
+      newGroupId: io.micronaut.platform
+      newVersion: 4.0.0-M2
+      retainVersions:
+        - io.micronaut:micronaut-validation
+        - io.micronaut:micronaut-session
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: org.openrewrite.java.micronaut.UpdateJakartaAnnotations
+displayName: Update jakarta annotations dependency
+description: This recipe will remove jakarta annotations dependency as it is a transitive dependency of micronaut-inject, and migrate from javax.annotation if needed.
+recipeList:
+  - org.openrewrite.java.migrate.jakarta.JavaxAnnotationPackageToJakarta
+  - org.openrewrite.java.dependencies.RemoveDependency:
+      groupId: jakarta.annotation
+      artifactId: jakarta.annotation-api
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: org.openrewrite.java.micronaut.UpdateMicronautValidation
+displayName: Update to Micronaut Validation 4.x
+description: This recipe will add jakarta validation dependency if needed, migrate from javax.validation if needed, and update micronaut validation dependencies.
+recipeList:
+  - org.openrewrite.java.migrate.jakarta.JavaxValidationMigrationToJakartaValidation
+  - org.openrewrite.gradle.ChangeDependencyGroupId:
+      groupId: io.micronaut
+      artifactId: micronaut-validation
+      newGroupId: io.micronaut.validation
+      configuration: implementation
+  - org.openrewrite.gradle.ChangeDependencyGroupId:
+      groupId: io.micronaut
+      artifactId: micronaut-http-validation
+      newGroupId: io.micronaut.validation
+      configuration: annotationProcessor
+  - org.openrewrite.gradle.ChangeDependencyArtifactId:
+      groupId: io.micronaut.validation
+      artifactId: micronaut-http-validation
+      newArtifactId: micronaut-validation-processor
+      configuration: annotationProcessor
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: io.micronaut
+      oldArtifactId: micronaut-validation
+      newGroupId: io.micronaut.validation
+      newVersion: LATEST
+  - org.openrewrite.java.micronaut.ChangeAnnotationProcessorPath:
+      oldGroupId: io.micronaut
+      oldArtifactId: micronaut-http-validation
+      newGroupId: io.micronaut.validation
+      newArtifactId: micronaut-validation-processor
+      newVersion: ${micronaut.validation.version}
+      exclusions:
+        - io.micronaut:micronaut-inject
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: org.openrewrite.java.micronaut.UpdateMicronautEmail
+displayName: Update to Micronaut Validation 4.x
+description: This recipe will migrate from javax.validation if needed, and update packages in for the Postmark integration if needed.
+recipeList:
+  - org.openrewrite.java.ChangePackage:
+      oldPackageName: javax.mail
+      newPackageName: jakarta.mail
+      recursive: true
+  - org.openrewrite.java.ChangePackage:
+      oldPackageName: com.wildbit.java
+      newPackageName: com.postmarkapp
+      recursive: true
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: org.openrewrite.java.micronaut.AddMicronautWebsocketDependencyIfNeeded
+displayName: Update the Micronaut Websocket support
+description: This recipe will add the explicit Micronaut Websocket dependency if needed
+recipeList:
+  - org.openrewrite.java.dependencies.AddDependency:
+      groupId: io.micronaut
+      artifactId: micronaut-websocket
+      configuration: implementation
+      scope: compile
+      onlyIfUsing: io.micronaut.websocket..*
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: org.openrewrite.java.micronaut.UpdateMicronautSession
+displayName: Update the Micronaut Session support
+description: This recipe will update the Micronaut Session dependency if needed
+recipeList:
+  - org.openrewrite.gradle.ChangeDependencyGroupId:
+      groupId: io.micronaut
+      artifactId: micronaut-session
+      newGroupId: io.micronaut.session
+      configuration: implementation
+  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+      oldGroupId: io.micronaut
+      oldArtifactId: micronaut-session
+      newGroupId: io.micronaut.session
+      newVersion: LATEST
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: org.openrewrite.java.micronaut.AddMicronautRetryDependencyIfNeeded
+displayName: Update the Micronaut Retry support
+description: This recipe will add the explicit Micronaut Retry dependency if needed
+recipeList:
+  - org.openrewrite.java.dependencies.AddDependency:
+      groupId: io.micronaut
+      artifactId: micronaut-retry
+      configuration: implementation
+      scope: compile
+      onlyIfUsing: io.micronaut.retry.annotation.*
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: org.openrewrite.java.micronaut.UpdateMicronautSecurity
+displayName: Update the Micronaut Security library
+description: This recipe will update imports for relocated classes and update configuration files with renamed keys.
+recipeList:
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.security.token.jwt.endpoints.TokenRefreshRequest
+      newFullyQualifiedTypeName: io.micronaut.security.endpoints.TokenRefreshRequest
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.security.token.jwt.render.AccessRefreshToken
+      newFullyQualifiedTypeName: io.micronaut.security.token.render.AccessRefreshToken
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.security.token.jwt.render.BearerAccessRefreshToken
+      newFullyQualifiedTypeName: io.micronaut.security.token.render.BearerAccessRefreshToken
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.security.token.jwt.endpoints.OauthController
+      newFullyQualifiedTypeName: io.micronaut.security.endpoints.OauthController
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.security.token.jwt.endpoints.OauthControllerConfiguration
+      newFullyQualifiedTypeName: io.micronaut.security.endpoints.OauthControllerConfiguration
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.security.token.jwt.endpoints.OauthControllerConfigurationProperties
+      newFullyQualifiedTypeName: io.micronaut.security.endpoints.OauthControllerConfigurationProperties
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.security.token.jwt.generator.DefaultAccessRefreshTokenGenerator
+      newFullyQualifiedTypeName: io.micronaut.security.token.generator.DefaultAccessRefreshTokenGenerator
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.security.token.jwt.cookie.AccessTokenCookieConfiguration
+      newFullyQualifiedTypeName: io.micronaut.security.token.cookie.AccessTokenCookieConfiguration
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.security.token.jwt.cookie.CookieLoginHandler
+      newFullyQualifiedTypeName: io.micronaut.security.token.cookie.CookieLoginHandler
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.security.token.jwt.bearer.AccessRefreshTokenLoginHandler
+      newFullyQualifiedTypeName: io.micronaut.security.token.bearer.AccessRefreshTokenLoginHandler
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.security.token.jwt.bearer.BearerTokenConfiguration
+      newFullyQualifiedTypeName: io.micronaut.security.token.bearer.BearerTokenConfiguration
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.security.token.jwt.bearer.BearerTokenConfigurationProperties
+      newFullyQualifiedTypeName: io.micronaut.security.token.bearer.BearerTokenConfigurationProperties
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.security.token.jwt.bearer.BearerTokenReader
+      newFullyQualifiedTypeName: io.micronaut.security.token.bearer.BearerTokenReader
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.security.token.jwt.render.TokenRenderer
+      newFullyQualifiedTypeName: io.micronaut.security.token.render.TokenRenderer
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.security.token.jwt.render.BearerTokenRenderer
+      newFullyQualifiedTypeName: io.micronaut.security.token.render.BearerTokenRenderer
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.security.token.jwt.cookie.JwtCookieTokenReader
+      newFullyQualifiedTypeName: io.micronaut.security.token.cookie.CookieTokenReader
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.security.token.jwt.cookie.RefreshTokenCookieConfiguration
+      newFullyQualifiedTypeName: io.micronaut.security.token.cookie.RefreshTokenCookieConfiguration
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.security.token.jwt.cookie.RefreshTokenCookieConfigurationProperties
+      newFullyQualifiedTypeName: io.micronaut.security.token.cookie.RefreshTokenCookieConfigurationProperties
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.security.token.jwt.cookie.JwtCookieClearerLogoutHandler
+      newFullyQualifiedTypeName: io.micronaut.security.token.cookie.TokenCookieClearerLogoutHandler
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.security.token.jwt.cookie.JwtCookieLoginHandler
+      newFullyQualifiedTypeName: io.micronaut.security.token.cookie.TokenCookieLoginHandler
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.security.token.jwt.cookie.JwtCookieTokenReader
+      newFullyQualifiedTypeName: io.micronaut.security.token.cookie.TokenCookieTokenReader
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.security.token.jwt.generator.AccessRefreshTokenGenerator
+      newFullyQualifiedTypeName: io.micronaut.security.token.generator.AccessRefreshTokenGenerator
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.security.token.jwt.generator.AccessTokenConfiguration
+      newFullyQualifiedTypeName: io.micronaut.security.token.generator.AccessTokenConfiguration
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.security.token.jwt.generator.AccessTokenConfigurationProperties
+      newFullyQualifiedTypeName: io.micronaut.security.token.generator.AccessTokenConfigurationProperties
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.security.token.jwt.generator.claims.ClaimsGenerator
+      newFullyQualifiedTypeName: io.micronaut.security.token.claims.ClaimsGenerator
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.security.token.jwt.generator.claims.ClaimsAudienceProvider
+      newFullyQualifiedTypeName: io.micronaut.security.token.claims.ClaimsAudienceProvider
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.security.token.jwt.cookie.AbstractAccessTokenCookieConfigurationProperties
+      newFullyQualifiedTypeName: io.micronaut.security.token.cookie.AbstractAccessTokenCookieConfigurationProperties
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.security.token.jwt.cookie.JwtCookieConfigurationProperties
+      newFullyQualifiedTypeName: io.micronaut.security.token.cookie.TokenCookieConfigurationProperties
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.security.token.jwt.generator.claims.JwtIdGenerator
+      newFullyQualifiedTypeName: io.micronaut.security.token.claims.JtiGenerator
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.security.token.jwt.generator.claims.JwtClaims
+      newFullyQualifiedTypeName: io.micronaut.security.token.Claims
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.security.annotation.DenyAllAnnotationMapper
+      newFullyQualifiedTypeName: io.micronaut.security.annotation.JakartaDenyAllAnnotationMapper
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.security.annotation.PermitAllAnnotationMapper
+      newFullyQualifiedTypeName: io.micronaut.security.annotation.JakartaPermitAllAnnotationMapper
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.security.annotation.RolesAllowedAnnotationMapper
+      newFullyQualifiedTypeName: io.micronaut.security.annotation.JakartaRolesAllowedAnnotationMapper
+  - org.openrewrite.java.micronaut.UpdateSecurityPropertiesIfNeeded
+  - org.openrewrite.java.micronaut.UpdateSecurityYamlIfNeeded
