@@ -45,16 +45,16 @@ public class UpdateBuildPluginsTest implements RewriteTest {
     private final String updatedPlugins = """
             plugins {
                 id("com.github.johnrengelman.shadow") version "8.1.1"
-                id("io.micronaut.application") version "4.0.0-M2"
-                id("io.micronaut.minimal.application") version "4.0.0-M2"
-                id("io.micronaut.aot") version "4.0.0-M2"
-                id("io.micronaut.crac") version "4.0.0-M2"
-                id("io.micronaut.docker") version "4.0.0-M2"
-                id("io.micronaut.graalvm") version "4.0.0-M2"
-                id("io.micronaut.library") version "4.0.0-M2"
-                id("io.micronaut.minimal.library") version "4.0.0-M2"
-                id("io.micronaut.test-resources") version "4.0.0-M2"
-                id("io.micronaut.test-resources-consumer") version "4.0.0-M2"
+                id("io.micronaut.application") version "4.0.0-M4"
+                id("io.micronaut.minimal.application") version "4.0.0-M4"
+                id("io.micronaut.aot") version "4.0.0-M4"
+                id("io.micronaut.crac") version "4.0.0-M4"
+                id("io.micronaut.docker") version "4.0.0-M4"
+                id("io.micronaut.graalvm") version "4.0.0-M4"
+                id("io.micronaut.library") version "4.0.0-M4"
+                id("io.micronaut.minimal.library") version "4.0.0-M4"
+                id("io.micronaut.test-resources") version "4.0.0-M4"
+                id("io.micronaut.test-resources-consumer") version "4.0.0-M4"
             }
         """;
 

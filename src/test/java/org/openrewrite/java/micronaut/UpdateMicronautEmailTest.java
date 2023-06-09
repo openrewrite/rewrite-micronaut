@@ -28,7 +28,7 @@ public class UpdateMicronautEmailTest implements RewriteTest {
 
     @Override
     public void defaults(RecipeSpec spec) {
-        spec.parser(JavaParser.fromJavaVersion().classpathFromResources(new InMemoryExecutionContext(), "micronaut-email-2.0.0-M1", "jakarta.inject-api-2.*", "jakarta.mail-api-2.*", "javax.mail-api-1.*"));
+        spec.parser(JavaParser.fromJavaVersion().classpathFromResources(new InMemoryExecutionContext(), "micronaut-email-2.0.*", "jakarta.inject-api-2.*", "jakarta.mail-api-2.*", "javax.mail-api-1.*"));
         spec.recipeFromResource("/META-INF/rewrite/micronaut3-to-4.yml", "org.openrewrite.java.micronaut.UpdateMicronautEmail");
     }
 
