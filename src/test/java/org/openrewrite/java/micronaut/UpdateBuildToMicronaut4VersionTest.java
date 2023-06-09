@@ -29,7 +29,7 @@ public class UpdateBuildToMicronaut4VersionTest implements RewriteTest {
 
     @Override
     public void defaults(RecipeSpec spec) {
-        spec.parser(JavaParser.fromJavaVersion().classpathFromResources(new InMemoryExecutionContext(), "micronaut-context-4.0.0-M2"));
+        spec.parser(JavaParser.fromJavaVersion().classpathFromResources(new InMemoryExecutionContext(), "micronaut-context-4.*"));
         spec.recipeFromResource("/META-INF/rewrite/micronaut3-to-4.yml", "org.openrewrite.java.micronaut.UpdateBuildToMicronaut4Version");
     }
 
@@ -40,7 +40,7 @@ public class UpdateBuildToMicronaut4VersionTest implements RewriteTest {
 
     @Language("properties")
     private final String v4GradleProperties = """
-            micronautVersion=4.0.0-M2    
+            micronautVersion=4.0.0-M3    
         """;
 
     @Language("xml")
@@ -64,7 +64,7 @@ public class UpdateBuildToMicronaut4VersionTest implements RewriteTest {
                 <artifactId>my-app</artifactId>
                 <version>1</version>
                 <properties>
-                    <micronaut.version>4.0.0-M2</micronaut.version>
+                    <micronaut.version>4.0.0-M3</micronaut.version>
                 </properties>
             </project>
         """;

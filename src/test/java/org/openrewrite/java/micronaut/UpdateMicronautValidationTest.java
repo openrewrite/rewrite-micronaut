@@ -165,7 +165,7 @@ class UpdateMicronautValidationTest implements RewriteTest {
           <parent>
               <groupId>io.micronaut.platform</groupId>
               <artifactId>micronaut-parent</artifactId>
-              <version>4.0.0-M2</version>
+              <version>4.0.0-M3</version>
           </parent>
           <dependencies>
               <dependency>
