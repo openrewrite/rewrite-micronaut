@@ -84,6 +84,10 @@ recipeList:
   - org.openrewrite.gradle.plugins.UpgradePluginVersion:
       pluginIdPattern: io.micronaut.test-resources-consumer
       newVersion: 4.0.0-M4
+  - org.openrewrite.maven.ChangePluginGroupIdAndArtifactId:
+      oldGroupId: io.micronaut.build
+      oldArtifactId: micronaut-maven-plugin
+      newGroupId: io.micronaut.maven
 ---
 type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.UpdateMicronautPlatformBom
