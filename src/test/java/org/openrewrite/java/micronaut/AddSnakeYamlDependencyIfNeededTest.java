@@ -61,7 +61,7 @@ public class AddSnakeYamlDependencyIfNeededTest implements RewriteTest {
             micronaut.application.name=testApp
         """;
 
-    private final SourceSpecs gradleProperties = properties("micronautVersion=4.0.0-M3", s -> s.path("gradle.properties"));
+    private final SourceSpecs gradleProperties = properties("micronautVersion=4.0.0-M4", s -> s.path("gradle.properties"));
 
     @Language("groovy")
     private final String buildGradleNoDependency = """
@@ -98,7 +98,7 @@ public class AddSnakeYamlDependencyIfNeededTest implements RewriteTest {
                 <parent>
                     <groupId>io.micronaut.platform</groupId>
                     <artifactId>micronaut-parent</artifactId>
-                    <version>4.0.0-M3</version>
+                    <version>4.0.0-M4</version>
                 </parent>
             </project>
         """;
@@ -112,7 +112,7 @@ public class AddSnakeYamlDependencyIfNeededTest implements RewriteTest {
                 <parent>
                     <groupId>io.micronaut.platform</groupId>
                     <artifactId>micronaut-parent</artifactId>
-                    <version>4.0.0-M3</version>
+                    <version>4.0.0-M4</version>
                 </parent>
                 <dependencies>
                     <dependency>
