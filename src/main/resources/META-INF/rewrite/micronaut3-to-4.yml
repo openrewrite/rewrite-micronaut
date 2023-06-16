@@ -42,9 +42,9 @@ displayName: Update the Micronaut version to 4.x
 description: This recipe will update the Micronaut version to 4.x for a Gradle or Maven build.
 recipeList:
   - org.openrewrite.java.micronaut.UpgradeMicronautMavenPropertyVersion:
-      newVersion: 4.0.0-M3
+      newVersion: 4.0.0-M4
   - org.openrewrite.java.micronaut.UpgradeMicronautGradlePropertiesVersion:
-      newVersion: 4.0.0-M3
+      newVersion: 4.0.0-M4
 ---
 type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.UpdateBuildPlugins
@@ -98,7 +98,7 @@ recipeList:
       oldGroupId: io.micronaut
       oldArtifactId: micronaut-parent
       newGroupId: io.micronaut.platform
-      newVersion: 4.0.0-M3
+      newVersion: 4.0.0-M4
       retainVersions:
         - io.micronaut:micronaut-validation
         - io.micronaut:micronaut-session
