@@ -16,6 +16,7 @@
 package org.openrewrite.java.micronaut;
 
 import org.junit.jupiter.api.Test;
+import org.openrewrite.DocumentExample;
 import org.openrewrite.test.RecipeSpec;
 import org.openrewrite.test.RewriteTest;
 
@@ -31,6 +32,7 @@ public class UpdateBuildPluginsTest implements RewriteTest {
           "org.openrewrite.java.micronaut.UpdateBuildPlugins");
     }
 
+    @DocumentExample
     @Test
     void updateGradleBuildPlugins() {
         rewriteRun(

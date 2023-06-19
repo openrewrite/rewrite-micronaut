@@ -16,6 +16,7 @@
 package org.openrewrite.java.micronaut;
 
 import org.junit.jupiter.api.Test;
+import org.openrewrite.DocumentExample;
 import org.openrewrite.InMemoryExecutionContext;
 import org.openrewrite.java.JavaParser;
 import org.openrewrite.test.RecipeSpec;
@@ -40,6 +41,7 @@ class ProviderImplementationsGenerateFactoriesTest implements RewriteTest {
           .recipe(new ProviderImplementationsToMicronautFactories());
     }
 
+    @DocumentExample
     @Test
     void javaxProviderImplementation() {
         rewriteRun(

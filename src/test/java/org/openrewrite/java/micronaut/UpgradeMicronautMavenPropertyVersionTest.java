@@ -16,6 +16,7 @@
 package org.openrewrite.java.micronaut;
 
 import org.junit.jupiter.api.Test;
+import org.openrewrite.DocumentExample;
 import org.openrewrite.test.RecipeSpec;
 import org.openrewrite.test.RewriteTest;
 
@@ -27,6 +28,7 @@ class UpgradeMicronautMavenPropertyVersionTest implements RewriteTest {
         spec.recipe(new UpgradeMicronautMavenPropertyVersion("~2.1"));
     }
 
+    @DocumentExample
     @Test
     void changeMavenMicronautVersion() {
         rewriteRun(
