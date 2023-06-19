@@ -16,6 +16,7 @@
 package org.openrewrite.java.micronaut;
 
 import org.junit.jupiter.api.Test;
+import org.openrewrite.DocumentExample;
 import org.openrewrite.InMemoryExecutionContext;
 import org.openrewrite.java.JavaParser;
 import org.openrewrite.test.RecipeSpec;
@@ -97,6 +98,7 @@ class OncePerRequestHttpServerFilterToHttpServerFilterTest implements RewriteTes
         );
     }
 
+    @DocumentExample
     @Test
     void simpleConversion() {
         rewriteRun(
