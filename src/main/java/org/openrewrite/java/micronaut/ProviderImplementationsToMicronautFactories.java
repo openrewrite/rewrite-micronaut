@@ -29,8 +29,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ProviderImplementationsToMicronautFactories extends Recipe {
-    private static final JavaParser.Builder<?, ?> JAVA_PARSER =
-            JavaParser.fromJavaVersion().dependsOn("package io.micronaut.context.annotation; public @interface Factory {}");
 
     private static final List<AnnotationMatcher> BEAN_ANNOTATION_MATCHERS = Stream.concat(
             Stream.of("io.micronaut.context.annotation.Bean",
@@ -63,7 +61,8 @@ public class ProviderImplementationsToMicronautFactories extends Recipe {
         ), new JavaIsoVisitor<ExecutionContext>() {
             @Override
             public J.CompilationUnit visitCompilationUnit(J.CompilationUnit cu, ExecutionContext executionContext) {
-                if (cu.getClasses().stream().anyMatch(cd -> isProvider(cd) && cd.getLeadingAnnotations().stream().anyMatch(ProviderImplementationsToMicronautFactories::isBeanAnnotation))) {
+                if (cu.getClasses().stream().anyMatch(cd -> isProvider(cd) && cd.getLeadingAnnotations().stream()
+                        .anyMatch(ProviderImplementationsToMicronautFactories::isBeanAnnotation))) {
                     doAfterVisit(new ProviderImplementationsGenerateFactoriesVisitor());
                 }
                 return cu;
@@ -84,7 +83,9 @@ public class ProviderImplementationsToMicronautFactories extends Recipe {
     private static class ProviderImplementationsGenerateFactoriesVisitor extends JavaIsoVisitor<ExecutionContext> {
         @Override
         public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext executionContext) {
-            List<J.Annotation> beanAnnotations = classDecl.getLeadingAnnotations().stream().filter(ProviderImplementationsToMicronautFactories::isBeanAnnotation).collect(Collectors.toList());
+            List<J.Annotation> beanAnnotations = classDecl.getLeadingAnnotations().stream()
+                    .filter(ProviderImplementationsToMicronautFactories::isBeanAnnotation)
+                    .collect(Collectors.toList());
             if (classDecl.getType() == null || !isProvider(classDecl) || beanAnnotations.isEmpty()) {
                 return classDecl;
             }
@@ -101,7 +102,9 @@ public class ProviderImplementationsToMicronautFactories extends Recipe {
 
             cd = JavaTemplate.builder("@Factory")
                     .imports("io.micronaut.context.annotation.Factory")
-                    .javaParser(JAVA_PARSER).build()
+                    .javaParser(JavaParser.fromJavaVersion()
+                            .dependsOn("package io.micronaut.context.annotation; public @interface Factory {}"))
+                    .build()
                     .apply(new Cursor(getCursor().getParent(), cd),
                             cd.getCoordinates().addAnnotation(Comparator.comparing(J.Annotation::getSimpleName)));
             maybeAddImport("io.micronaut.context.annotation.Factory");
@@ -124,7 +127,7 @@ public class ProviderImplementationsToMicronautFactories extends Recipe {
             return md;
         }
 
-        private static boolean annotationExists(List<J.Annotation> annotations, J.Annotation annotation) {
+        private boolean annotationExists(List<J.Annotation> annotations, J.Annotation annotation) {
             return annotations.stream().anyMatch(anno -> {
                 JavaType.FullyQualified fq = TypeUtils.asFullyQualified(anno.getType());
                 return fq != null && fq.isAssignableFrom(TypeUtils.asFullyQualified(annotation.getType()));
