@@ -44,14 +44,6 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
     private static final TreeVisitor<?, ExecutionContext> precondition =
             Preconditions.or(exception_handlers.stream().map(fqn -> new UsesType<>(fqn, false)).toArray(TreeVisitor[]::new));
 
-    private static final JavaParser.Builder<?, ?> JAVA_PARSER =
-            JavaParser.fromJavaVersion().dependsOn(
-                    "package jakarta.inject; public @interface Inject {}",
-                    "package io.micronaut.http.server.exceptions.response; public interface ErrorContext {}",
-                    "package io.micronaut.http; public interface MutableHttpResponse<B> {}",
-                    "package io.micronaut.http.server.exceptions.response; public interface ErrorResponseProcessor<T> {MutableHttpResponse<T> processResponse(ErrorContext errorContext, MutableHttpResponse<?> baseResponse);}",
-                    "package io.micronaut.validation.exceptions; public class ConstraintExceptionHandler { public ConstraintExceptionHandler(ErrorResponseProcessor<?> responseProcessor){}}");
-
     private static final AnnotationMatcher javax_matcher = new AnnotationMatcher("@javax.inject.Inject");
     private static final AnnotationMatcher jakarta_matcher = new AnnotationMatcher("@jakarta.inject.Inject");
 
@@ -68,7 +60,17 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
     @Override
     public TreeVisitor<?, ExecutionContext> getVisitor() {
         return Preconditions.check(precondition, new JavaIsoVisitor<ExecutionContext>() {
-            final JavaTemplate injectTemplate = JavaTemplate.builder("@Inject").javaParser(JAVA_PARSER)
+
+            final JavaParser.Builder<?, ?> parser =
+                    JavaParser.fromJavaVersion()
+                            .dependsOn("package jakarta.inject; public @interface Inject {}",
+                                    "package io.micronaut.http.server.exceptions.response; public interface ErrorContext {}",
+                                    "package io.micronaut.http; public interface MutableHttpResponse<B> {}",
+                                    "package io.micronaut.http.server.exceptions.response; public interface ErrorResponseProcessor<T> {MutableHttpResponse<T> processResponse(ErrorContext errorContext, MutableHttpResponse<?> baseResponse);}",
+                                    "package io.micronaut.validation.exceptions; public class ConstraintExceptionHandler { public ConstraintExceptionHandler(ErrorResponseProcessor<?> responseProcessor){}}");
+
+            final JavaTemplate injectTemplate = JavaTemplate.builder("@Inject")
+                    .javaParser(parser)
                     .imports("jakarta.inject.Inject")
                     .build();
 
@@ -108,7 +110,7 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
                             JavaTemplate paramsTemplate = JavaTemplate.builder(params.stream().map(p -> "#{}").collect(Collectors.joining(", ")))
                                     .contextSensitive()
                                     .imports(errorResponseProcessorFqn)
-                                    .javaParser(JAVA_PARSER).build();
+                                    .javaParser(parser).build();
                             md = paramsTemplate.apply(
                                     new Cursor(getCursor().getParent(), md),
                                     md.getCoordinates().replaceParameters(),
@@ -124,7 +126,7 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
                                 JavaTemplate superInvocationTemplate = JavaTemplate.builder("super(#{any(" + errorResponseProcessorFqn + ")});")
                                         .contextSensitive()
                                         .imports(errorResponseProcessorFqn)
-                                        .javaParser(JAVA_PARSER).build();
+                                        .javaParser(parser).build();
                                 md = maybeAutoFormat(md, superInvocationTemplate.apply(
                                                 getCursor(),
                                                 md.getBody().getCoordinates().lastStatement(),
@@ -151,7 +153,7 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
                                         "super(errorResponseProcessor);}")
                                 .contextSensitive()
                                 .imports(errorResponseProcessorFqn, "jakarta.inject.Inject", cdFq.getFullyQualifiedName())
-                                .javaParser(JAVA_PARSER).build();
+                                .javaParser(parser).build();
                         cd = template.apply(getCursor(),
                                 cd.getBody().getCoordinates().lastStatement());
                         cd = cd.withBody(moveLastStatementToFirst(cd.getBody()));
