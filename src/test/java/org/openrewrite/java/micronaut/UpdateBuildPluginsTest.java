@@ -21,8 +21,10 @@ import org.openrewrite.test.RecipeSpec;
 import org.openrewrite.test.RewriteTest;
 
 import static org.openrewrite.gradle.Assertions.buildGradle;
+import static org.openrewrite.gradle.Assertions.withToolingApi;
 import static org.openrewrite.java.Assertions.mavenProject;
 import static org.openrewrite.maven.Assertions.pomXml;
+import static org.openrewrite.properties.Assertions.properties;
 
 public class UpdateBuildPluginsTest implements RewriteTest {
 
@@ -35,7 +37,8 @@ public class UpdateBuildPluginsTest implements RewriteTest {
     @DocumentExample
     @Test
     void updateGradleBuildPlugins() {
-        rewriteRun(
+        rewriteRun(spec -> spec.beforeRecipe(withToolingApi()),
+          properties("micronautVersion=3.9.1", s -> s.path("gradle.properties")),
           //language=groovy
           buildGradle("""
                 plugins {
@@ -43,28 +46,36 @@ public class UpdateBuildPluginsTest implements RewriteTest {
                     id("io.micronaut.application") version "3.7.9"
                     id("io.micronaut.minimal.application") version "3.7.9"
                     id("io.micronaut.aot") version "3.7.9"
+                    id("io.micronaut.component") version "3.7.9"
                     id("io.micronaut.crac") version "3.7.9"
                     id("io.micronaut.docker") version "3.7.9"
                     id("io.micronaut.graalvm") version "3.7.9"
                     id("io.micronaut.library") version "3.7.9"
                     id("io.micronaut.minimal.library") version "3.7.9"
                     id("io.micronaut.test-resources") version "3.5.1"
-                    id("io.micronaut.test-resources-consumer") version "3.5.1"
+                }
+                
+                repositories {
+                    mavenCentral()
                 }
             """, """
                 plugins {
                     id("com.github.johnrengelman.shadow") version "8.1.1"
-                    id("io.micronaut.application") version "4.0.0-RC1"
-                    id("io.micronaut.minimal.application") version "4.0.0-RC1"
-                    id("io.micronaut.aot") version "4.0.0-RC1"
-                    id("io.micronaut.crac") version "4.0.0-RC1"
-                    id("io.micronaut.docker") version "4.0.0-RC1"
-                    id("io.micronaut.graalvm") version "4.0.0-RC1"
-                    id("io.micronaut.library") version "4.0.0-RC1"
-                    id("io.micronaut.minimal.library") version "4.0.0-RC1"
-                    id("io.micronaut.test-resources") version "4.0.0-RC1"
-                    id("io.micronaut.test-resources-consumer") version "4.0.0-RC1"
-                } 
+                    id("io.micronaut.application") version "4.0.0-M8"
+                    id("io.micronaut.minimal.application") version "4.0.0-M8"
+                    id("io.micronaut.aot") version "4.0.0-M8"
+                    id("io.micronaut.component") version "4.0.0-M8"
+                    id("io.micronaut.crac") version "4.0.0-M8"
+                    id("io.micronaut.docker") version "4.0.0-M8"
+                    id("io.micronaut.graalvm") version "4.0.0-M8"
+                    id("io.micronaut.library") version "4.0.0-M8"
+                    id("io.micronaut.minimal.library") version "4.0.0-M8"
+                    id("io.micronaut.test-resources") version "4.0.0-M8"
+                }
+                
+                repositories {
+                    mavenCentral()
+                }
             """));
     }
 
