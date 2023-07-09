@@ -76,7 +76,7 @@ public class UpdateJakartaAnnotationsTest implements RewriteTest {
     @Language("groovy")
     private final String buildGradleWithDependency = """
             plugins {
-                id("io.micronaut.application") version "4.0.0-M4"
+                id("io.micronaut.application") version "4.0.0-M8"
             }
             
             repositories {
@@ -95,7 +95,7 @@ public class UpdateJakartaAnnotationsTest implements RewriteTest {
     @Language("groovy")
     private final String buildGradleWithoutDependency = """
             plugins {
-                id("io.micronaut.application") version "4.0.0-M4"
+                id("io.micronaut.application") version "4.0.0-M8"
             }
             
             repositories {

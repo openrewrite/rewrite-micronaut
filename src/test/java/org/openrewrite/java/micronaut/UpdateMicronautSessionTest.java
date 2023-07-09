@@ -74,7 +74,7 @@ public class UpdateMicronautSessionTest implements RewriteTest {
                 <parent>
                     <groupId>io.micronaut.platform</groupId>
                     <artifactId>micronaut-parent</artifactId>
-                    <version>4.0.0-M4</version>
+                    <version>4.0.0-RC1</version>
                 </parent>
                 <dependencies>
                     <dependency>
