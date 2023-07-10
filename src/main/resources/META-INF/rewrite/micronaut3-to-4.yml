@@ -314,3 +314,12 @@ recipeList:
       newFullyQualifiedTypeName: io.micronaut.security.annotation.JakartaRolesAllowedAnnotationMapper
   - org.openrewrite.java.micronaut.UpdateSecurityPropertiesIfNeeded
   - org.openrewrite.java.micronaut.UpdateSecurityYamlIfNeeded
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: org.openrewrite.java.micronaut.UpdateBlockingTaskExecutors
+displayName: Migrate the use of TaskExecutors with blocking IO
+description: This recipe will any usage of TaskExecutors.IO to TaskExecutors.BLOCKING in order to be compatible with virtual threads.
+recipeList:
+  - org.openrewrite.java.ReplaceConstantWithAnotherConstant:
+      existingFullyQualifiedConstantName: io.micronaut.scheduling.TaskExecutors.IO
+      fullyQualifiedConstantName: io.micronaut.scheduling.TaskExecutors.BLOCKING
