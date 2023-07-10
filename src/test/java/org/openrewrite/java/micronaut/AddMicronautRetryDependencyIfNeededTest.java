@@ -57,7 +57,7 @@ public class AddMicronautRetryDependencyIfNeededTest implements RewriteTest {
     @Language("groovy")
     private final String buildGradleInitial = """
             plugins {
-                id("io.micronaut.application") version "4.0.0-M4"
+                id("io.micronaut.application") version "4.0.0-M8"
             }
             
             repositories {
@@ -68,7 +68,7 @@ public class AddMicronautRetryDependencyIfNeededTest implements RewriteTest {
     @Language("groovy")
     private final String buildGradleExpected = """
             plugins {
-                id("io.micronaut.application") version "4.0.0-M4"
+                id("io.micronaut.application") version "4.0.0-M8"
             }
             
             repositories {

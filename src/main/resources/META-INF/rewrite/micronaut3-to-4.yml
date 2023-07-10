@@ -22,7 +22,7 @@ description: This recipe will apply changes required for migrating from Micronau
 recipeList:
   - org.openrewrite.java.migrate.JavaVersion17
   - org.openrewrite.gradle.UpdateGradleWrapper:
-      version: 8.x
+      version: 8.1.x
   - org.openrewrite.java.micronaut.UpdateBuildToMicronaut4Version
   - org.openrewrite.java.micronaut.UpdateMicronautPlatformBom
   - org.openrewrite.java.micronaut.UpdateBuildPlugins
@@ -43,9 +43,9 @@ displayName: Update the Micronaut version to 4.x
 description: This recipe will update the Micronaut version to 4.x for a Gradle or Maven build.
 recipeList:
   - org.openrewrite.java.micronaut.UpgradeMicronautMavenPropertyVersion:
-      newVersion: 4.0.0-M4
+      newVersion: 4.0.0-RC1
   - org.openrewrite.java.micronaut.UpgradeMicronautGradlePropertiesVersion:
-      newVersion: 4.0.0-M4
+      newVersion: 4.0.0-RC1
 ---
 type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.UpdateBuildPlugins
@@ -57,34 +57,40 @@ recipeList:
       newVersion: 8.x
   - org.openrewrite.gradle.plugins.UpgradePluginVersion:
       pluginIdPattern: io.micronaut.aot
-      newVersion: 4.0.0-M4
+      newVersion: 4.0.0-M8
   - org.openrewrite.gradle.plugins.UpgradePluginVersion:
       pluginIdPattern: io.micronaut.application
-      newVersion: 4.0.0-M4
+      newVersion: 4.0.0-M8
+  - org.openrewrite.gradle.plugins.UpgradePluginVersion:
+      pluginIdPattern: io.micronaut.component
+      newVersion: 4.0.0-M8
   - org.openrewrite.gradle.plugins.UpgradePluginVersion:
       pluginIdPattern: io.micronaut.crac
-      newVersion: 4.0.0-M4
+      newVersion: 4.0.0-M8
   - org.openrewrite.gradle.plugins.UpgradePluginVersion:
       pluginIdPattern: io.micronaut.docker
-      newVersion: 4.0.0-M4
+      newVersion: 4.0.0-M8
   - org.openrewrite.gradle.plugins.UpgradePluginVersion:
       pluginIdPattern: io.micronaut.graalvm
-      newVersion: 4.0.0-M4
+      newVersion: 4.0.0-M8
   - org.openrewrite.gradle.plugins.UpgradePluginVersion:
       pluginIdPattern: io.micronaut.library
-      newVersion: 4.0.0-M4
+      newVersion: 4.0.0-M8
   - org.openrewrite.gradle.plugins.UpgradePluginVersion:
       pluginIdPattern: io.micronaut.minimal.application
-      newVersion: 4.0.0-M4
+      newVersion: 4.0.0-M8
   - org.openrewrite.gradle.plugins.UpgradePluginVersion:
       pluginIdPattern: io.micronaut.minimal.library
-      newVersion: 4.0.0-M4
+      newVersion: 4.0.0-M8
+  - org.openrewrite.gradle.plugins.UpgradePluginVersion:
+      pluginIdPattern: io.micronaut.openapi
+      newVersion: 4.0.0-M8
   - org.openrewrite.gradle.plugins.UpgradePluginVersion:
       pluginIdPattern: io.micronaut.test-resources
-      newVersion: 4.0.0-M4
+      newVersion: 4.0.0-M8
   - org.openrewrite.gradle.plugins.UpgradePluginVersion:
       pluginIdPattern: io.micronaut.test-resources-consumer
-      newVersion: 4.0.0-M4
+      newVersion: 4.0.0-M8
   - org.openrewrite.maven.ChangePluginGroupIdAndArtifactId:
       oldGroupId: io.micronaut.build
       oldArtifactId: micronaut-maven-plugin
@@ -99,7 +105,7 @@ recipeList:
       oldGroupId: io.micronaut
       oldArtifactId: micronaut-parent
       newGroupId: io.micronaut.platform
-      newVersion: 4.0.0-M4
+      newVersion: 4.0.0-RC1
       retainVersions:
         - io.micronaut:micronaut-validation
         - io.micronaut:micronaut-session
@@ -151,7 +157,7 @@ recipeList:
 ---
 type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.UpdateMicronautEmail
-displayName: Update to Micronaut Validation 4.x
+displayName: Update to Micronaut Email 2.x
 description: This recipe will migrate from javax.validation if needed, and update packages in for the Postmark integration if needed.
 recipeList:
   - org.openrewrite.java.ChangePackage:
