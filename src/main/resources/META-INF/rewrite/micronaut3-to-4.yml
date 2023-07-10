@@ -35,6 +35,7 @@ recipeList:
   - org.openrewrite.java.micronaut.UpdateMicronautSession
   - org.openrewrite.java.micronaut.AddMicronautRetryDependencyIfNeeded
   - org.openrewrite.java.micronaut.UpdateMicronautSecurity
+  - org.openrewrite.java.micronaut.UpdateMicronautData
 ---
 type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.UpdateBuildToMicronaut4Version
@@ -314,6 +315,13 @@ recipeList:
       newFullyQualifiedTypeName: io.micronaut.security.annotation.JakartaRolesAllowedAnnotationMapper
   - org.openrewrite.java.micronaut.UpdateSecurityPropertiesIfNeeded
   - org.openrewrite.java.micronaut.UpdateSecurityYamlIfNeeded
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: org.openrewrite.java.micronaut.UpdateMicronautData
+displayName: Update the Micronaut Data library
+description: This recipe will make the necessary updates for using Micronaut Data with Micronaut Framework 4.
+recipeList:
+  - org.openrewrite.java.migrate.jakarta.JavaxTransactionMigrationToJakartaTransaction
 ---
 type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.UpdateBlockingTaskExecutors
