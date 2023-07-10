@@ -322,6 +322,18 @@ displayName: Update the Micronaut Data library
 description: This recipe will make the necessary updates for using Micronaut Data with Micronaut Framework 4.
 recipeList:
   - org.openrewrite.java.migrate.jakarta.JavaxTransactionMigrationToJakartaTransaction
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.data.jdbc.annotation.ColumnTransformer
+      newFullyQualifiedTypeName: io.micronaut.data.annotation.sql.ColumnTransformer
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.data.jdbc.annotation.JoinColumn
+      newFullyQualifiedTypeName: io.micronaut.data.annotation.sql.JoinColumn
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.data.jdbc.annotation.JoinColumns
+      newFullyQualifiedTypeName: io.micronaut.data.annotation.sql.JoinColumns
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.data.jdbc.annotation.JoinTable
+      newFullyQualifiedTypeName: io.micronaut.data.annotation.sql.JoinTable
 ---
 type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.UpdateBlockingTaskExecutors
