@@ -334,6 +334,9 @@ recipeList:
   - org.openrewrite.java.ChangeType:
       oldFullyQualifiedTypeName: io.micronaut.data.jdbc.annotation.JoinTable
       newFullyQualifiedTypeName: io.micronaut.data.annotation.sql.JoinTable
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.transaction.annotation.TransactionalAdvice
+      newFullyQualifiedTypeName: io.micronaut.transaction.annotation.Transactional
 ---
 type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.UpdateBlockingTaskExecutors

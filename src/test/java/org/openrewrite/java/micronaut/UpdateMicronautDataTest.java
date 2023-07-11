@@ -35,7 +35,7 @@ public class UpdateMicronautDataTest implements RewriteTest {
         spec
           .parser(JavaParser.fromJavaVersion().classpathFromResources(new InMemoryExecutionContext(),
             "javax.transaction-api-1.*", "jakarta.transaction-api-2.*", "micronaut-data-jdbc-3.*", "micronaut-data-jdbc-4.*",
-            "micronaut-data-model-4.*"))
+            "micronaut-data-model-4.*", "micronaut-data-tx-3.*", "micronaut-data-tx-4.*"))
           .recipes(Environment.builder()
             .scanRuntimeClasspath("org.openrewrite.java.micronaut")
             .build()
@@ -172,5 +172,33 @@ public class UpdateMicronautDataTest implements RewriteTest {
                       
             }
             """))));
+    }
+
+    @Test
+    void updateTransactionalAdvice() {
+        rewriteRun(mavenProject("project",
+          //language=java
+          srcMainJava(java("""
+            import io.micronaut.transaction.annotation.TransactionalAdvice;
+                        
+            public class MyTxService {
+                
+                @TransactionalAdvice
+                public void doSomethingTransactional() {
+                
+                }
+            }
+            """, """
+            import io.micronaut.transaction.annotation.Transactional;
+                        
+            public class MyTxService {
+                
+                @Transactional
+                public void doSomethingTransactional() {
+                
+                }
+            }
+            """))));
+
     }
 }
