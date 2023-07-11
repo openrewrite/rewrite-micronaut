@@ -125,33 +125,29 @@ name: org.openrewrite.java.micronaut.UpdateMicronautValidation
 displayName: Update to Micronaut Validation 4.x
 description: This recipe will add jakarta validation dependency if needed, migrate from javax.validation if needed, and update micronaut validation dependencies.
 recipeList:
-  - org.openrewrite.java.migrate.jakarta.JavaxValidationMigrationToJakartaValidation
-  - org.openrewrite.gradle.ChangeDependencyGroupId:
+  - org.openrewrite.java.ChangePackage:
+      oldPackageName: javax.validation
+      newPackageName: jakarta.validation
+      recursive: true
+  - org.openrewrite.java.dependencies.RemoveDependency:
       groupId: io.micronaut
       artifactId: micronaut-validation
-      newGroupId: io.micronaut.validation
-      configuration: implementation
-  - org.openrewrite.gradle.ChangeDependencyGroupId:
-      groupId: io.micronaut
-      artifactId: micronaut-http-validation
-      newGroupId: io.micronaut.validation
-      configuration: annotationProcessor
-  - org.openrewrite.gradle.ChangeDependencyArtifactId:
+  - org.openrewrite.java.dependencies.AddDependency:
       groupId: io.micronaut.validation
-      artifactId: micronaut-http-validation
-      newArtifactId: micronaut-validation-processor
+      artifactId: micronaut-validation
+      configuration: implementation
+      scope: compile
+      onlyIfUsing: jakarta.validation.constraints.*
+  - org.openrewrite.gradle.AddDependency:
+      groupId: io.micronaut.validation
+      artifactId: micronaut-validation-processor
       configuration: annotationProcessor
-  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
-      oldGroupId: io.micronaut
-      oldArtifactId: micronaut-validation
-      newGroupId: io.micronaut.validation
-      newVersion: LATEST
-  - org.openrewrite.java.micronaut.ChangeAnnotationProcessorPath:
-      oldGroupId: io.micronaut
-      oldArtifactId: micronaut-http-validation
-      newGroupId: io.micronaut.validation
-      newArtifactId: micronaut-validation-processor
-      newVersion: ${micronaut.validation.version}
+      onlyIfUsing: jakarta.validation.constraints.*
+  - org.openrewrite.java.micronaut.AddAnnotationProcessorPath:
+      groupId: io.micronaut.validation
+      artifactId: micronaut-validation-processor
+      version: ${micronaut.validation.version}
+      onlyIfUsing: jakarta.validation.constraints.*
       exclusions:
         - io.micronaut:micronaut-inject
 ---
