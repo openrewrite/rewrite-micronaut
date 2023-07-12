@@ -36,6 +36,7 @@ recipeList:
   - org.openrewrite.java.micronaut.AddMicronautRetryDependencyIfNeeded
   - org.openrewrite.java.micronaut.UpdateMicronautSecurity
   - org.openrewrite.java.micronaut.UpdateMicronautData
+  - org.openrewrite.java.micronaut.RemoveWithJansiLogbackConfiguration
 ---
 type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.UpdateBuildToMicronaut4Version
@@ -346,3 +347,12 @@ recipeList:
   - org.openrewrite.java.ReplaceConstantWithAnotherConstant:
       existingFullyQualifiedConstantName: io.micronaut.scheduling.TaskExecutors.IO
       fullyQualifiedConstantName: io.micronaut.scheduling.TaskExecutors.BLOCKING
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: org.openrewrite.java.micronaut.RemoveWithJansiLogbackConfiguration
+displayName: Remove withJansi Logback configuration
+description: This recipe will remove the withJansi configuration tag from logback.xml.
+recipeList:
+  - org.openrewrite.xml.RemoveXmlTag:
+      xPath: /configuration/appender/withJansi
+      fileMatcher: '**/logback.xml'
