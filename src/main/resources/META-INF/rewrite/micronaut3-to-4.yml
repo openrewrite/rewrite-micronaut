@@ -23,6 +23,7 @@ recipeList:
   - org.openrewrite.java.migrate.JavaVersion17
   - org.openrewrite.gradle.UpdateGradleWrapper:
       version: 8.1.x
+      addIfMissing: false
   - org.openrewrite.java.micronaut.UpdateBuildToMicronaut4Version
   - org.openrewrite.java.micronaut.UpdateMicronautPlatformBom
   - org.openrewrite.java.micronaut.UpdateBuildPlugins
