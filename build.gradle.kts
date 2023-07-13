@@ -54,6 +54,7 @@ recipeDependencies {
 
     parserClasspath("io.micronaut:micronaut-context:4.0.0")
     parserClasspath("io.micronaut:micronaut-websocket:4.0.0")
+    parserClasspath("io.micronaut:micronaut-http:4.0.0")
     parserClasspath("io.micronaut.validation:micronaut-validation:4.0.0")
     parserClasspath("io.micronaut:micronaut-retry:4.0.0")
     parserClasspath("io.micronaut.email:micronaut-email:2.0.0")
@@ -62,6 +63,7 @@ recipeDependencies {
     parserClasspath("io.micronaut.data:micronaut-data-model:4.0.0")
     parserClasspath("io.micronaut.data:micronaut-data-tx:3.9.1")
     parserClasspath("io.micronaut.data:micronaut-data-tx:4.0.0")
+    parserClasspath("io.micronaut.security:micronaut-security:4.0.0")
     parserClasspath("javax.annotation:javax.annotation-api:1.3.2")
     parserClasspath("javax.validation:validation-api:2.0.1.Final")
     parserClasspath("jakarta.validation:jakarta.validation-api:3.0.2")
