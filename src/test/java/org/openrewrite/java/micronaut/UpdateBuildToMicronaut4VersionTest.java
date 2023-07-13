@@ -40,7 +40,7 @@ public class UpdateBuildToMicronaut4VersionTest implements RewriteTest {
 
     @Language("properties")
     private final String v4GradleProperties = """
-            micronautVersion=4.0.
+            micronautVersion=4.0.0
         """;
 
     @Language("xml")
