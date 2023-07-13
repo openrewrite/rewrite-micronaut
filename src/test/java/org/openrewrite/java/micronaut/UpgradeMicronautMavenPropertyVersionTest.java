@@ -79,7 +79,7 @@ class UpgradeMicronautMavenPropertyVersionTest implements RewriteTest {
                       <artifactId>my-app</artifactId>
                       <version>1</version>
                       <properties>
-                          <micronaut.version>4.0.0-M4</micronaut.version>
+                          <micronaut.version>4.0.0</micronaut.version>
                       </properties>
                   </project>
               """)

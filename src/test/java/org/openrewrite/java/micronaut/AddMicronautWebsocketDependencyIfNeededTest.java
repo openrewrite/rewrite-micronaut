@@ -58,7 +58,7 @@ public class AddMicronautWebsocketDependencyIfNeededTest implements RewriteTest 
     @Language("groovy")
     private final String buildGradleInitial = """
             plugins {
-                id("io.micronaut.application") version "4.0.0-M8"
+                id("io.micronaut.application") version "4.0.0"
             }
             
             repositories {
@@ -69,7 +69,7 @@ public class AddMicronautWebsocketDependencyIfNeededTest implements RewriteTest 
     @Language("groovy")
     private final String buildGradleExpected = """
             plugins {
-                id("io.micronaut.application") version "4.0.0-M8"
+                id("io.micronaut.application") version "4.0.0"
             }
             
             repositories {
@@ -90,7 +90,7 @@ public class AddMicronautWebsocketDependencyIfNeededTest implements RewriteTest 
                 <parent>
                     <groupId>io.micronaut.platform</groupId>
                     <artifactId>micronaut-parent</artifactId>
-                    <version>4.0.0-M4</version>
+                    <version>4.0.0</version>
                 </parent>
             </project>
         """;
@@ -104,7 +104,7 @@ public class AddMicronautWebsocketDependencyIfNeededTest implements RewriteTest 
                 <parent>
                     <groupId>io.micronaut.platform</groupId>
                     <artifactId>micronaut-parent</artifactId>
-                    <version>4.0.0-M4</version>
+                    <version>4.0.0</version>
                 </parent>
                 <dependencies>
                     <dependency>
