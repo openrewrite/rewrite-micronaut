@@ -41,6 +41,22 @@ public final class MicronautVersionHelper {
 
     public static final MavenRepository GRADLE_PLUGIN_REPO = new MavenRepository("gradle-plugins", "https://plugins.gradle.org/m2/", "true", "false", true, null, null, true);
 
+    public static final String getLatestMN2Version() {
+        try {
+            return getNewerVersion("2.x", "2.0.0", new InMemoryExecutionContext()).orElse("2.0.0");
+        } catch (MavenDownloadingException e) {
+            throw new IllegalStateException("Failed to resolve latest Micronaut Framework 2.x version", e);
+        }
+    }
+
+    public static final String getLatestMN3Version() {
+        try {
+            return getNewerVersion("3.x", "3.0.0", new InMemoryExecutionContext()).orElse("3.0.0");
+        } catch (MavenDownloadingException e) {
+            throw new IllegalStateException("Failed to resolve latest Micronaut Framework 3.x version", e);
+        }
+    }
+
     public static final String getLatestMN4Version() {
         try {
             return getNewerVersion("4.x", "4.0.0", new InMemoryExecutionContext()).orElse("4.0.0");

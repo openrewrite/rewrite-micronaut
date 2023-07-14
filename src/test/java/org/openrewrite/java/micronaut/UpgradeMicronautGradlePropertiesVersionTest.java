@@ -18,7 +18,6 @@ package org.openrewrite.java.micronaut;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.openrewrite.DocumentExample;
-import org.openrewrite.test.RecipeSpec;
 import org.openrewrite.test.RewriteTest;
 
 import java.io.IOException;
@@ -29,30 +28,43 @@ import static org.openrewrite.properties.Assertions.properties;
 @SuppressWarnings("UnusedProperty")
 class UpgradeMicronautGradlePropertiesVersionTest implements RewriteTest {
 
-    @Override
-    public void defaults(RecipeSpec spec) {
-        spec.recipe(new UpgradeMicronautGradlePropertiesVersion("~2.1"));
-    }
-
     @DocumentExample
     @Test
-    void changeValue(@TempDir Path tempDir) throws IOException {
-        rewriteRun(
+    void upgradeMicronaut2(@TempDir Path tempDir) throws IOException {
+        String latestMicronautVersion = MicronautVersionHelper.getLatestMN2Version();
+
+        rewriteRun(spec -> spec.recipe(new UpgradeMicronautGradlePropertiesVersion("2.x")),
           properties(
             "micronautVersion=2.0.3",
-            "micronautVersion=2.1.4",
+            String.format("micronautVersion=%s", latestMicronautVersion),
             source -> source.path("gradle.properties")
           )
         );
     }
 
     @Test
+    void upgradeToMicronaut3() {
+        String latestMicronautVersion = MicronautVersionHelper.getLatestMN3Version();
+
+        rewriteRun(
+          spec -> spec.recipe(new UpgradeMicronautGradlePropertiesVersion("3.x")),
+          properties(
+            "micronautVersion=2.0.3",
+            String.format("micronautVersion=%s", latestMicronautVersion),
+            s -> s.path("gradle.properties")
+          )
+        );
+    }
+
+    @Test
     void upgradeToMicronaut4() {
+        String latestMicronautVersion = MicronautVersionHelper.getLatestMN4Version();
+
         rewriteRun(
           spec -> spec.recipe(new UpgradeMicronautGradlePropertiesVersion("4.x")),
           properties(
             "micronautVersion=3.9.0",
-            "micronautVersion=4.0.0",
+            String.format("micronautVersion=%s", latestMicronautVersion),
             s -> s.path("gradle.properties")
           )
         );

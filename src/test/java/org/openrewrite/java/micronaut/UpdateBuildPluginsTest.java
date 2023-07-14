@@ -18,7 +18,6 @@ package org.openrewrite.java.micronaut;
 import org.junit.jupiter.api.Test;
 import org.openrewrite.DocumentExample;
 import org.openrewrite.test.RecipeSpec;
-import org.openrewrite.test.RewriteTest;
 
 import static org.openrewrite.gradle.Assertions.buildGradle;
 import static org.openrewrite.gradle.Assertions.withToolingApi;
@@ -26,19 +25,17 @@ import static org.openrewrite.java.Assertions.mavenProject;
 import static org.openrewrite.maven.Assertions.pomXml;
 import static org.openrewrite.properties.Assertions.properties;
 
-public class UpdateBuildPluginsTest implements RewriteTest {
+public class UpdateBuildPluginsTest extends Micronaut4RewriteTest {
 
     @Override
     public void defaults(RecipeSpec spec) {
-        spec.recipeFromResource("/META-INF/rewrite/micronaut3-to-4.yml", "org.openrewrite.java.micronaut.UpdateMicronautPlatformBom",
-          "org.openrewrite.java.micronaut.UpdateBuildPlugins");
+        spec.recipeFromResource("/META-INF/rewrite/micronaut3-to-4.yml", "org.openrewrite.java.micronaut.UpdateMicronautPlatformBom", "org.openrewrite.java.micronaut.UpdateBuildPlugins");
     }
 
     @DocumentExample
     @Test
     void updateGradleBuildPlugins() {
-        rewriteRun(spec -> spec.beforeRecipe(withToolingApi()),
-          properties("micronautVersion=3.9.1", s -> s.path("gradle.properties")),
+        rewriteRun(spec -> spec.beforeRecipe(withToolingApi()), properties("micronautVersion=3.9.1", s -> s.path("gradle.properties")),
           //language=groovy
           buildGradle("""
                 plugins {
@@ -58,69 +55,69 @@ public class UpdateBuildPluginsTest implements RewriteTest {
                 repositories {
                     mavenCentral()
                 }
-            """, """
+            """, String.format("""
                 plugins {
                     id("com.github.johnrengelman.shadow") version "8.1.1"
-                    id("io.micronaut.application") version "4.0.0"
-                    id("io.micronaut.minimal.application") version "4.0.0"
-                    id("io.micronaut.aot") version "4.0.0"
-                    id("io.micronaut.component") version "4.0.0"
-                    id("io.micronaut.crac") version "4.0.0"
-                    id("io.micronaut.docker") version "4.0.0"
-                    id("io.micronaut.graalvm") version "4.0.0"
-                    id("io.micronaut.library") version "4.0.0"
-                    id("io.micronaut.minimal.library") version "4.0.0"
-                    id("io.micronaut.test-resources") version "4.0.0"
+                    id("io.micronaut.application") version "%s"
+                    id("io.micronaut.minimal.application") version "%s"
+                    id("io.micronaut.aot") version "%s"
+                    id("io.micronaut.component") version "%s"
+                    id("io.micronaut.crac") version "%s"
+                    id("io.micronaut.docker") version "%s"
+                    id("io.micronaut.graalvm") version "%s"
+                    id("io.micronaut.library") version "%s"
+                    id("io.micronaut.minimal.library") version "%s"
+                    id("io.micronaut.test-resources") version "%s"
                 }
                 
                 repositories {
                     mavenCentral()
                 }
-            """));
+            """, latestApplicationPluginVersion, MicronautVersionHelper.getLatestMN4PluginVersion("io.micronaut.minimal.application"), MicronautVersionHelper.getLatestMN4PluginVersion("io.micronaut.aot"), MicronautVersionHelper.getLatestMN4PluginVersion("io.micronaut.component"), MicronautVersionHelper.getLatestMN4PluginVersion("io.micronaut.crac"), MicronautVersionHelper.getLatestMN4PluginVersion("io.micronaut.docker"), MicronautVersionHelper.getLatestMN4PluginVersion("io.micronaut.graalvmn"), MicronautVersionHelper.getLatestMN4PluginVersion("io.micronaut.library"), MicronautVersionHelper.getLatestMN4PluginVersion("io.micronaut.minimal.library"), MicronautVersionHelper.getLatestMN4PluginVersion("io.micronaut.test-resources"))));
     }
 
     @Test
     void updateMavenBuildPlugin() {
         rewriteRun(mavenProject("project",
-            //language=xml
-            pomXml("""
-                    <project>
-                        <groupId>com.mycompany.app</groupId>
-                        <artifactId>my-app</artifactId>
-                        <version>1</version>
-                        <parent>
-                            <groupId>io.micronaut</groupId>
-                            <artifactId>micronaut-parent</artifactId>
-                            <version>3.9.1</version>
-                        </parent>
-                        <build>
-                          <plugins>
-                              <plugin>
-                                  <groupId>io.micronaut.build</groupId>
-                                  <artifactId>micronaut-maven-plugin</artifactId>
-                              </plugin>
-                          </plugins>
-                        </build>
-                    </project>    
-                """, """
-                    <project>
-                        <groupId>com.mycompany.app</groupId>
-                        <artifactId>my-app</artifactId>
-                        <version>1</version>
-                        <parent>
-                            <groupId>io.micronaut.platform</groupId>
-                            <artifactId>micronaut-parent</artifactId>
-                            <version>4.0.0</version>
-                        </parent>
-                        <build>
-                          <plugins>
-                              <plugin>
-                                  <groupId>io.micronaut.maven</groupId>
-                                  <artifactId>micronaut-maven-plugin</artifactId>
-                              </plugin>
-                          </plugins>
-                        </build>
-                    </project>
-                """)));
+          //language=xml
+          pomXml("""
+                <project>
+                    <groupId>com.mycompany.app</groupId>
+                    <artifactId>my-app</artifactId>
+                    <version>1</version>
+                    <parent>
+                        <groupId>io.micronaut</groupId>
+                        <artifactId>micronaut-parent</artifactId>
+                        <version>3.9.1</version>
+                    </parent>
+                    <build>
+                      <plugins>
+                          <plugin>
+                              <groupId>io.micronaut.build</groupId>
+                              <artifactId>micronaut-maven-plugin</artifactId>
+                          </plugin>
+                      </plugins>
+                    </build>
+                </project>    
+            """, String.format("""
+                <project>
+                    <groupId>com.mycompany.app</groupId>
+                    <artifactId>my-app</artifactId>
+                    <version>1</version>
+                    <parent>
+                        <groupId>io.micronaut.platform</groupId>
+                        <artifactId>micronaut-parent</artifactId>
+                        <version>%s</version>
+                    </parent>
+                    <build>
+                      <plugins>
+                          <plugin>
+                              <groupId>io.micronaut.maven</groupId>
+                              <artifactId>micronaut-maven-plugin</artifactId>
+                          </plugin>
+                      </plugins>
+                    </build>
+                </project>
+            """, latestMicronautVersion))));
     }
 }
