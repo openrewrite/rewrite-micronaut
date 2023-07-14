@@ -60,7 +60,7 @@ class UpgradeMicronautMavenPropertyVersionTest implements RewriteTest {
     @Test
     void changeMavenMicronautVersion4() {
         rewriteRun(
-          spec -> spec.recipe(new UpgradeMicronautMavenPropertyVersion("4.0.0-M4")),
+          spec -> spec.recipe(new UpgradeMicronautMavenPropertyVersion("4.x")),
           pomXml("""
                   <project>
                       <modelVersion>4.0.0</modelVersion>
@@ -79,7 +79,7 @@ class UpgradeMicronautMavenPropertyVersionTest implements RewriteTest {
                       <artifactId>my-app</artifactId>
                       <version>1</version>
                       <properties>
-                          <micronaut.version>4.0.0-M4</micronaut.version>
+                          <micronaut.version>4.0.0</micronaut.version>
                       </properties>
                   </project>
               """)

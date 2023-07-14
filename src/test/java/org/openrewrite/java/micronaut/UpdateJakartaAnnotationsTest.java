@@ -71,12 +71,12 @@ public class UpdateJakartaAnnotationsTest implements RewriteTest {
             }
         """;
 
-    private final SourceSpecs gradleProperties = properties("micronautVersion=4.0.0-M4", s -> s.path("gradle.properties"));
+    private final SourceSpecs gradleProperties = properties("micronautVersion=4.0.0", s -> s.path("gradle.properties"));
 
     @Language("groovy")
     private final String buildGradleWithDependency = """
             plugins {
-                id("io.micronaut.application") version "4.0.0-M8"
+                id("io.micronaut.application") version "4.0.0"
             }
             
             repositories {
@@ -95,7 +95,7 @@ public class UpdateJakartaAnnotationsTest implements RewriteTest {
     @Language("groovy")
     private final String buildGradleWithoutDependency = """
             plugins {
-                id("io.micronaut.application") version "4.0.0-M8"
+                id("io.micronaut.application") version "4.0.0"
             }
             
             repositories {
@@ -119,7 +119,7 @@ public class UpdateJakartaAnnotationsTest implements RewriteTest {
                 <parent>
                     <groupId>io.micronaut.platform</groupId>
                     <artifactId>micronaut-parent</artifactId>
-                    <version>4.0.0-M4</version>
+                    <version>4.0.0</version>
                 </parent>
                 <dependencies>
                     <dependency>
@@ -160,7 +160,7 @@ public class UpdateJakartaAnnotationsTest implements RewriteTest {
                 <parent>
                     <groupId>io.micronaut.platform</groupId>
                     <artifactId>micronaut-parent</artifactId>
-                    <version>4.0.0-M4</version>
+                    <version>4.0.0</version>
                 </parent>
                 <dependencies>
                     <dependency>

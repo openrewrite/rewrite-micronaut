@@ -71,14 +71,6 @@ class UpdateMicronautValidationTest implements RewriteTest {
       }
       """;
 
-    //@Language("xml")
-    //private final String pomInitial = ;
-
-    //@Language("xml")
-    //private final String pomExpected = """
-    //  ;
-
-
     @Test
     void updateJavaCodeAndModifyGradleDependencies() {
         rewriteRun(spec -> spec.beforeRecipe(withToolingApi()),
@@ -103,7 +95,7 @@ class UpdateMicronautValidationTest implements RewriteTest {
               }
               """, """
               plugins {
-                  id("io.micronaut.application") version "4.0.0-M8"
+                  id("io.micronaut.application") version "4.0.0"
               }
                             
               repositories {
@@ -144,7 +136,7 @@ class UpdateMicronautValidationTest implements RewriteTest {
               }
               """, """
               plugins {
-                  id("io.micronaut.application") version "4.0.0-M8"
+                  id("io.micronaut.application") version "4.0.0"
               }
                             
               repositories {
@@ -237,7 +229,7 @@ class UpdateMicronautValidationTest implements RewriteTest {
                 <parent>
                     <groupId>io.micronaut.platform</groupId>
                     <artifactId>micronaut-parent</artifactId>
-                    <version>4.0.0-RC1</version>
+                    <version>4.0.0</version>
                 </parent>
                 <dependencies>
                     <dependency>
@@ -375,7 +367,7 @@ class UpdateMicronautValidationTest implements RewriteTest {
                 <parent>
                     <groupId>io.micronaut.platform</groupId>
                     <artifactId>micronaut-parent</artifactId>
-                    <version>4.0.0-RC1</version>
+                    <version>4.0.0</version>
                 </parent>
                 <dependencies>
                     <dependency>
@@ -455,7 +447,7 @@ class UpdateMicronautValidationTest implements RewriteTest {
                 <parent>
                     <groupId>io.micronaut.platform</groupId>
                     <artifactId>micronaut-parent</artifactId>
-                    <version>4.0.0-RC1</version>
+                    <version>4.0.0</version>
                 </parent>
                 <dependencies>
                     <dependency>

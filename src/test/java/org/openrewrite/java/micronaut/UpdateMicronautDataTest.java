@@ -106,7 +106,7 @@ public class UpdateMicronautDataTest implements RewriteTest {
                 <parent>
                     <groupId>io.micronaut.platform</groupId>
                     <artifactId>micronaut-parent</artifactId>
-                    <version>4.0.0-RC1</version>
+                    <version>4.0.0</version>
                 </parent>
                 <dependencies>
                     <dependency>

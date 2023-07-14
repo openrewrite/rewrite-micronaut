@@ -61,16 +61,16 @@ public class UpdateBuildPluginsTest implements RewriteTest {
             """, """
                 plugins {
                     id("com.github.johnrengelman.shadow") version "8.1.1"
-                    id("io.micronaut.application") version "4.0.0-M8"
-                    id("io.micronaut.minimal.application") version "4.0.0-M8"
-                    id("io.micronaut.aot") version "4.0.0-M8"
-                    id("io.micronaut.component") version "4.0.0-M8"
-                    id("io.micronaut.crac") version "4.0.0-M8"
-                    id("io.micronaut.docker") version "4.0.0-M8"
-                    id("io.micronaut.graalvm") version "4.0.0-M8"
-                    id("io.micronaut.library") version "4.0.0-M8"
-                    id("io.micronaut.minimal.library") version "4.0.0-M8"
-                    id("io.micronaut.test-resources") version "4.0.0-M8"
+                    id("io.micronaut.application") version "4.0.0"
+                    id("io.micronaut.minimal.application") version "4.0.0"
+                    id("io.micronaut.aot") version "4.0.0"
+                    id("io.micronaut.component") version "4.0.0"
+                    id("io.micronaut.crac") version "4.0.0"
+                    id("io.micronaut.docker") version "4.0.0"
+                    id("io.micronaut.graalvm") version "4.0.0"
+                    id("io.micronaut.library") version "4.0.0"
+                    id("io.micronaut.minimal.library") version "4.0.0"
+                    id("io.micronaut.test-resources") version "4.0.0"
                 }
                 
                 repositories {
@@ -110,7 +110,7 @@ public class UpdateBuildPluginsTest implements RewriteTest {
                         <parent>
                             <groupId>io.micronaut.platform</groupId>
                             <artifactId>micronaut-parent</artifactId>
-                            <version>4.0.0-RC1</version>
+                            <version>4.0.0</version>
                         </parent>
                         <build>
                           <plugins>
