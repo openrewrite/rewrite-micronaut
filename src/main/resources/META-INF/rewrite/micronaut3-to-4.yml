@@ -38,6 +38,7 @@ recipeList:
   - org.openrewrite.java.micronaut.UpdateMicronautSecurity
   - org.openrewrite.java.micronaut.UpdateMicronautData
   - org.openrewrite.java.micronaut.RemoveWithJansiLogbackConfiguration
+  - org.openrewrite.java.micronaut.RemoveUnnecessaryDependencies
 ---
 type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.UpdateBuildToMicronaut4Version
