@@ -38,6 +38,7 @@ recipeList:
   - org.openrewrite.java.micronaut.UpdateMicronautSecurity
   - org.openrewrite.java.micronaut.UpdateMicronautData
   - org.openrewrite.java.micronaut.RemoveWithJansiLogbackConfiguration
+  - org.openrewrite.java.micronaut.RemoveUnnecessaryDependencies
 ---
 type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.UpdateBuildToMicronaut4Version
@@ -353,3 +354,12 @@ recipeList:
   - org.openrewrite.xml.RemoveXmlTag:
       xPath: /configuration/appender/withJansi
       fileMatcher: '**/logback.xml'
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: org.openrewrite.java.micronaut.RemoveUnnecessaryDependencies
+displayName: Remove unnecessary dependencies
+description: This recipe will remove dependencies that are no longer explicitly needed.
+recipeList:
+  - org.openrewrite.java.dependencies.RemoveDependency:
+      groupId: io.micronaut
+      artifactId: micronaut-runtime

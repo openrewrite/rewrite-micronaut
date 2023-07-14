@@ -16,17 +16,18 @@
 package org.openrewrite.java.micronaut;
 
 import org.openrewrite.ExecutionContext;
+import org.openrewrite.InMemoryExecutionContext;
+import org.openrewrite.gradle.plugins.AddPluginVisitor;
 import org.openrewrite.maven.MavenDownloadingException;
 import org.openrewrite.maven.internal.MavenPomDownloader;
 import org.openrewrite.maven.tree.GroupArtifact;
 import org.openrewrite.maven.tree.MavenMetadata;
+import org.openrewrite.maven.tree.MavenRepository;
 import org.openrewrite.semver.LatestRelease;
 import org.openrewrite.semver.Semver;
 import org.openrewrite.semver.VersionComparator;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Optional;
+import java.util.*;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
@@ -37,6 +38,25 @@ public final class MicronautVersionHelper {
     private static final String V4_GROUP_ID = "io.micronaut.platform";
     private static final String ARTIFACT_ID = "micronaut-parent";
     private static final LatestRelease LATEST_RELEASE = new LatestRelease(null);
+
+    public static final MavenRepository GRADLE_PLUGIN_REPO = new MavenRepository("gradle-plugins", "https://plugins.gradle.org/m2/", "true", "false", true, null, null, true);
+
+    public static final String getLatestMN4Version() {
+        try {
+            return getNewerVersion("4.x", "4.0.0", new InMemoryExecutionContext()).orElse("4.0.0");
+        } catch (MavenDownloadingException e) {
+            throw new IllegalStateException("Failed to resolve latest Micronaut Framework 4.x version", e);
+        }
+    }
+
+    public static final String getLatestMN4PluginVersion(String pluginId) {
+        try {
+            return getNewerGradlePluginVersion("io.micronaut.application", "4.x", "4.0.0", new InMemoryExecutionContext()).orElse("4.0.0");
+        } catch (MavenDownloadingException e) {
+            throw new IllegalStateException("Failed to resolve plugin version for "+pluginId, e);
+        }
+    }
+
 
     public static Optional<String> getNewerVersion(String versionPattern, String currentVersion, ExecutionContext ctx) throws MavenDownloadingException {
         VersionComparator versionComparator = Semver.validate(versionPattern, null).getValue();
@@ -57,6 +77,10 @@ public final class MicronautVersionHelper {
         return availableVersions.stream()
                 .filter(v -> LATEST_RELEASE.compare(null, currentVersion, v) < 0)
                 .max(LATEST_RELEASE);
+    }
+
+    public static Optional<String> getNewerGradlePluginVersion(String pluginId, String versionPattern, String currentVersion, ExecutionContext ctx) throws MavenDownloadingException {
+        return AddPluginVisitor.resolvePluginVersion(pluginId, currentVersion, versionPattern, null, Collections.singletonList(GRADLE_PLUGIN_REPO), ctx);
     }
 
     private MicronautVersionHelper() {
