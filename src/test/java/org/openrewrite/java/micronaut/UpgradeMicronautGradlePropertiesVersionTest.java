@@ -36,7 +36,7 @@ class UpgradeMicronautGradlePropertiesVersionTest implements RewriteTest {
         rewriteRun(spec -> spec.recipe(new UpgradeMicronautGradlePropertiesVersion("2.x")),
           properties(
             "micronautVersion=2.0.3",
-            String.format("micronautVersion=%s", latestMicronautVersion),
+                  "micronautVersion=%s".formatted(latestMicronautVersion),
             source -> source.path("gradle.properties")
           )
         );
@@ -50,7 +50,7 @@ class UpgradeMicronautGradlePropertiesVersionTest implements RewriteTest {
           spec -> spec.recipe(new UpgradeMicronautGradlePropertiesVersion("3.x")),
           properties(
             "micronautVersion=2.0.3",
-            String.format("micronautVersion=%s", latestMicronautVersion),
+                  "micronautVersion=%s".formatted(latestMicronautVersion),
             s -> s.path("gradle.properties")
           )
         );
@@ -64,7 +64,7 @@ class UpgradeMicronautGradlePropertiesVersionTest implements RewriteTest {
           spec -> spec.recipe(new UpgradeMicronautGradlePropertiesVersion("4.x")),
           properties(
             "micronautVersion=3.9.0",
-            String.format("micronautVersion=%s", latestMicronautVersion),
+                  "micronautVersion=%s".formatted(latestMicronautVersion),
             s -> s.path("gradle.properties")
           )
         );

@@ -53,7 +53,7 @@ public class AddMicronautRetryDependencyIfNeededTest extends Micronaut4RewriteTe
     void updateGradleDependencies() {
         rewriteRun(spec -> spec.beforeRecipe(withToolingApi()), mavenProject("project", srcMainJava(java(retryableService)), getGradleProperties(),
           //language=groovy
-          buildGradle(String.format("""
+          buildGradle("""
                 plugins {
                     id("io.micronaut.application") version "%s"
                 }
@@ -61,7 +61,7 @@ public class AddMicronautRetryDependencyIfNeededTest extends Micronaut4RewriteTe
                 repositories {
                     mavenCentral()
                 }
-            """, latestApplicationPluginVersion), String.format("""
+            """.formatted(latestApplicationPluginVersion), """
                 plugins {
                     id("io.micronaut.application") version "%s"
                 }
@@ -73,14 +73,14 @@ public class AddMicronautRetryDependencyIfNeededTest extends Micronaut4RewriteTe
                 dependencies {
                     implementation "io.micronaut:micronaut-retry"
                 }
-            """, latestApplicationPluginVersion))));
+            """.formatted(latestApplicationPluginVersion))));
     }
 
     @Test
     void updateMavenDependencies() {
         rewriteRun(mavenProject("project", srcMainJava(java(retryableService)),
           //language=xml
-          pomXml(String.format("""
+          pomXml("""
                 <project>
                     <groupId>com.mycompany.app</groupId>
                     <artifactId>my-app</artifactId>
@@ -91,7 +91,7 @@ public class AddMicronautRetryDependencyIfNeededTest extends Micronaut4RewriteTe
                         <version>%s</version>
                     </parent>
                 </project>
-            """, latestMicronautVersion), String.format("""
+            """.formatted(latestMicronautVersion), """
                 <project>
                     <groupId>com.mycompany.app</groupId>
                     <artifactId>my-app</artifactId>
@@ -108,6 +108,6 @@ public class AddMicronautRetryDependencyIfNeededTest extends Micronaut4RewriteTe
                         </dependency>
                     </dependencies>
                 </project>
-            """, latestMicronautVersion))));
+            """.formatted(latestMicronautVersion))));
     }
 }

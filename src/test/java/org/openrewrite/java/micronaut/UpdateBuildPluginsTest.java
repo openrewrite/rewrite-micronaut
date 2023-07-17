@@ -55,7 +55,7 @@ public class UpdateBuildPluginsTest extends Micronaut4RewriteTest {
                 repositories {
                     mavenCentral()
                 }
-            """, String.format("""
+            """, """
                 plugins {
                     id("com.github.johnrengelman.shadow") version "8.1.1"
                     id("io.micronaut.application") version "%s"
@@ -73,7 +73,7 @@ public class UpdateBuildPluginsTest extends Micronaut4RewriteTest {
                 repositories {
                     mavenCentral()
                 }
-            """, latestApplicationPluginVersion, MicronautVersionHelper.getLatestMN4PluginVersion("io.micronaut.minimal.application"), MicronautVersionHelper.getLatestMN4PluginVersion("io.micronaut.aot"), MicronautVersionHelper.getLatestMN4PluginVersion("io.micronaut.component"), MicronautVersionHelper.getLatestMN4PluginVersion("io.micronaut.crac"), MicronautVersionHelper.getLatestMN4PluginVersion("io.micronaut.docker"), MicronautVersionHelper.getLatestMN4PluginVersion("io.micronaut.graalvmn"), MicronautVersionHelper.getLatestMN4PluginVersion("io.micronaut.library"), MicronautVersionHelper.getLatestMN4PluginVersion("io.micronaut.minimal.library"), MicronautVersionHelper.getLatestMN4PluginVersion("io.micronaut.test-resources"))));
+            """.formatted(latestApplicationPluginVersion, MicronautVersionHelper.getLatestMN4PluginVersion("io.micronaut.minimal.application"), MicronautVersionHelper.getLatestMN4PluginVersion("io.micronaut.aot"), MicronautVersionHelper.getLatestMN4PluginVersion("io.micronaut.component"), MicronautVersionHelper.getLatestMN4PluginVersion("io.micronaut.crac"), MicronautVersionHelper.getLatestMN4PluginVersion("io.micronaut.docker"), MicronautVersionHelper.getLatestMN4PluginVersion("io.micronaut.graalvmn"), MicronautVersionHelper.getLatestMN4PluginVersion("io.micronaut.library"), MicronautVersionHelper.getLatestMN4PluginVersion("io.micronaut.minimal.library"), MicronautVersionHelper.getLatestMN4PluginVersion("io.micronaut.test-resources"))));
     }
 
     @Test
@@ -99,7 +99,7 @@ public class UpdateBuildPluginsTest extends Micronaut4RewriteTest {
                       </plugins>
                     </build>
                 </project>    
-            """, String.format("""
+            """, """
                 <project>
                     <groupId>com.mycompany.app</groupId>
                     <artifactId>my-app</artifactId>
@@ -118,6 +118,6 @@ public class UpdateBuildPluginsTest extends Micronaut4RewriteTest {
                       </plugins>
                     </build>
                 </project>
-            """, latestMicronautVersion))));
+            """.formatted(latestMicronautVersion))));
     }
 }

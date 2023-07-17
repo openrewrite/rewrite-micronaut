@@ -81,7 +81,7 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
                 implementation("io.micronaut:micronaut-validation")
                 runtimeOnly("ch.qos.logback:logback-classic")
             }
-            """, String.format("""
+            """, """
             plugins {
                 id("io.micronaut.application") version "%s"
             }
@@ -98,7 +98,7 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
                 implementation "io.micronaut.validation:micronaut-validation"
                 runtimeOnly("ch.qos.logback:logback-classic")
             }
-            """, latestApplicationPluginVersion))));
+            """.formatted(latestApplicationPluginVersion))));
     }
 
     @Test
@@ -120,7 +120,7 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
                 implementation("io.micronaut:micronaut-jackson-databind")
                 runtimeOnly("ch.qos.logback:logback-classic")
             }
-            """, String.format("""
+            """, """
             plugins {
                 id("io.micronaut.application") version "%s"
             }
@@ -137,14 +137,14 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
                 implementation "io.micronaut.validation:micronaut-validation"
                 runtimeOnly("ch.qos.logback:logback-classic")
             }
-            """, latestMicronautVersion))));
+            """.formatted(latestMicronautVersion))));
     }
 
     @Test
     void updateJavaCodeAndModifyMavenDependencies() {
         rewriteRun(mavenProject("project", srcMainJava(java(annotatedJavaxClass, annotatedJakartaClass)),
           //language=xml
-          pomXml(String.format("""
+          pomXml("""
             <project>
                 <groupId>com.mycompany.app</groupId>
                 <artifactId>my-app</artifactId>
@@ -207,7 +207,7 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
                     </plugins>
                 </build>
             </project>
-            """, MicronautVersionHelper.getLatestMN3Version()), String.format("""
+            """.formatted(MicronautVersionHelper.getLatestMN3Version()), """
             <project>
                 <groupId>com.mycompany.app</groupId>
                 <artifactId>my-app</artifactId>
@@ -280,14 +280,14 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
                     </plugins>
                 </build>
             </project>
-            """, latestMicronautVersion))));
+            """.formatted(latestMicronautVersion))));
     }
 
     @Test
     void updateJavaCodeAndAddMissingMavenDependencies() {
         rewriteRun(mavenProject("project", srcMainJava(java(annotatedJavaxClass, annotatedJakartaClass)),
           //language=xml
-          pomXml(String.format("""
+          pomXml("""
             <project>
                 <groupId>com.mycompany.app</groupId>
                 <artifactId>my-app</artifactId>
@@ -345,7 +345,7 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
                     </plugins>
                 </build>
             </project>
-            """, MicronautVersionHelper.getLatestMN3Version()), String.format("""
+            """.formatted(MicronautVersionHelper.getLatestMN3Version()), """
             <project>
                 <groupId>com.mycompany.app</groupId>
                 <artifactId>my-app</artifactId>
@@ -418,14 +418,14 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
                     </plugins>
                 </build>
             </project>
-            """, latestMicronautVersion))));
+            """.formatted(latestMicronautVersion))));
     }
 
     @Test
     void updateJavaCodeAndLeaveExistingMavenAnnotationProcessor() {
         rewriteRun(mavenProject("project", srcMainJava(java(annotatedJavaxClass, annotatedJakartaClass))),
           //language=xml
-          pomXml(String.format("""
+          pomXml("""
             <project>
                 <groupId>com.mycompany.app</groupId>
                 <artifactId>my-app</artifactId>
@@ -499,6 +499,6 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
                     </plugins>
                 </build>
             </project>
-            """, latestMicronautVersion)));
+            """.formatted(latestMicronautVersion)));
     }
 }

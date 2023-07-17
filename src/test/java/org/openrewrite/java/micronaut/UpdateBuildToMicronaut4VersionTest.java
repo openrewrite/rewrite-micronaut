@@ -33,18 +33,18 @@ public class UpdateBuildToMicronaut4VersionTest extends Micronaut4RewriteTest {
 
     @Test
     public void updateGradleProperties() {
-        rewriteRun(properties(String.format("""
+        rewriteRun(properties("""
               micronautVersion=%s
-          """, MicronautVersionHelper.getLatestMN3Version()), String.format("""
+          """.formatted(MicronautVersionHelper.getLatestMN3Version()), """
               micronautVersion=%s
-          """, latestMicronautVersion), s -> s.path("gradle.properties")));
+          """.formatted(latestMicronautVersion), s -> s.path("gradle.properties")));
     }
 
     @Test
     public void updatePomXmlProperties() {
         rewriteRun(
           //language=xml
-          pomXml(String.format("""
+          pomXml("""
                 <project>
                     <modelVersion>4.0.0</modelVersion>
                     <groupId>com.mycompany.app</groupId>
@@ -54,7 +54,7 @@ public class UpdateBuildToMicronaut4VersionTest extends Micronaut4RewriteTest {
                         <micronaut.version>%s</micronaut.version>
                     </properties>
                 </project>
-            """, MicronautVersionHelper.getLatestMN3Version()), String.format("""
+            """.formatted(MicronautVersionHelper.getLatestMN3Version()), """
                 <project>
                     <modelVersion>4.0.0</modelVersion>
                     <groupId>com.mycompany.app</groupId>
@@ -64,6 +64,6 @@ public class UpdateBuildToMicronaut4VersionTest extends Micronaut4RewriteTest {
                         <micronaut.version>%s</micronaut.version>
                     </properties>
                 </project>
-            """, latestMicronautVersion)));
+            """.formatted(latestMicronautVersion)));
     }
 }

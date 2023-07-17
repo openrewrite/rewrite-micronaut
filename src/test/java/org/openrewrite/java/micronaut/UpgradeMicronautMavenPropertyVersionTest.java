@@ -40,7 +40,7 @@ class UpgradeMicronautMavenPropertyVersionTest implements RewriteTest {
                       </properties>
                   </project>
               """,
-            String.format("""
+                  """
                   <project>
                       <modelVersion>4.0.0</modelVersion>
                       <groupId>com.mycompany.app</groupId>
@@ -50,7 +50,7 @@ class UpgradeMicronautMavenPropertyVersionTest implements RewriteTest {
                           <micronaut.version>%s</micronaut.version>
                       </properties>
                   </project>
-              """, latestMicronautVersion))
+              """.formatted(latestMicronautVersion))
         );
     }
 
@@ -70,7 +70,7 @@ class UpgradeMicronautMavenPropertyVersionTest implements RewriteTest {
                       </properties>
                   </project>
               """,
-            String.format("""
+                  """
                   <project>
                       <modelVersion>4.0.0</modelVersion>
                       <groupId>com.mycompany.app</groupId>
@@ -80,7 +80,7 @@ class UpgradeMicronautMavenPropertyVersionTest implements RewriteTest {
                           <micronaut.version>%s</micronaut.version>
                       </properties>
                   </project>
-              """, latestMicronautVersion))
+              """.formatted(latestMicronautVersion))
         );
     }
 
@@ -101,7 +101,7 @@ class UpgradeMicronautMavenPropertyVersionTest implements RewriteTest {
                       </properties>
                   </project>
               """,
-            String.format("""
+                  """
                   <project>
                       <modelVersion>4.0.0</modelVersion>
                       <groupId>com.mycompany.app</groupId>
@@ -111,7 +111,7 @@ class UpgradeMicronautMavenPropertyVersionTest implements RewriteTest {
                           <micronaut.version>%s</micronaut.version>
                       </properties>
                   </project>
-              """, latestMicronautVersion))
+              """.formatted(latestMicronautVersion))
         );
     }
 }

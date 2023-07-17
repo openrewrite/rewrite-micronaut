@@ -54,7 +54,7 @@ public class AddMicronautWebsocketDependencyIfNeededTest extends Micronaut4Rewri
     void updateGradleDependencies() {
         rewriteRun(spec -> spec.beforeRecipe(withToolingApi()), mavenProject("project", srcMainJava(java(annotatedWebsocketClass)), getGradleProperties(),
           //language=groovy
-          buildGradle(String.format("""
+          buildGradle("""
                 plugins {
                     id("io.micronaut.application") version "%s"
                 }
@@ -62,7 +62,7 @@ public class AddMicronautWebsocketDependencyIfNeededTest extends Micronaut4Rewri
                 repositories {
                     mavenCentral()
                 }
-            """, latestApplicationPluginVersion), String.format("""
+            """.formatted(latestApplicationPluginVersion), """
                 plugins {
                     id("io.micronaut.application") version "%s"
                 }
@@ -74,14 +74,14 @@ public class AddMicronautWebsocketDependencyIfNeededTest extends Micronaut4Rewri
                 dependencies {
                     implementation "io.micronaut:micronaut-websocket"
                 }
-            """, latestApplicationPluginVersion))));
+            """.formatted(latestApplicationPluginVersion))));
     }
 
     @Test
     void updateMavenDependencies() {
         rewriteRun(mavenProject("project", srcMainJava(java(annotatedWebsocketClass)),
           //language=xml
-          pomXml(String.format("""
+          pomXml("""
                 <project>
                     <groupId>com.mycompany.app</groupId>
                     <artifactId>my-app</artifactId>
@@ -92,7 +92,7 @@ public class AddMicronautWebsocketDependencyIfNeededTest extends Micronaut4Rewri
                         <version>%s</version>
                     </parent>
                 </project>
-            """, latestMicronautVersion), String.format("""
+            """.formatted(latestMicronautVersion), """
                 <project>
                     <groupId>com.mycompany.app</groupId>
                     <artifactId>my-app</artifactId>
@@ -109,6 +109,6 @@ public class AddMicronautWebsocketDependencyIfNeededTest extends Micronaut4Rewri
                         </dependency>
                     </dependencies>
                 </project>
-            """, latestMicronautVersion))));
+            """.formatted(latestMicronautVersion))));
     }
 }

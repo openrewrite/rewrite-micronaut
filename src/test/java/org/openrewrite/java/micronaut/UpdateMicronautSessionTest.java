@@ -48,7 +48,7 @@ public class UpdateMicronautSessionTest extends Micronaut4RewriteTest {
     void updateMavenDependencies() {
         rewriteRun(mavenProject("project",
           //language=xml
-          pomXml(String.format("""
+          pomXml("""
                 <project>
                     <groupId>com.mycompany.app</groupId>
                     <artifactId>my-app</artifactId>
@@ -65,7 +65,7 @@ public class UpdateMicronautSessionTest extends Micronaut4RewriteTest {
                         </dependency>
                     </dependencies>
                 </project>
-            """, MicronautVersionHelper.getLatestMN3Version()), String.format("""
+            """.formatted(MicronautVersionHelper.getLatestMN3Version()), """
                 <project>
                     <groupId>com.mycompany.app</groupId>
                     <artifactId>my-app</artifactId>
@@ -82,6 +82,6 @@ public class UpdateMicronautSessionTest extends Micronaut4RewriteTest {
                         </dependency>
                     </dependencies>
                 </project>
-            """, latestMicronautVersion))));
+            """.formatted(latestMicronautVersion))));
     }
 }

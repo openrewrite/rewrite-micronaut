@@ -88,7 +88,7 @@ public class UpdateMicronautDataTest extends Micronaut4RewriteTest {
     void updateJavaCodeAndUnmodifiedMavenDependencies() {
         rewriteRun(mavenProject("project", srcMainJava(java(annotatedJavaxTxRepository, annotatedJakartaTxRepository)),
           //language=xml
-          pomXml(String.format("""
+          pomXml("""
             <project>
                 <groupId>com.mycompany.app</groupId>
                 <artifactId>my-app</artifactId>
@@ -114,7 +114,7 @@ public class UpdateMicronautDataTest extends Micronaut4RewriteTest {
                     </plugins>
                 </build>
             </project>
-            """, latestMicronautVersion))));
+            """.formatted(latestMicronautVersion))));
     }
 
     @Test

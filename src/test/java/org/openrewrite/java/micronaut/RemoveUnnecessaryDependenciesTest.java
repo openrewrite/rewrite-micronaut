@@ -35,7 +35,7 @@ public class RemoveUnnecessaryDependenciesTest extends Micronaut4RewriteTest {
         rewriteRun(spec -> spec.beforeRecipe(withToolingApi()), mavenProject("project",
           getGradleProperties(),
           //language=groovy
-          buildGradle(String.format("""
+          buildGradle("""
             plugins {
                 id("io.micronaut.application") version "%s"
             }
@@ -47,7 +47,7 @@ public class RemoveUnnecessaryDependenciesTest extends Micronaut4RewriteTest {
             dependencies {
                 implementation "io.micronaut:micronaut-runtime"
             }
-            """, latestApplicationPluginVersion), String.format("""
+            """.formatted(latestApplicationPluginVersion), """
             plugins {
                 id("io.micronaut.application") version "%s"
             }
@@ -58,14 +58,14 @@ public class RemoveUnnecessaryDependenciesTest extends Micronaut4RewriteTest {
                         
             dependencies {
             }
-            """, latestApplicationPluginVersion))));
+            """.formatted(latestApplicationPluginVersion))));
     }
 
     @Test
     void mavenDependenciesRemoved() {
         rewriteRun(mavenProject("project",
           //language=xml
-          pomXml(String.format("""
+          pomXml("""
             <project>
                 <groupId>com.mycompany.app</groupId>
                 <artifactId>my-app</artifactId>
@@ -82,7 +82,7 @@ public class RemoveUnnecessaryDependenciesTest extends Micronaut4RewriteTest {
                     </dependency>
                 </dependencies>
             </project>
-            """, latestMicronautVersion), String.format("""
+            """.formatted(latestMicronautVersion), """
             <project>
                 <groupId>com.mycompany.app</groupId>
                 <artifactId>my-app</artifactId>
@@ -93,6 +93,6 @@ public class RemoveUnnecessaryDependenciesTest extends Micronaut4RewriteTest {
                     <version>%s</version>
                 </parent>
             </project>
-            """, latestMicronautVersion))));
+            """.formatted(latestMicronautVersion))));
     }
 }

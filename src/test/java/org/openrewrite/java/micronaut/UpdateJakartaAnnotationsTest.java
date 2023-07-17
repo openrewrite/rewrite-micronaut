@@ -69,7 +69,7 @@ public class UpdateJakartaAnnotationsTest extends Micronaut4RewriteTest {
     void updateJavaCodeAndRemoveGradleDependency() {
         rewriteRun(spec -> spec.beforeRecipe(withToolingApi()), mavenProject("project", srcMainJava(java(annotatedJavaxClass, annotatedJakartaClass)), getGradleProperties(),
           //language=groovy
-          buildGradle(String.format("""
+          buildGradle("""
                 plugins {
                     id("io.micronaut.application") version "%s"
                 }
@@ -85,7 +85,7 @@ public class UpdateJakartaAnnotationsTest extends Micronaut4RewriteTest {
                     implementation "jakarta.annotation:jakarta.annotation-api:2.1.1"
                     runtimeOnly("ch.qos.logback:logback-classic")
                 }
-            """, latestApplicationPluginVersion), String.format("""
+            """.formatted(latestApplicationPluginVersion), """
                 plugins {
                     id("io.micronaut.application") version "%s"
                 }
@@ -100,7 +100,7 @@ public class UpdateJakartaAnnotationsTest extends Micronaut4RewriteTest {
                     implementation("io.micronaut:micronaut-jackson-databind")
                     runtimeOnly("ch.qos.logback:logback-classic")
                 }
-            """, latestApplicationPluginVersion))));
+            """.formatted(latestApplicationPluginVersion))));
 
     }
 
@@ -108,7 +108,7 @@ public class UpdateJakartaAnnotationsTest extends Micronaut4RewriteTest {
     void updateJavaCodeAndRemoveMavenDependency() {
         rewriteRun(mavenProject("project", srcMainJava(java(annotatedJavaxClass, annotatedJakartaClass)),
           //language=xml
-          pomXml(String.format("""
+          pomXml("""
                 <project>
                     <groupId>com.mycompany.app</groupId>
                     <artifactId>my-app</artifactId>
@@ -146,7 +146,7 @@ public class UpdateJakartaAnnotationsTest extends Micronaut4RewriteTest {
                         </dependency>
                     </dependencies>
                 </project>
-            """, latestMicronautVersion), String.format("""
+            """.formatted(latestMicronautVersion), """
                 <project>
                     <groupId>com.mycompany.app</groupId>
                     <artifactId>my-app</artifactId>
@@ -179,6 +179,6 @@ public class UpdateJakartaAnnotationsTest extends Micronaut4RewriteTest {
                         </dependency>
                     </dependencies>
                 </project>
-            """, latestMicronautVersion))));
+            """.formatted(latestMicronautVersion))));
     }
 }

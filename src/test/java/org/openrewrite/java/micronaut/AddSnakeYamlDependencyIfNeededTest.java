@@ -60,8 +60,8 @@ public class AddSnakeYamlDependencyIfNeededTest extends Micronaut4RewriteTest {
       """;
 
     private final String buildGradleNoDependency =
-      //language=groovy
-      String.format("""
+            //language=groovy
+            """
             plugins {
                 id("io.micronaut.application") version "%s"
             }
@@ -69,11 +69,11 @@ public class AddSnakeYamlDependencyIfNeededTest extends Micronaut4RewriteTest {
             repositories {
                 mavenCentral()
             }
-        """, latestApplicationPluginVersion);
+        """.formatted(latestApplicationPluginVersion);
 
     private final String buildGradleWithDependency =
-      //language=groovy
-      String.format("""
+            //language=groovy
+            """
             plugins {
                 id("io.micronaut.application") version "%s"
             }
@@ -85,11 +85,11 @@ public class AddSnakeYamlDependencyIfNeededTest extends Micronaut4RewriteTest {
             dependencies {
                 runtimeOnly "org.yaml:snakeyaml"
             }
-        """, latestApplicationPluginVersion);
+        """.formatted(latestApplicationPluginVersion);
 
     private final String initialPom =
-      //language=xml
-      String.format("""
+            //language=xml
+            """
             <project>
                 <groupId>com.mycompany.app</groupId>
                 <artifactId>my-app</artifactId>
@@ -100,11 +100,11 @@ public class AddSnakeYamlDependencyIfNeededTest extends Micronaut4RewriteTest {
                     <version>%s</version>
                 </parent>
             </project>
-        """, latestMicronautVersion);
+        """.formatted(latestMicronautVersion);
 
     private final String pomWithDependency =
-      //language=xml
-      String.format("""
+            //language=xml
+            """
             <project>
                 <groupId>com.mycompany.app</groupId>
                 <artifactId>my-app</artifactId>
@@ -122,7 +122,7 @@ public class AddSnakeYamlDependencyIfNeededTest extends Micronaut4RewriteTest {
                     </dependency>
                 </dependencies>
             </project>
-        """, latestMicronautVersion);
+        """.formatted(latestMicronautVersion);
 
     @Test
     void testAddGradleDependencyForApplicationYml() {
