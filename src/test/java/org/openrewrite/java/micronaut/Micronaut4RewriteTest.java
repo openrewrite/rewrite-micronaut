@@ -30,8 +30,8 @@ public abstract class Micronaut4RewriteTest implements RewriteTest {
 
     @BeforeAll
     static void init() throws MavenDownloadingException {
-        latestApplicationPluginVersion = MicronautVersionHelper.getLatestMN4PluginVersion("io.micronaut.application");
-        latestMicronautVersion = MicronautVersionHelper.getLatestMN4Version();
+        latestApplicationPluginVersion = MicronautRewriteTestVersions.getLatestMN4ApplicationPluginVersion();
+        latestMicronautVersion = MicronautRewriteTestVersions.getLatestMN4Version();
     }
 
     @BeforeEach

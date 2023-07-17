@@ -31,7 +31,7 @@ class UpgradeMicronautGradlePropertiesVersionTest implements RewriteTest {
     @DocumentExample
     @Test
     void upgradeMicronaut2(@TempDir Path tempDir) throws IOException {
-        String latestMicronautVersion = MicronautVersionHelper.getLatestMN2Version();
+        String latestMicronautVersion = MicronautRewriteTestVersions.getLatestMN2Version();
 
         rewriteRun(spec -> spec.recipe(new UpgradeMicronautGradlePropertiesVersion("2.x")),
           properties(
@@ -44,7 +44,7 @@ class UpgradeMicronautGradlePropertiesVersionTest implements RewriteTest {
 
     @Test
     void upgradeToMicronaut3() {
-        String latestMicronautVersion = MicronautVersionHelper.getLatestMN3Version();
+        String latestMicronautVersion = MicronautRewriteTestVersions.getLatestMN3Version();
 
         rewriteRun(
           spec -> spec.recipe(new UpgradeMicronautGradlePropertiesVersion("3.x")),
@@ -58,7 +58,7 @@ class UpgradeMicronautGradlePropertiesVersionTest implements RewriteTest {
 
     @Test
     void upgradeToMicronaut4() {
-        String latestMicronautVersion = MicronautVersionHelper.getLatestMN4Version();
+        String latestMicronautVersion = MicronautRewriteTestVersions.getLatestMN4Version();
 
         rewriteRun(
           spec -> spec.recipe(new UpgradeMicronautGradlePropertiesVersion("4.x")),

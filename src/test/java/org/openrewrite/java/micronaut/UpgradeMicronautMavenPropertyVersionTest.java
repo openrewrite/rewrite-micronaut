@@ -26,7 +26,7 @@ class UpgradeMicronautMavenPropertyVersionTest implements RewriteTest {
     @DocumentExample
     @Test
     void changeMavenMicronautVersion() {
-        String latestMicronautVersion = MicronautVersionHelper.getLatestMN2Version();
+        String latestMicronautVersion = MicronautRewriteTestVersions.getLatestMN2Version();
 
         rewriteRun(spec -> spec.recipe(new UpgradeMicronautMavenPropertyVersion("2.x")),
           pomXml("""
@@ -56,7 +56,7 @@ class UpgradeMicronautMavenPropertyVersionTest implements RewriteTest {
 
     @Test
     void changeMavenMicronautVersion3() {
-        String latestMicronautVersion = MicronautVersionHelper.getLatestMN3Version();
+        String latestMicronautVersion = MicronautRewriteTestVersions.getLatestMN3Version();
 
         rewriteRun(spec -> spec.recipe(new UpgradeMicronautMavenPropertyVersion("3.x")),
           pomXml("""
@@ -86,7 +86,7 @@ class UpgradeMicronautMavenPropertyVersionTest implements RewriteTest {
 
     @Test
     void changeMavenMicronautVersion4() {
-        String latestMicronautVersion = MicronautVersionHelper.getLatestMN4Version();
+        String latestMicronautVersion = MicronautRewriteTestVersions.getLatestMN4Version();
 
         rewriteRun(
           spec -> spec.recipe(new UpgradeMicronautMavenPropertyVersion("4.x")),

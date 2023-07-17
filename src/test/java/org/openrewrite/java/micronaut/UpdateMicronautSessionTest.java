@@ -65,7 +65,7 @@ public class UpdateMicronautSessionTest extends Micronaut4RewriteTest {
                         </dependency>
                     </dependencies>
                 </project>
-            """.formatted(MicronautVersionHelper.getLatestMN3Version()), """
+            """.formatted(MicronautRewriteTestVersions.getLatestMN3Version()), """
                 <project>
                     <groupId>com.mycompany.app</groupId>
                     <artifactId>my-app</artifactId>

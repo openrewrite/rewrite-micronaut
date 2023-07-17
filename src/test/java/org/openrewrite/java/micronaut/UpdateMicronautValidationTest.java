@@ -63,7 +63,7 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
 
     @Test
     void updateJavaCodeAndModifyGradleDependencies() {
-        rewriteRun(spec -> spec.beforeRecipe(withToolingApi()), mavenProject("project", properties("micronautVersion=" + MicronautVersionHelper.getLatestMN3Version(), s -> s.path("gradle.properties")), srcMainJava(java(annotatedJavaxClass, annotatedJakartaClass)),
+        rewriteRun(spec -> spec.beforeRecipe(withToolingApi()), mavenProject("project", properties("micronautVersion=" + MicronautRewriteTestVersions.getLatestMN3Version(), s -> s.path("gradle.properties")), srcMainJava(java(annotatedJavaxClass, annotatedJakartaClass)),
           //language=groovy
           buildGradle("""
             plugins {
@@ -103,7 +103,7 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
 
     @Test
     void updateJavaCodeAndAddMissingGradleDependencies() {
-        rewriteRun(spec -> spec.beforeRecipe(withToolingApi()), mavenProject("project", properties("micronautVersion=" + MicronautVersionHelper.getLatestMN3Version(), s -> s.path("gradle.properties")), srcMainJava(java(annotatedJavaxClass, annotatedJakartaClass)),
+        rewriteRun(spec -> spec.beforeRecipe(withToolingApi()), mavenProject("project", properties("micronautVersion=" + MicronautRewriteTestVersions.getLatestMN3Version(), s -> s.path("gradle.properties")), srcMainJava(java(annotatedJavaxClass, annotatedJakartaClass)),
           //language=groovy
           buildGradle("""
             plugins {
@@ -137,7 +137,7 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
                 implementation "io.micronaut.validation:micronaut-validation"
                 runtimeOnly("ch.qos.logback:logback-classic")
             }
-            """.formatted(latestMicronautVersion))));
+            """.formatted(latestApplicationPluginVersion))));
     }
 
     @Test
@@ -207,7 +207,7 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
                     </plugins>
                 </build>
             </project>
-            """.formatted(MicronautVersionHelper.getLatestMN3Version()), """
+            """.formatted(MicronautRewriteTestVersions.getLatestMN3Version()), """
             <project>
                 <groupId>com.mycompany.app</groupId>
                 <artifactId>my-app</artifactId>
@@ -345,7 +345,7 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
                     </plugins>
                 </build>
             </project>
-            """.formatted(MicronautVersionHelper.getLatestMN3Version()), """
+            """.formatted(MicronautRewriteTestVersions.getLatestMN3Version()), """
             <project>
                 <groupId>com.mycompany.app</groupId>
                 <artifactId>my-app</artifactId>

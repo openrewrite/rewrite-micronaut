@@ -35,7 +35,7 @@ public class UpdateBuildToMicronaut4VersionTest extends Micronaut4RewriteTest {
     public void updateGradleProperties() {
         rewriteRun(properties("""
               micronautVersion=%s
-          """.formatted(MicronautVersionHelper.getLatestMN3Version()), """
+          """.formatted(MicronautRewriteTestVersions.getLatestMN3Version()), """
               micronautVersion=%s
           """.formatted(latestMicronautVersion), s -> s.path("gradle.properties")));
     }
@@ -54,7 +54,7 @@ public class UpdateBuildToMicronaut4VersionTest extends Micronaut4RewriteTest {
                         <micronaut.version>%s</micronaut.version>
                     </properties>
                 </project>
-            """.formatted(MicronautVersionHelper.getLatestMN3Version()), """
+            """.formatted(MicronautRewriteTestVersions.getLatestMN3Version()), """
                 <project>
                     <modelVersion>4.0.0</modelVersion>
                     <groupId>com.mycompany.app</groupId>
