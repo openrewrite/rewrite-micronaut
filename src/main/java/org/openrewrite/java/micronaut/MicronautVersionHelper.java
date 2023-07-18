@@ -16,7 +16,6 @@
 package org.openrewrite.java.micronaut;
 
 import org.openrewrite.ExecutionContext;
-import org.openrewrite.InMemoryExecutionContext;
 import org.openrewrite.gradle.plugins.AddPluginVisitor;
 import org.openrewrite.maven.MavenDownloadingException;
 import org.openrewrite.maven.internal.MavenPomDownloader;
@@ -27,7 +26,10 @@ import org.openrewrite.semver.LatestRelease;
 import org.openrewrite.semver.Semver;
 import org.openrewrite.semver.VersionComparator;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
@@ -40,22 +42,6 @@ public final class MicronautVersionHelper {
     private static final LatestRelease LATEST_RELEASE = new LatestRelease(null);
 
     public static final MavenRepository GRADLE_PLUGIN_REPO = new MavenRepository("gradle-plugins", "https://plugins.gradle.org/m2/", "true", "false", true, null, null, true);
-
-    public static final String getLatestMN4Version() {
-        try {
-            return getNewerVersion("4.x", "4.0.0", new InMemoryExecutionContext()).orElse("4.0.0");
-        } catch (MavenDownloadingException e) {
-            throw new IllegalStateException("Failed to resolve latest Micronaut Framework 4.x version", e);
-        }
-    }
-
-    public static final String getLatestMN4PluginVersion(String pluginId) {
-        try {
-            return getNewerGradlePluginVersion("io.micronaut.application", "4.x", "4.0.0", new InMemoryExecutionContext()).orElse("4.0.0");
-        } catch (MavenDownloadingException e) {
-            throw new IllegalStateException("Failed to resolve plugin version for "+pluginId, e);
-        }
-    }
 
 
     public static Optional<String> getNewerVersion(String versionPattern, String currentVersion, ExecutionContext ctx) throws MavenDownloadingException {

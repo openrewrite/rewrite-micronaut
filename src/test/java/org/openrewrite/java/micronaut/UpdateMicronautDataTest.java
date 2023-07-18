@@ -22,26 +22,16 @@ import org.openrewrite.InMemoryExecutionContext;
 import org.openrewrite.config.Environment;
 import org.openrewrite.java.JavaParser;
 import org.openrewrite.test.RecipeSpec;
-import org.openrewrite.test.RewriteTest;
 
 import static org.openrewrite.gradle.Assertions.buildGradle;
 import static org.openrewrite.java.Assertions.*;
 import static org.openrewrite.maven.Assertions.pomXml;
 
-public class UpdateMicronautDataTest implements RewriteTest {
+public class UpdateMicronautDataTest extends Micronaut4RewriteTest {
 
     @Override
     public void defaults(RecipeSpec spec) {
-        spec
-          .parser(JavaParser.fromJavaVersion().classpathFromResources(new InMemoryExecutionContext(),
-            "javax.transaction-api-1.*", "jakarta.transaction-api-2.*", "micronaut-data-jdbc-3.*", "micronaut-data-jdbc-4.*",
-            "micronaut-data-model-4.*", "micronaut-data-tx-3.*", "micronaut-data-tx-4.*"))
-          .recipes(Environment.builder()
-            .scanRuntimeClasspath("org.openrewrite.java.micronaut")
-            .build()
-            .activateRecipes(
-              "org.openrewrite.java.micronaut.UpdateMicronautPlatformBom",
-              "org.openrewrite.java.micronaut.UpdateMicronautData"));
+        spec.parser(JavaParser.fromJavaVersion().classpathFromResources(new InMemoryExecutionContext(), "javax.transaction-api-1.*", "jakarta.transaction-api-2.*", "micronaut-data-jdbc-3.*", "micronaut-data-jdbc-4.*", "micronaut-data-model-4.*", "micronaut-data-tx-3.*", "micronaut-data-tx-4.*")).recipes(Environment.builder().scanRuntimeClasspath("org.openrewrite.java.micronaut").build().activateRecipes("org.openrewrite.java.micronaut.UpdateMicronautPlatformBom", "org.openrewrite.java.micronaut.UpdateMicronautData"));
     }
 
     @Language("java")
@@ -106,7 +96,7 @@ public class UpdateMicronautDataTest implements RewriteTest {
                 <parent>
                     <groupId>io.micronaut.platform</groupId>
                     <artifactId>micronaut-parent</artifactId>
-                    <version>4.0.0</version>
+                    <version>%s</version>
                 </parent>
                 <dependencies>
                     <dependency>
@@ -124,7 +114,7 @@ public class UpdateMicronautDataTest implements RewriteTest {
                     </plugins>
                 </build>
             </project>
-            """)));
+            """.formatted(latestMicronautVersion))));
     }
 
     @Test

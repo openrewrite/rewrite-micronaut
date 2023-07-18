@@ -15,36 +15,15 @@
  */
 package org.openrewrite.java.micronaut;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.openrewrite.ExecutionContext;
-import org.openrewrite.InMemoryExecutionContext;
-import org.openrewrite.maven.MavenDownloadingException;
 import org.openrewrite.test.RecipeSpec;
-import org.openrewrite.test.RewriteTest;
-import org.openrewrite.test.SourceSpecs;
 
 import static org.openrewrite.gradle.Assertions.buildGradle;
 import static org.openrewrite.gradle.Assertions.withToolingApi;
 import static org.openrewrite.java.Assertions.mavenProject;
 import static org.openrewrite.maven.Assertions.pomXml;
-import static org.openrewrite.properties.Assertions.properties;
 
-public class RemoveUnnecessaryDependenciesTest implements RewriteTest {
-
-    private static String latestPluginVersion;
-
-    private static String latestMicronautVersion;
-
-    private static SourceSpecs gradleProperties;
-
-    @BeforeAll
-    static void init() throws MavenDownloadingException {
-        ExecutionContext ctx = new InMemoryExecutionContext();
-        latestPluginVersion = MicronautVersionHelper.getLatestMN4PluginVersion("io.micronaut.application");
-        latestMicronautVersion = MicronautVersionHelper.getLatestMN4Version();
-        gradleProperties = properties("micronautVersion=" + latestMicronautVersion, s -> s.path("gradle.properties"));
-    }
+public class RemoveUnnecessaryDependenciesTest extends Micronaut4RewriteTest {
 
     @Override
     public void defaults(RecipeSpec spec) {
@@ -54,9 +33,9 @@ public class RemoveUnnecessaryDependenciesTest implements RewriteTest {
     @Test
     void gradleDependenciesRemoved() {
         rewriteRun(spec -> spec.beforeRecipe(withToolingApi()), mavenProject("project",
-          gradleProperties,
+          getGradleProperties(),
           //language=groovy
-          buildGradle(String.format("""
+          buildGradle("""
             plugins {
                 id("io.micronaut.application") version "%s"
             }
@@ -68,7 +47,7 @@ public class RemoveUnnecessaryDependenciesTest implements RewriteTest {
             dependencies {
                 implementation "io.micronaut:micronaut-runtime"
             }
-            """, latestPluginVersion), String.format("""
+            """.formatted(latestApplicationPluginVersion), """
             plugins {
                 id("io.micronaut.application") version "%s"
             }
@@ -79,14 +58,14 @@ public class RemoveUnnecessaryDependenciesTest implements RewriteTest {
                         
             dependencies {
             }
-            """, latestPluginVersion))));
+            """.formatted(latestApplicationPluginVersion))));
     }
 
     @Test
     void mavenDependenciesRemoved() {
         rewriteRun(mavenProject("project",
           //language=xml
-          pomXml(String.format("""
+          pomXml("""
             <project>
                 <groupId>com.mycompany.app</groupId>
                 <artifactId>my-app</artifactId>
@@ -103,7 +82,7 @@ public class RemoveUnnecessaryDependenciesTest implements RewriteTest {
                     </dependency>
                 </dependencies>
             </project>
-            """, latestMicronautVersion), String.format("""
+            """.formatted(latestMicronautVersion), """
             <project>
                 <groupId>com.mycompany.app</groupId>
                 <artifactId>my-app</artifactId>
@@ -114,6 +93,6 @@ public class RemoveUnnecessaryDependenciesTest implements RewriteTest {
                     <version>%s</version>
                 </parent>
             </project>
-            """, latestMicronautVersion))));
+            """.formatted(latestMicronautVersion))));
     }
 }

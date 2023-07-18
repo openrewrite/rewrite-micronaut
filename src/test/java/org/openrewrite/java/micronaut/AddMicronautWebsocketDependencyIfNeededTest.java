@@ -20,16 +20,13 @@ import org.junit.jupiter.api.Test;
 import org.openrewrite.InMemoryExecutionContext;
 import org.openrewrite.java.JavaParser;
 import org.openrewrite.test.RecipeSpec;
-import org.openrewrite.test.RewriteTest;
-import org.openrewrite.test.SourceSpecs;
 
 import static org.openrewrite.gradle.Assertions.buildGradle;
 import static org.openrewrite.gradle.Assertions.withToolingApi;
 import static org.openrewrite.java.Assertions.*;
 import static org.openrewrite.maven.Assertions.pomXml;
-import static org.openrewrite.properties.Assertions.properties;
 
-public class AddMicronautWebsocketDependencyIfNeededTest implements RewriteTest {
+public class AddMicronautWebsocketDependencyIfNeededTest extends Micronaut4RewriteTest {
 
     @Override
     public void defaults(RecipeSpec spec) {
@@ -39,89 +36,79 @@ public class AddMicronautWebsocketDependencyIfNeededTest implements RewriteTest 
 
     @Language("java")
     private final String annotatedWebsocketClass = """
-            import io.micronaut.websocket.WebSocketBroadcaster;
-            import io.micronaut.websocket.annotation.ServerWebSocket;       
-            
-            @ServerWebSocket("/chat/{topic}/{username}")
-            public class ChatServerWebSocket {
-            
-                private final WebSocketBroadcaster broadcaster;
-                
-                public ChatServerWebSocket(WebSocketBroadcaster broadcaster) {
-                    this.broadcaster = broadcaster;
-                }
-            }
-        """;
-
-    private final SourceSpecs gradleProperties = properties("micronautVersion=4.0.0-RC1", s -> s.path("gradle.properties"));
-
-    @Language("groovy")
-    private final String buildGradleInitial = """
-            plugins {
-                id("io.micronaut.application") version "4.0.0"
-            }
-            
-            repositories {
-                mavenCentral()
-            }
-        """;
-
-    @Language("groovy")
-    private final String buildGradleExpected = """
-            plugins {
-                id("io.micronaut.application") version "4.0.0"
-            }
-            
-            repositories {
-                mavenCentral()
-            }
-            
-            dependencies {
-                implementation "io.micronaut:micronaut-websocket"
-            }
-        """;
-
-    @Language("xml")
-    private final String pomInitial = """
-            <project>
-                <groupId>com.mycompany.app</groupId>
-                <artifactId>my-app</artifactId>
-                <version>1</version>
-                <parent>
-                    <groupId>io.micronaut.platform</groupId>
-                    <artifactId>micronaut-parent</artifactId>
-                    <version>4.0.0</version>
-                </parent>
-            </project>
-        """;
-
-    @Language("xml")
-    private final String pomExpected = """
-            <project>
-                <groupId>com.mycompany.app</groupId>
-                <artifactId>my-app</artifactId>
-                <version>1</version>
-                <parent>
-                    <groupId>io.micronaut.platform</groupId>
-                    <artifactId>micronaut-parent</artifactId>
-                    <version>4.0.0</version>
-                </parent>
-                <dependencies>
-                    <dependency>
-                        <groupId>io.micronaut</groupId>
-                        <artifactId>micronaut-websocket</artifactId>
-                    </dependency>
-                </dependencies>
-            </project>
-        """;
+          import io.micronaut.websocket.WebSocketBroadcaster;
+          import io.micronaut.websocket.annotation.ServerWebSocket;       
+          
+          @ServerWebSocket("/chat/{topic}/{username}")
+          public class ChatServerWebSocket {
+          
+              private final WebSocketBroadcaster broadcaster;
+              
+              public ChatServerWebSocket(WebSocketBroadcaster broadcaster) {
+                  this.broadcaster = broadcaster;
+              }
+          }
+      """;
 
     @Test
     void updateGradleDependencies() {
-        rewriteRun(spec -> spec.beforeRecipe(withToolingApi()), mavenProject("project", srcMainJava(java(annotatedWebsocketClass)), gradleProperties, buildGradle(buildGradleInitial, buildGradleExpected)));
+        rewriteRun(spec -> spec.beforeRecipe(withToolingApi()), mavenProject("project", srcMainJava(java(annotatedWebsocketClass)), getGradleProperties(),
+          //language=groovy
+          buildGradle("""
+                plugins {
+                    id("io.micronaut.application") version "%s"
+                }
+                
+                repositories {
+                    mavenCentral()
+                }
+            """.formatted(latestApplicationPluginVersion), """
+                plugins {
+                    id("io.micronaut.application") version "%s"
+                }
+                
+                repositories {
+                    mavenCentral()
+                }
+                
+                dependencies {
+                    implementation "io.micronaut:micronaut-websocket"
+                }
+            """.formatted(latestApplicationPluginVersion))));
     }
 
     @Test
     void updateMavenDependencies() {
-        rewriteRun(mavenProject("project", srcMainJava(java(annotatedWebsocketClass)), pomXml(pomInitial, pomExpected)));
+        rewriteRun(mavenProject("project", srcMainJava(java(annotatedWebsocketClass)),
+          //language=xml
+          pomXml("""
+                <project>
+                    <groupId>com.mycompany.app</groupId>
+                    <artifactId>my-app</artifactId>
+                    <version>1</version>
+                    <parent>
+                        <groupId>io.micronaut.platform</groupId>
+                        <artifactId>micronaut-parent</artifactId>
+                        <version>%s</version>
+                    </parent>
+                </project>
+            """.formatted(latestMicronautVersion), """
+                <project>
+                    <groupId>com.mycompany.app</groupId>
+                    <artifactId>my-app</artifactId>
+                    <version>1</version>
+                    <parent>
+                        <groupId>io.micronaut.platform</groupId>
+                        <artifactId>micronaut-parent</artifactId>
+                        <version>%s</version>
+                    </parent>
+                    <dependencies>
+                        <dependency>
+                            <groupId>io.micronaut</groupId>
+                            <artifactId>micronaut-websocket</artifactId>
+                        </dependency>
+                    </dependencies>
+                </project>
+            """.formatted(latestMicronautVersion))));
     }
 }

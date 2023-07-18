@@ -21,7 +21,6 @@ import org.openrewrite.InMemoryExecutionContext;
 import org.openrewrite.config.Environment;
 import org.openrewrite.java.JavaParser;
 import org.openrewrite.test.RecipeSpec;
-import org.openrewrite.test.RewriteTest;
 
 import static org.openrewrite.gradle.Assertions.buildGradle;
 import static org.openrewrite.gradle.Assertions.withToolingApi;
@@ -29,20 +28,11 @@ import static org.openrewrite.java.Assertions.*;
 import static org.openrewrite.maven.Assertions.pomXml;
 import static org.openrewrite.properties.Assertions.properties;
 
-class UpdateMicronautValidationTest implements RewriteTest {
+class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
 
     @Override
     public void defaults(RecipeSpec spec) {
-        spec
-          .parser(JavaParser.fromJavaVersion().classpathFromResources(new InMemoryExecutionContext(),
-            "validation-api-2.*", "jakarta.validation-api-3.*", "jakarta.inject-api-2.*"))
-          .recipes(Environment.builder()
-            .scanRuntimeClasspath("org.openrewrite.java.micronaut")
-            .build()
-            .activateRecipes(
-              "org.openrewrite.java.micronaut.UpdateMicronautPlatformBom",
-              "org.openrewrite.java.micronaut.UpdateBuildPlugins",
-              "org.openrewrite.java.micronaut.UpdateMicronautValidation"));
+        spec.parser(JavaParser.fromJavaVersion().classpathFromResources(new InMemoryExecutionContext(), "validation-api-2.*", "jakarta.validation-api-3.*", "jakarta.inject-api-2.*")).recipes(Environment.builder().scanRuntimeClasspath("org.openrewrite.java.micronaut").build().activateRecipes("org.openrewrite.java.micronaut.UpdateMicronautPlatformBom", "org.openrewrite.java.micronaut.UpdateBuildPlugins", "org.openrewrite.java.micronaut.UpdateMicronautValidation"));
     }
 
     @Language("java")
@@ -73,85 +63,81 @@ class UpdateMicronautValidationTest implements RewriteTest {
 
     @Test
     void updateJavaCodeAndModifyGradleDependencies() {
-        rewriteRun(spec -> spec.beforeRecipe(withToolingApi()),
-          mavenProject("project", properties("micronautVersion=3.9.1", s -> s.path("gradle.properties")),
-            srcMainJava(java(annotatedJavaxClass, annotatedJakartaClass)),
-            //language=groovy
-            buildGradle("""
-              plugins {
-                  id("io.micronaut.application") version "3.7.10"
-              }
-                            
-              repositories {
-                  mavenCentral()
-              }
-                            
-              dependencies {
-                  annotationProcessor("io.micronaut:micronaut-http-validation")
-                  implementation("io.micronaut:micronaut-http-client")
-                  implementation("io.micronaut:micronaut-jackson-databind")
-                  implementation("io.micronaut:micronaut-validation")
-                  runtimeOnly("ch.qos.logback:logback-classic")
-              }
-              """, """
-              plugins {
-                  id("io.micronaut.application") version "4.0.0"
-              }
-                            
-              repositories {
-                  mavenCentral()
-              }
-                            
-              dependencies {
-                  annotationProcessor("io.micronaut:micronaut-http-validation")
-                  annotationProcessor "io.micronaut.validation:micronaut-validation-processor"
-                  implementation("io.micronaut:micronaut-http-client")
-                  implementation("io.micronaut:micronaut-jackson-databind")
-                  implementation "io.micronaut.validation:micronaut-validation"
-                  runtimeOnly("ch.qos.logback:logback-classic")
-              }
-              """)));
+        rewriteRun(spec -> spec.beforeRecipe(withToolingApi()), mavenProject("project", properties("micronautVersion=" + MicronautRewriteTestVersions.getLatestMN3Version(), s -> s.path("gradle.properties")), srcMainJava(java(annotatedJavaxClass, annotatedJakartaClass)),
+          //language=groovy
+          buildGradle("""
+            plugins {
+                id("io.micronaut.application") version "3.7.10"
+            }
+                          
+            repositories {
+                mavenCentral()
+            }
+                          
+            dependencies {
+                annotationProcessor("io.micronaut:micronaut-http-validation")
+                implementation("io.micronaut:micronaut-http-client")
+                implementation("io.micronaut:micronaut-jackson-databind")
+                implementation("io.micronaut:micronaut-validation")
+                runtimeOnly("ch.qos.logback:logback-classic")
+            }
+            """, """
+            plugins {
+                id("io.micronaut.application") version "%s"
+            }
+                          
+            repositories {
+                mavenCentral()
+            }
+                          
+            dependencies {
+                annotationProcessor("io.micronaut:micronaut-http-validation")
+                annotationProcessor "io.micronaut.validation:micronaut-validation-processor"
+                implementation("io.micronaut:micronaut-http-client")
+                implementation("io.micronaut:micronaut-jackson-databind")
+                implementation "io.micronaut.validation:micronaut-validation"
+                runtimeOnly("ch.qos.logback:logback-classic")
+            }
+            """.formatted(latestApplicationPluginVersion))));
     }
 
     @Test
     void updateJavaCodeAndAddMissingGradleDependencies() {
-        rewriteRun(spec -> spec.beforeRecipe(withToolingApi()),
-          mavenProject("project", properties("micronautVersion=3.9.1", s -> s.path("gradle.properties")),
-            srcMainJava(java(annotatedJavaxClass, annotatedJakartaClass)),
-            //language=groovy
-            buildGradle("""
-              plugins {
-                  id("io.micronaut.application") version "3.7.10"
-              }
-                            
-              repositories {
-                  mavenCentral()
-              }
-                            
-              dependencies {
-                  annotationProcessor("io.micronaut:micronaut-http-validation")
-                  implementation("io.micronaut:micronaut-http-client")
-                  implementation("io.micronaut:micronaut-jackson-databind")
-                  runtimeOnly("ch.qos.logback:logback-classic")
-              }
-              """, """
-              plugins {
-                  id("io.micronaut.application") version "4.0.0"
-              }
-                            
-              repositories {
-                  mavenCentral()
-              }
-                            
-              dependencies {
-                  annotationProcessor("io.micronaut:micronaut-http-validation")
-                  annotationProcessor "io.micronaut.validation:micronaut-validation-processor"
-                  implementation("io.micronaut:micronaut-http-client")
-                  implementation("io.micronaut:micronaut-jackson-databind")
-                  implementation "io.micronaut.validation:micronaut-validation"
-                  runtimeOnly("ch.qos.logback:logback-classic")
-              }
-              """)));
+        rewriteRun(spec -> spec.beforeRecipe(withToolingApi()), mavenProject("project", properties("micronautVersion=" + MicronautRewriteTestVersions.getLatestMN3Version(), s -> s.path("gradle.properties")), srcMainJava(java(annotatedJavaxClass, annotatedJakartaClass)),
+          //language=groovy
+          buildGradle("""
+            plugins {
+                id("io.micronaut.application") version "3.7.10"
+            }
+                          
+            repositories {
+                mavenCentral()
+            }
+                          
+            dependencies {
+                annotationProcessor("io.micronaut:micronaut-http-validation")
+                implementation("io.micronaut:micronaut-http-client")
+                implementation("io.micronaut:micronaut-jackson-databind")
+                runtimeOnly("ch.qos.logback:logback-classic")
+            }
+            """, """
+            plugins {
+                id("io.micronaut.application") version "%s"
+            }
+                          
+            repositories {
+                mavenCentral()
+            }
+                          
+            dependencies {
+                annotationProcessor("io.micronaut:micronaut-http-validation")
+                annotationProcessor "io.micronaut.validation:micronaut-validation-processor"
+                implementation("io.micronaut:micronaut-http-client")
+                implementation("io.micronaut:micronaut-jackson-databind")
+                implementation "io.micronaut.validation:micronaut-validation"
+                runtimeOnly("ch.qos.logback:logback-classic")
+            }
+            """.formatted(latestApplicationPluginVersion))));
     }
 
     @Test
@@ -166,7 +152,7 @@ class UpdateMicronautValidationTest implements RewriteTest {
                 <parent>
                     <groupId>io.micronaut</groupId>
                     <artifactId>micronaut-parent</artifactId>
-                    <version>3.9.1</version>
+                    <version>%s</version>
                 </parent>
                 <dependencies>
                     <dependency>
@@ -221,7 +207,7 @@ class UpdateMicronautValidationTest implements RewriteTest {
                     </plugins>
                 </build>
             </project>
-            """, """
+            """.formatted(MicronautRewriteTestVersions.getLatestMN3Version()), """
             <project>
                 <groupId>com.mycompany.app</groupId>
                 <artifactId>my-app</artifactId>
@@ -229,7 +215,7 @@ class UpdateMicronautValidationTest implements RewriteTest {
                 <parent>
                     <groupId>io.micronaut.platform</groupId>
                     <artifactId>micronaut-parent</artifactId>
-                    <version>4.0.0</version>
+                    <version>%s</version>
                 </parent>
                 <dependencies>
                     <dependency>
@@ -294,7 +280,7 @@ class UpdateMicronautValidationTest implements RewriteTest {
                     </plugins>
                 </build>
             </project>
-            """)));
+            """.formatted(latestMicronautVersion))));
     }
 
     @Test
@@ -309,7 +295,7 @@ class UpdateMicronautValidationTest implements RewriteTest {
                 <parent>
                     <groupId>io.micronaut</groupId>
                     <artifactId>micronaut-parent</artifactId>
-                    <version>3.9.1</version>
+                    <version>%s</version>
                 </parent>
                 <dependencies>
                     <dependency>
@@ -359,7 +345,7 @@ class UpdateMicronautValidationTest implements RewriteTest {
                     </plugins>
                 </build>
             </project>
-            """, """
+            """.formatted(MicronautRewriteTestVersions.getLatestMN3Version()), """
             <project>
                 <groupId>com.mycompany.app</groupId>
                 <artifactId>my-app</artifactId>
@@ -367,7 +353,7 @@ class UpdateMicronautValidationTest implements RewriteTest {
                 <parent>
                     <groupId>io.micronaut.platform</groupId>
                     <artifactId>micronaut-parent</artifactId>
-                    <version>4.0.0</version>
+                    <version>%s</version>
                 </parent>
                 <dependencies>
                     <dependency>
@@ -432,7 +418,7 @@ class UpdateMicronautValidationTest implements RewriteTest {
                     </plugins>
                 </build>
             </project>
-            """)));
+            """.formatted(latestMicronautVersion))));
     }
 
     @Test
@@ -447,7 +433,7 @@ class UpdateMicronautValidationTest implements RewriteTest {
                 <parent>
                     <groupId>io.micronaut.platform</groupId>
                     <artifactId>micronaut-parent</artifactId>
-                    <version>4.0.0</version>
+                    <version>%s</version>
                 </parent>
                 <dependencies>
                     <dependency>
@@ -513,6 +499,6 @@ class UpdateMicronautValidationTest implements RewriteTest {
                     </plugins>
                 </build>
             </project>
-            """));
+            """.formatted(latestMicronautVersion)));
     }
 }

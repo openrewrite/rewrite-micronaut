@@ -20,8 +20,6 @@ import org.junit.jupiter.api.Test;
 import org.openrewrite.InMemoryExecutionContext;
 import org.openrewrite.java.JavaParser;
 import org.openrewrite.test.RecipeSpec;
-import org.openrewrite.test.RewriteTest;
-import org.openrewrite.test.SourceSpecs;
 
 import static org.openrewrite.gradle.Assertions.buildGradle;
 import static org.openrewrite.gradle.Assertions.withToolingApi;
@@ -30,7 +28,7 @@ import static org.openrewrite.maven.Assertions.pomXml;
 import static org.openrewrite.properties.Assertions.properties;
 import static org.openrewrite.yaml.Assertions.yaml;
 
-public class AddSnakeYamlDependencyIfNeededTest implements RewriteTest {
+public class AddSnakeYamlDependencyIfNeededTest extends Micronaut4RewriteTest {
 
     @Override
     public void defaults(RecipeSpec spec) {
@@ -51,33 +49,33 @@ public class AddSnakeYamlDependencyIfNeededTest implements RewriteTest {
 
     @Language("yml")
     private final String micronautConfig = """
-        micronaut:
-            application:
-                name: testApp
-        """;
+      micronaut:
+          application:
+              name: testApp
+      """;
 
     @Language("properties")
     private final String micronautPropertiesConfig = """
-            micronaut.application.name=testApp
-        """;
+          micronaut.application.name=testApp
+      """;
 
-    private final SourceSpecs gradleProperties = properties("micronautVersion=4.0.0", s -> s.path("gradle.properties"));
-
-    @Language("groovy")
-    private final String buildGradleNoDependency = """
+    private final String buildGradleNoDependency =
+            //language=groovy
+            """
             plugins {
-                id("io.micronaut.application") version "4.0.0"
+                id("io.micronaut.application") version "%s"
             }
             
             repositories {
                 mavenCentral()
             }
-        """;
+        """.formatted(latestApplicationPluginVersion);
 
-    @Language("groovy")
-    private final String buildGradleWithDependency = """
+    private final String buildGradleWithDependency =
+            //language=groovy
+            """
             plugins {
-                id("io.micronaut.application") version "4.0.0"
+                id("io.micronaut.application") version "%s"
             }
             
             repositories {
@@ -87,10 +85,11 @@ public class AddSnakeYamlDependencyIfNeededTest implements RewriteTest {
             dependencies {
                 runtimeOnly "org.yaml:snakeyaml"
             }
-        """;
+        """.formatted(latestApplicationPluginVersion);
 
-    @Language("xml")
-    private final String initialPom = """
+    private final String initialPom =
+            //language=xml
+            """
             <project>
                 <groupId>com.mycompany.app</groupId>
                 <artifactId>my-app</artifactId>
@@ -98,13 +97,14 @@ public class AddSnakeYamlDependencyIfNeededTest implements RewriteTest {
                 <parent>
                     <groupId>io.micronaut.platform</groupId>
                     <artifactId>micronaut-parent</artifactId>
-                    <version>4.0.0</version>
+                    <version>%s</version>
                 </parent>
             </project>
-        """;
+        """.formatted(latestMicronautVersion);
 
-    @Language("xml")
-    private final String pomWithDependency = """
+    private final String pomWithDependency =
+            //language=xml
+            """
             <project>
                 <groupId>com.mycompany.app</groupId>
                 <artifactId>my-app</artifactId>
@@ -112,7 +112,7 @@ public class AddSnakeYamlDependencyIfNeededTest implements RewriteTest {
                 <parent>
                     <groupId>io.micronaut.platform</groupId>
                     <artifactId>micronaut-parent</artifactId>
-                    <version>4.0.0</version>
+                    <version>%s</version>
                 </parent>
                 <dependencies>
                     <dependency>
@@ -122,159 +122,159 @@ public class AddSnakeYamlDependencyIfNeededTest implements RewriteTest {
                     </dependency>
                 </dependencies>
             </project>
-        """;
+        """.formatted(latestMicronautVersion);
 
     @Test
     void testAddGradleDependencyForApplicationYml() {
         rewriteRun(spec -> spec.beforeRecipe(withToolingApi()).recipe(new AddSnakeYamlDependencyIfNeeded()), mavenProject("project",
-                srcMainJava(java(micronautApplication)),
-                srcMainResources(yaml(micronautConfig, s -> s.path("application.yml"))),
-                gradleProperties,
-                buildGradle(buildGradleNoDependency, buildGradleWithDependency)));
+          srcMainJava(java(micronautApplication)),
+          srcMainResources(yaml(micronautConfig, s -> s.path("application.yml"))),
+          getGradleProperties(),
+          buildGradle(buildGradleNoDependency, buildGradleWithDependency)));
     }
 
     @Test
     void testAddMavenDependencyForApplicationYml() {
         rewriteRun(spec -> spec.recipe(new AddSnakeYamlDependencyIfNeeded()), mavenProject("project",
-                srcMainJava(java(micronautApplication)),
-                srcMainResources(yaml(micronautConfig, s -> s.path("application.yml"))),
-                pomXml(initialPom, pomWithDependency)));
+          srcMainJava(java(micronautApplication)),
+          srcMainResources(yaml(micronautConfig, s -> s.path("application.yml"))),
+          pomXml(initialPom, pomWithDependency)));
     }
 
     @Test
     void testAddGradleDependencyForApplicationYaml() {
         rewriteRun(spec -> spec.beforeRecipe(withToolingApi()).recipe(new AddSnakeYamlDependencyIfNeeded()), mavenProject("project",
-                srcMainJava(java(micronautApplication)),
-                srcMainResources(yaml(micronautConfig, s -> s.path("application.yaml"))),
-                gradleProperties,
-                buildGradle(buildGradleNoDependency, buildGradleWithDependency)));
+          srcMainJava(java(micronautApplication)),
+          srcMainResources(yaml(micronautConfig, s -> s.path("application.yaml"))),
+          getGradleProperties(),
+          buildGradle(buildGradleNoDependency, buildGradleWithDependency)));
     }
 
     @Test
     void testAddMavenDependencyForApplicationYaml() {
         rewriteRun(spec -> spec.recipe(new AddSnakeYamlDependencyIfNeeded()), mavenProject("project",
-                srcMainJava(java(micronautApplication)),
-                srcMainResources(yaml(micronautConfig, s -> s.path("application.yaml"))),
-                pomXml(initialPom, pomWithDependency)));
+          srcMainJava(java(micronautApplication)),
+          srcMainResources(yaml(micronautConfig, s -> s.path("application.yaml"))),
+          pomXml(initialPom, pomWithDependency)));
     }
 
 
     @Test
     void testNoGradleDependencyForMissingApplicationYml() {
         rewriteRun(spec -> spec.beforeRecipe(withToolingApi()).recipe(new AddSnakeYamlDependencyIfNeeded()), mavenProject("project",
-                srcMainJava(java(micronautApplication)),
-                srcMainResources(yaml(micronautConfig, s -> s.path("foo.yml"))),
-                gradleProperties,
-                buildGradle(buildGradleNoDependency)));
+          srcMainJava(java(micronautApplication)),
+          srcMainResources(yaml(micronautConfig, s -> s.path("foo.yml"))),
+          getGradleProperties(),
+          buildGradle(buildGradleNoDependency)));
     }
 
     @Test
     void testNoMavenDependencyForMissingApplicationYml() {
         rewriteRun(spec -> spec.recipe(new AddSnakeYamlDependencyIfNeeded()), mavenProject("project",
-                srcMainJava(java(micronautApplication)),
-                srcMainResources(yaml(micronautConfig, s -> s.path("foo.yml"))),
-                pomXml(initialPom)));
+          srcMainJava(java(micronautApplication)),
+          srcMainResources(yaml(micronautConfig, s -> s.path("foo.yml"))),
+          pomXml(initialPom)));
     }
 
     @Test
     void testNoGradleDependencyForApplicationProperties() {
         rewriteRun(spec -> spec.beforeRecipe(withToolingApi()).recipe(new AddSnakeYamlDependencyIfNeeded()), mavenProject("project",
-                srcMainJava(java(micronautApplication)),
-                srcMainResources(properties(micronautPropertiesConfig, s -> s.path("application.properties"))),
-                gradleProperties,
-                buildGradle(buildGradleNoDependency)));
+          srcMainJava(java(micronautApplication)),
+          srcMainResources(properties(micronautPropertiesConfig, s -> s.path("application.properties"))),
+          getGradleProperties(),
+          buildGradle(buildGradleNoDependency)));
     }
 
     @Test
     void testNoMavenDependencyForApplicationProperties() {
         rewriteRun(spec -> spec.recipe(new AddSnakeYamlDependencyIfNeeded()), mavenProject("project",
-                srcMainJava(java(micronautApplication)),
-                srcMainResources(properties(micronautPropertiesConfig, s -> s.path("application.properties"))),
-                pomXml(initialPom)));
+          srcMainJava(java(micronautApplication)),
+          srcMainResources(properties(micronautPropertiesConfig, s -> s.path("application.properties"))),
+          pomXml(initialPom)));
     }
 
     @Test
     void testExistingGradleDependencyUnchanged() {
         rewriteRun(spec -> spec.beforeRecipe(withToolingApi()).recipe(new AddSnakeYamlDependencyIfNeeded()), mavenProject("project",
-                srcMainJava(java(micronautApplication)),
-                srcMainResources(yaml(micronautConfig, s -> s.path("application.yml"))),
-                gradleProperties,
-                buildGradle(buildGradleWithDependency)));
+          srcMainJava(java(micronautApplication)),
+          srcMainResources(yaml(micronautConfig, s -> s.path("application.yml"))),
+          getGradleProperties(),
+          buildGradle(buildGradleWithDependency)));
     }
 
     @Test
     void testExistingMavenDependencyUnchanged() {
         rewriteRun(spec -> spec.recipe(new AddSnakeYamlDependencyIfNeeded()), mavenProject("project",
-                srcMainJava(java(micronautApplication)),
-                srcMainResources(yaml(micronautConfig, s -> s.path("application.yml"))),
-                pomXml(pomWithDependency)));
+          srcMainJava(java(micronautApplication)),
+          srcMainResources(yaml(micronautConfig, s -> s.path("application.yml"))),
+          pomXml(pomWithDependency)));
     }
 
     @Test
     void testAddGradleDependencyForEnvironmentYml() {
         rewriteRun(spec -> spec.beforeRecipe(withToolingApi()).recipe(new AddSnakeYamlDependencyIfNeeded()), mavenProject("project",
-                srcMainJava(java(micronautApplication)),
-                srcMainResources(yaml(micronautConfig, s -> s.path("application-foo.yml"))),
-                gradleProperties,
-                buildGradle(buildGradleNoDependency, buildGradleWithDependency)));
+          srcMainJava(java(micronautApplication)),
+          srcMainResources(yaml(micronautConfig, s -> s.path("application-foo.yml"))),
+          getGradleProperties(),
+          buildGradle(buildGradleNoDependency, buildGradleWithDependency)));
     }
 
     @Test
     void testAddMavenDependencyForEnvironmentYml() {
         rewriteRun(spec -> spec.recipe(new AddSnakeYamlDependencyIfNeeded()), mavenProject("project",
-                srcMainJava(java(micronautApplication)),
-                srcMainResources(yaml(micronautConfig, s -> s.path("application-foo.yml"))),
-                pomXml(initialPom, pomWithDependency)));
+          srcMainJava(java(micronautApplication)),
+          srcMainResources(yaml(micronautConfig, s -> s.path("application-foo.yml"))),
+          pomXml(initialPom, pomWithDependency)));
     }
 
     @Test
     void testAddGradleDependencyForTestYml() {
         rewriteRun(spec -> spec.beforeRecipe(withToolingApi()).recipe(new AddSnakeYamlDependencyIfNeeded()), mavenProject("project",
-                srcMainJava(java(micronautApplication)),
-                srcTestResources(yaml(micronautConfig, s -> s.path("application-test.yml"))),
-                gradleProperties,
-                buildGradle(buildGradleNoDependency, buildGradleWithDependency)));
+          srcMainJava(java(micronautApplication)),
+          srcTestResources(yaml(micronautConfig, s -> s.path("application-test.yml"))),
+          getGradleProperties(),
+          buildGradle(buildGradleNoDependency, buildGradleWithDependency)));
     }
 
     @Test
     void testAddMavenDependencyForTestYml() {
         rewriteRun(spec -> spec.recipe(new AddSnakeYamlDependencyIfNeeded()), mavenProject("project",
-                srcMainJava(java(micronautApplication)),
-                srcTestResources(yaml(micronautConfig, s -> s.path("application-test.yml"))),
-                pomXml(initialPom, pomWithDependency)));
+          srcMainJava(java(micronautApplication)),
+          srcTestResources(yaml(micronautConfig, s -> s.path("application-test.yml"))),
+          pomXml(initialPom, pomWithDependency)));
     }
 
     @Test
     void testAddGradleDependencyForBootstrapYml() {
         rewriteRun(spec -> spec.beforeRecipe(withToolingApi()).recipe(new AddSnakeYamlDependencyIfNeeded()), mavenProject("project",
-                srcMainJava(java(micronautApplication)),
-                srcMainResources(yaml(micronautConfig, s -> s.path("bootstrap.yml"))),
-                gradleProperties,
-                buildGradle(buildGradleNoDependency, buildGradleWithDependency)));
+          srcMainJava(java(micronautApplication)),
+          srcMainResources(yaml(micronautConfig, s -> s.path("bootstrap.yml"))),
+          getGradleProperties(),
+          buildGradle(buildGradleNoDependency, buildGradleWithDependency)));
     }
 
     @Test
     void testAddMavenDependencyForBootstrapYml() {
         rewriteRun(spec -> spec.recipe(new AddSnakeYamlDependencyIfNeeded()), mavenProject("project",
-                srcMainJava(java(micronautApplication)),
-                srcMainResources(yaml(micronautConfig, s -> s.path("bootstrap.yml"))),
-                pomXml(initialPom, pomWithDependency)));
+          srcMainJava(java(micronautApplication)),
+          srcMainResources(yaml(micronautConfig, s -> s.path("bootstrap.yml"))),
+          pomXml(initialPom, pomWithDependency)));
     }
 
     @Test
     void testAddGradleDependencyForBootstrapEnvironmentYml() {
         rewriteRun(spec -> spec.beforeRecipe(withToolingApi()).recipe(new AddSnakeYamlDependencyIfNeeded()), mavenProject("project",
-                srcMainJava(java(micronautApplication)),
-                srcMainResources(yaml(micronautConfig, s -> s.path("bootstrap-foo.yml"))),
-                gradleProperties,
-                buildGradle(buildGradleNoDependency, buildGradleWithDependency)));
+          srcMainJava(java(micronautApplication)),
+          srcMainResources(yaml(micronautConfig, s -> s.path("bootstrap-foo.yml"))),
+          getGradleProperties(),
+          buildGradle(buildGradleNoDependency, buildGradleWithDependency)));
     }
 
     @Test
     void testAddMavenDependencyForBootstrapEnvironmentYml() {
         rewriteRun(spec -> spec.recipe(new AddSnakeYamlDependencyIfNeeded()), mavenProject("project",
-                srcMainJava(java(micronautApplication)),
-                srcMainResources(yaml(micronautConfig, s -> s.path("bootstrap-foo.yml"))),
-                pomXml(initialPom, pomWithDependency)));
+          srcMainJava(java(micronautApplication)),
+          srcMainResources(yaml(micronautConfig, s -> s.path("bootstrap-foo.yml"))),
+          pomXml(initialPom, pomWithDependency)));
     }
 }

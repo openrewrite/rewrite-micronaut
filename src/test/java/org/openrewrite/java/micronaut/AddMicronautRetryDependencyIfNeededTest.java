@@ -20,107 +20,94 @@ import org.junit.jupiter.api.Test;
 import org.openrewrite.InMemoryExecutionContext;
 import org.openrewrite.java.JavaParser;
 import org.openrewrite.test.RecipeSpec;
-import org.openrewrite.test.RewriteTest;
-import org.openrewrite.test.SourceSpecs;
 
 import static org.openrewrite.gradle.Assertions.buildGradle;
 import static org.openrewrite.gradle.Assertions.withToolingApi;
 import static org.openrewrite.java.Assertions.*;
 import static org.openrewrite.maven.Assertions.pomXml;
-import static org.openrewrite.properties.Assertions.properties;
 
-public class AddMicronautRetryDependencyIfNeededTest implements RewriteTest {
+public class AddMicronautRetryDependencyIfNeededTest extends Micronaut4RewriteTest {
 
     @Override
     public void defaults(RecipeSpec spec) {
-        spec.parser(JavaParser.fromJavaVersion().classpathFromResources(new InMemoryExecutionContext(),"jakarta.inject-api-2.*", "micronaut-retry-4.*"));
+        spec.parser(JavaParser.fromJavaVersion().classpathFromResources(new InMemoryExecutionContext(), "jakarta.inject-api-2.*", "micronaut-retry-4.*"));
         spec.recipeFromResource("/META-INF/rewrite/micronaut3-to-4.yml", "org.openrewrite.java.micronaut.AddMicronautRetryDependencyIfNeeded");
     }
 
     @Language("java")
     private final String retryableService = """
-            import jakarta.inject.Singleton;
-            import io.micronaut.retry.annotation.Retryable;
-            
-            @Singleton
-            public class PersonService {
-            
-                @Retryable
-                public void callFlakyRemote() {
-                    
-                }
-            }
-        """;
-
-    private final SourceSpecs gradleProperties = properties("micronautVersion=4.0.0", s -> s.path("gradle.properties"));
-
-    @Language("groovy")
-    private final String buildGradleInitial = """
-            plugins {
-                id("io.micronaut.application") version "4.0.0"
-            }
-            
-            repositories {
-                mavenCentral()
-            }
-        """;
-
-    @Language("groovy")
-    private final String buildGradleExpected = """
-            plugins {
-                id("io.micronaut.application") version "4.0.0"
-            }
-            
-            repositories {
-                mavenCentral()
-            }
-            
-            dependencies {
-                implementation "io.micronaut:micronaut-retry"
-            }
-        """;
-
-    @Language("xml")
-    private final String pomInitial = """
-            <project>
-                <groupId>com.mycompany.app</groupId>
-                <artifactId>my-app</artifactId>
-                <version>1</version>
-                <parent>
-                    <groupId>io.micronaut.platform</groupId>
-                    <artifactId>micronaut-parent</artifactId>
-                    <version>4.0.0</version>
-                </parent>
-            </project>
-        """;
-
-    @Language("xml")
-    private final String pomExpected = """
-            <project>
-                <groupId>com.mycompany.app</groupId>
-                <artifactId>my-app</artifactId>
-                <version>1</version>
-                <parent>
-                    <groupId>io.micronaut.platform</groupId>
-                    <artifactId>micronaut-parent</artifactId>
-                    <version>4.0.0</version>
-                </parent>
-                <dependencies>
-                    <dependency>
-                        <groupId>io.micronaut</groupId>
-                        <artifactId>micronaut-retry</artifactId>
-                    </dependency>
-                </dependencies>
-            </project>
-        """;
+          import jakarta.inject.Singleton;
+          import io.micronaut.retry.annotation.Retryable;
+          
+          @Singleton
+          public class PersonService {
+          
+              @Retryable
+              public void callFlakyRemote() {
+                  
+              }
+          }
+      """;
 
     @Test
     void updateGradleDependencies() {
-        rewriteRun(spec -> spec.beforeRecipe(withToolingApi()), mavenProject("project", srcMainJava(java(retryableService)), gradleProperties, buildGradle(buildGradleInitial, buildGradleExpected)));
+        rewriteRun(spec -> spec.beforeRecipe(withToolingApi()), mavenProject("project", srcMainJava(java(retryableService)), getGradleProperties(),
+          //language=groovy
+          buildGradle("""
+                plugins {
+                    id("io.micronaut.application") version "%s"
+                }
+                
+                repositories {
+                    mavenCentral()
+                }
+            """.formatted(latestApplicationPluginVersion), """
+                plugins {
+                    id("io.micronaut.application") version "%s"
+                }
+                
+                repositories {
+                    mavenCentral()
+                }
+                
+                dependencies {
+                    implementation "io.micronaut:micronaut-retry"
+                }
+            """.formatted(latestApplicationPluginVersion))));
     }
 
     @Test
     void updateMavenDependencies() {
-        rewriteRun(mavenProject("project", srcMainJava(java(retryableService)), pomXml(pomInitial, pomExpected)));
+        rewriteRun(mavenProject("project", srcMainJava(java(retryableService)),
+          //language=xml
+          pomXml("""
+                <project>
+                    <groupId>com.mycompany.app</groupId>
+                    <artifactId>my-app</artifactId>
+                    <version>1</version>
+                    <parent>
+                        <groupId>io.micronaut.platform</groupId>
+                        <artifactId>micronaut-parent</artifactId>
+                        <version>%s</version>
+                    </parent>
+                </project>
+            """.formatted(latestMicronautVersion), """
+                <project>
+                    <groupId>com.mycompany.app</groupId>
+                    <artifactId>my-app</artifactId>
+                    <version>1</version>
+                    <parent>
+                        <groupId>io.micronaut.platform</groupId>
+                        <artifactId>micronaut-parent</artifactId>
+                        <version>%s</version>
+                    </parent>
+                    <dependencies>
+                        <dependency>
+                            <groupId>io.micronaut</groupId>
+                            <artifactId>micronaut-retry</artifactId>
+                        </dependency>
+                    </dependencies>
+                </project>
+            """.formatted(latestMicronautVersion))));
     }
 }
