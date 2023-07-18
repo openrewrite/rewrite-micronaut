@@ -58,7 +58,7 @@ public class MicronautRewriteTestVersions {
         try {
             return MicronautVersionHelper.getNewerVersion(versionPattern, currentVersion, new InMemoryExecutionContext()).orElse(currentVersion);
         } catch (MavenDownloadingException e) {
-            throw new IllegalStateException(String.format("Failed to resolve latest Micronaut Framework %s version", versionPattern), e);
+            throw new IllegalStateException("Failed to resolve latest Micronaut Framework %s version".formatted(versionPattern), e);
         }
     }
 
