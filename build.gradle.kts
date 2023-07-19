@@ -64,6 +64,8 @@ recipeDependencies {
     parserClasspath("io.micronaut.data:micronaut-data-tx:3.9.1")
     parserClasspath("io.micronaut.data:micronaut-data-tx:4.0.0")
     parserClasspath("io.micronaut.security:micronaut-security:4.0.0")
+    parserClasspath("io.micronaut.security:micronaut-security-jwt:4.0.0")
+    parserClasspath("io.micronaut.security:micronaut-security-oauth2:4.0.0")
     parserClasspath("javax.annotation:javax.annotation-api:1.3.2")
     parserClasspath("javax.validation:validation-api:2.0.1.Final")
     parserClasspath("jakarta.validation:jakarta.validation-api:3.0.2")
