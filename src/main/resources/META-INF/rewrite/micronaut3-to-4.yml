@@ -40,6 +40,7 @@ recipeList:
   - org.openrewrite.java.micronaut.RemoveWithJansiLogbackConfiguration
   - org.openrewrite.java.micronaut.RemoveUnnecessaryDependencies
   - org.openrewrite.java.micronaut.AddHttpRequestTypeParameter
+  - org.openrewrite.java.micronaut.UpdateMavenAnnotationProcessors
 ---
 type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.UpdateBuildToMicronaut4Version
@@ -367,3 +368,21 @@ recipeList:
   - org.openrewrite.java.dependencies.RemoveDependency:
       groupId: io.micronaut
       artifactId: micronaut-runtime
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: org.openrewrite.java.micronaut.UpdateMavenAnnotationProcessors
+displayName: Update the version of core annotation processors
+description: This recipe will update the version of Maven-configured annotation processors from Micronaut Core.
+recipeList:
+  - org.openrewrite.java.micronaut.ChangeAnnotationProcessorPath:
+      oldGroupId: io.micronaut
+      oldArtifactId: micronaut-inject-java
+      newVersion: ${micronaut.core.version}
+  - org.openrewrite.java.micronaut.ChangeAnnotationProcessorPath:
+      oldGroupId: io.micronaut
+      oldArtifactId: micronaut-http-validation
+      newVersion: ${micronaut.core.version}
+  - org.openrewrite.java.micronaut.ChangeAnnotationProcessorPath:
+      oldGroupId: io.micronaut
+      oldArtifactId: micronaut-graal
+      newVersion: ${micronaut.core.version}
