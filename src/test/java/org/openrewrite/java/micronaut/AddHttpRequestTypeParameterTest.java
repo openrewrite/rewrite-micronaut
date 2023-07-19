@@ -23,18 +23,21 @@ import org.openrewrite.test.RewriteTest;
 
 import static org.openrewrite.java.Assertions.*;
 
-public class AddHttpRequestTypeParameterTest implements RewriteTest {
+class AddHttpRequestTypeParameterTest implements RewriteTest {
 
     @Override
     public void defaults(RecipeSpec spec) {
-        spec.parser(JavaParser.fromJavaVersion().classpathFromResources(new InMemoryExecutionContext(), "micronaut-security-4.*",
-          "micronaut-security-jwt-4.*", "micronaut-security-oauth2-4.*", "micronaut-http-4.*"));
+        spec.parser(JavaParser.fromJavaVersion().classpathFromResources(new InMemoryExecutionContext(),
+          "micronaut-security-4.*",
+          "micronaut-security-jwt-4.*",
+          "micronaut-security-oauth2-4.*",
+          "micronaut-http-4.*"));
         spec.recipe(new AddHttpRequestTypeParameter());
     }
 
     @Test
     void testAuthenticationProviderNoChangesNeeded() {
-        rewriteRun(mavenProject("project", srcMainJava(
+        rewriteRun(
           //language=java
           java("""
             import io.micronaut.http.HttpRequest;
@@ -51,12 +54,12 @@ public class AddHttpRequestTypeParameterTest implements RewriteTest {
                     return null;
                 }
             }
-            """))));
+            """));
     }
 
     @Test
     void testAuthenticationProvider() {
-        rewriteRun(mavenProject("project", srcMainJava(
+        rewriteRun(
           //language=java
           java("""
             import io.micronaut.http.HttpRequest;
@@ -88,12 +91,12 @@ public class AddHttpRequestTypeParameterTest implements RewriteTest {
                     return null;
                 }
             }
-            """))));
+            """));
     }
 
     @Test
     void testAuthenticationProviderWithAdditionalInterface() {
-        rewriteRun(mavenProject("project", srcMainJava(
+        rewriteRun(
           //language=java
           java("""
             import io.micronaut.http.HttpRequest;
@@ -101,7 +104,7 @@ public class AddHttpRequestTypeParameterTest implements RewriteTest {
             import io.micronaut.security.authentication.AuthenticationRequest;
             import io.micronaut.security.authentication.AuthenticationResponse;
             import org.reactivestreams.Publisher;
-                      
+                        
             import java.io.Serializable;
                       
             public class AuthenticationProviderUserPassword implements AuthenticationProvider, Serializable {
@@ -129,12 +132,12 @@ public class AddHttpRequestTypeParameterTest implements RewriteTest {
                     return null;
                 }
             }
-            """))));
+            """));
     }
 
     @Test
     void testGenericJwtClaimsValidator() {
-        rewriteRun(mavenProject("project", srcMainJava(
+        rewriteRun(
           //language=java
           java("""
             import io.micronaut.http.HttpRequest;
@@ -158,12 +161,12 @@ public class AddHttpRequestTypeParameterTest implements RewriteTest {
                     return false;
                 }
             }
-            """))));
+            """));
     }
 
     @Test
     void testJwtClaimsValidator() {
-        rewriteRun(mavenProject("project", srcMainJava(
+        rewriteRun(
           //language=java
           java("""
             import io.micronaut.http.HttpRequest;
@@ -187,12 +190,12 @@ public class AddHttpRequestTypeParameterTest implements RewriteTest {
                     return false;
                 }
             }
-            """))));
+            """));
     }
 
     @Test
     void testEndSessionCallbackUrlBuilder() {
-        rewriteRun(mavenProject("project", srcMainJava(
+        rewriteRun(
           //language=java
           java("""
             import io.micronaut.http.HttpRequest;
@@ -218,12 +221,12 @@ public class AddHttpRequestTypeParameterTest implements RewriteTest {
                     return null;
                 }
             }
-            """))));
+            """));
     }
 
     @Test
     void testAbsoluteUrlBuilder() {
-        rewriteRun(mavenProject("project", srcMainJava(
+        rewriteRun(
           //language=java
           java("""
             import io.micronaut.http.HttpRequest;
@@ -249,12 +252,12 @@ public class AddHttpRequestTypeParameterTest implements RewriteTest {
                     return null;
                 }
             }
-            """))));
+            """));
     }
 
     @Test
     void testOauthRouteUrlBuilder() {
-        rewriteRun(mavenProject("project", srcMainJava(
+        rewriteRun(
           //language=java
           java("""
             import io.micronaut.http.HttpRequest;
@@ -324,12 +327,12 @@ public class AddHttpRequestTypeParameterTest implements RewriteTest {
                     return null;
                 }
             }
-            """))));
+            """));
     }
 
     @Test
     void testIntrospectionProcessor() {
-        rewriteRun(mavenProject("project", srcMainJava(
+        rewriteRun(
           //language=java
           java("""
             import io.micronaut.http.HttpRequest;
@@ -371,12 +374,12 @@ public class AddHttpRequestTypeParameterTest implements RewriteTest {
                     return null;
                 }
             }
-            """))));
+            """));
     }
 
     @Test
     void testAuthenticationFetcher() {
-        rewriteRun(mavenProject("project", srcMainJava(
+        rewriteRun(
           //language=java
           java("""
             import io.micronaut.http.HttpRequest;
@@ -402,12 +405,12 @@ public class AddHttpRequestTypeParameterTest implements RewriteTest {
                     return null;
                 }
             }
-            """))));
+            """));
     }
 
     @Test
     void testTokenReader() {
-        rewriteRun(mavenProject("project", srcMainJava(
+        rewriteRun(
           //language=java
           java("""
             import io.micronaut.http.HttpRequest;
@@ -433,12 +436,12 @@ public class AddHttpRequestTypeParameterTest implements RewriteTest {
                     return Optional.empty();
                 }
             }
-            """))));
+            """));
     }
 
     @Test
     void testTokenResolver() {
-        rewriteRun(mavenProject("project", srcMainJava(
+        rewriteRun(
           //language=java
           java("""
             import io.micronaut.http.HttpRequest;
@@ -464,12 +467,12 @@ public class AddHttpRequestTypeParameterTest implements RewriteTest {
                     return Optional.empty();
                 }
             }
-            """))));
+            """));
     }
 
     @Test
     void testTokenValidator() {
-        rewriteRun(mavenProject("project", srcMainJava(
+        rewriteRun(
           //language=java
           java("""
             import io.micronaut.http.HttpRequest;
@@ -495,6 +498,6 @@ public class AddHttpRequestTypeParameterTest implements RewriteTest {
                     return null;
                 }
             }
-            """))));
+            """));
     }
 }
