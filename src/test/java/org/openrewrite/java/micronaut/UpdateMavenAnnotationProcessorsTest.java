@@ -19,7 +19,6 @@ import org.junit.jupiter.api.Test;
 import org.openrewrite.config.Environment;
 import org.openrewrite.test.RecipeSpec;
 
-import static org.openrewrite.java.Assertions.mavenProject;
 import static org.openrewrite.maven.Assertions.pomXml;
 
 public class UpdateMavenAnnotationProcessorsTest extends Micronaut4RewriteTest {
@@ -29,15 +28,12 @@ public class UpdateMavenAnnotationProcessorsTest extends Micronaut4RewriteTest {
         spec.recipes(Environment.builder()
           .scanRuntimeClasspath("org.openrewrite.java.micronaut")
           .build()
-          .activateRecipes(
-            "org.openrewrite.java.micronaut.UpdateMicronautPlatformBom",
-            "org.openrewrite.java.micronaut.UpdateBuildPlugins",
-            "org.openrewrite.java.micronaut.UpdateMavenAnnotationProcessors"));
+          .activateRecipes("org.openrewrite.java.micronaut.UpdateMavenAnnotationProcessors"));
     }
 
     @Test
     void updateCoreMavenAnnotationProcessors() {
-        rewriteRun(mavenProject("project",
+        rewriteRun(
           //language=xml
           pomXml("""
             <project>
@@ -45,7 +41,7 @@ public class UpdateMavenAnnotationProcessorsTest extends Micronaut4RewriteTest {
                 <artifactId>my-app</artifactId>
                 <version>1</version>
                 <parent>
-                    <groupId>io.micronaut</groupId>
+                    <groupId>io.micronaut.platform</groupId>
                     <artifactId>micronaut-parent</artifactId>
                     <version>%s</version>
                 </parent>
@@ -74,7 +70,7 @@ public class UpdateMavenAnnotationProcessorsTest extends Micronaut4RewriteTest {
                 <build>
                     <plugins>
                         <plugin>
-                            <groupId>io.micronaut.build</groupId>
+                            <groupId>io.micronaut.maven</groupId>
                             <artifactId>micronaut-maven-plugin</artifactId>
                         </plugin>
                         <plugin>
@@ -112,7 +108,7 @@ public class UpdateMavenAnnotationProcessorsTest extends Micronaut4RewriteTest {
                     </plugins>
                 </build>
             </project>
-            """.formatted(MicronautRewriteTestVersions.getLatestMN3Version()), """
+            """.formatted(latestMicronautVersion), """
             <project>
                 <groupId>com.mycompany.app</groupId>
                 <artifactId>my-app</artifactId>
@@ -185,12 +181,12 @@ public class UpdateMavenAnnotationProcessorsTest extends Micronaut4RewriteTest {
                     </plugins>
                 </build>
             </project>
-            """.formatted(latestMicronautVersion))));
+            """.formatted(latestMicronautVersion)));
     }
 
     @Test
     void updateCoreMavenAnnotationProcessorsAndDontModifyModuleProcessors() {
-        rewriteRun(mavenProject("project",
+        rewriteRun(
           //language=xml
           pomXml("""
             <project>
@@ -198,7 +194,7 @@ public class UpdateMavenAnnotationProcessorsTest extends Micronaut4RewriteTest {
                 <artifactId>my-app</artifactId>
                 <version>1</version>
                 <parent>
-                    <groupId>io.micronaut</groupId>
+                    <groupId>io.micronaut.platform</groupId>
                     <artifactId>micronaut-parent</artifactId>
                     <version>%s</version>
                 </parent>
@@ -227,7 +223,7 @@ public class UpdateMavenAnnotationProcessorsTest extends Micronaut4RewriteTest {
                 <build>
                     <plugins>
                         <plugin>
-                            <groupId>io.micronaut.build</groupId>
+                            <groupId>io.micronaut.maven</groupId>
                             <artifactId>micronaut-maven-plugin</artifactId>
                         </plugin>
                         <plugin>
@@ -260,7 +256,7 @@ public class UpdateMavenAnnotationProcessorsTest extends Micronaut4RewriteTest {
                     </plugins>
                 </build>
             </project>
-            """.formatted(MicronautRewriteTestVersions.getLatestMN3Version()), """
+            """.formatted(latestMicronautVersion), """
             <project>
                 <groupId>com.mycompany.app</groupId>
                 <artifactId>my-app</artifactId>
@@ -328,6 +324,6 @@ public class UpdateMavenAnnotationProcessorsTest extends Micronaut4RewriteTest {
                     </plugins>
                 </build>
             </project>
-            """.formatted(latestMicronautVersion))));
+            """.formatted(latestMicronautVersion)));
     }
 }
