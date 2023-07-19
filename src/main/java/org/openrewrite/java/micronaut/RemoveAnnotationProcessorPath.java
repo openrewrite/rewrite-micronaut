@@ -21,13 +21,8 @@ import org.openrewrite.ExecutionContext;
 import org.openrewrite.Option;
 import org.openrewrite.Recipe;
 import org.openrewrite.TreeVisitor;
-import org.openrewrite.maven.MavenVisitor;
-import org.openrewrite.xml.AddOrUpdateChild;
-import org.openrewrite.xml.ChangeTagValueVisitor;
+import org.openrewrite.maven.MavenIsoVisitor;
 import org.openrewrite.xml.tree.Xml;
-
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.openrewrite.xml.FilterTagChildrenVisitor.filterTagChildren;
 import static org.openrewrite.xml.MapTagChildrenVisitor.mapTagChildren;
@@ -58,13 +53,12 @@ public class RemoveAnnotationProcessorPath extends Recipe {
 
     @Override
     public TreeVisitor<?, ExecutionContext> getVisitor() {
-        return new MavenVisitor<ExecutionContext>() {
-
+        return new MavenIsoVisitor<ExecutionContext>() {
             @Override
-            public Xml visitTag(Xml.Tag tag, ExecutionContext ctx) {
-                Xml.Tag plugin = (Xml.Tag) super.visitTag(tag, ctx);
+            public Xml.Tag visitTag(Xml.Tag tag, ExecutionContext ctx) {
+                Xml.Tag plugin = super.visitTag(tag, ctx);
                 if (isPluginTag("org.apache.maven.plugins", "maven-compiler-plugin")) {
-                    plugin = maybeUpdatePlugin(plugin, ctx);
+                    plugin = maybeUpdatePlugin(plugin);
                     if (plugin != tag) {
                         maybeUpdateModel();
                     }
@@ -72,21 +66,24 @@ public class RemoveAnnotationProcessorPath extends Recipe {
                 return plugin;
             }
 
-            private Xml.Tag maybeUpdatePlugin(Xml.Tag plugin, ExecutionContext ctx) {
-                return mapTagChildren(plugin, childTag -> "configuration".equals(childTag.getName()) ? maybeUpdateConfiguration(childTag, ctx) : childTag);
+            private Xml.Tag maybeUpdatePlugin(Xml.Tag plugin) {
+                return mapTagChildren(plugin,
+                        childTag -> "configuration".equals(childTag.getName()) ? maybeUpdateConfiguration(childTag) : childTag);
             }
 
-            private Xml.Tag maybeUpdateConfiguration(Xml.Tag configuration, ExecutionContext ctx) {
-                return mapTagChildren(configuration, childTag -> "annotationProcessorPaths".equals(childTag.getName()) ? maybeUpdateAnnotationProcessorPaths(childTag, ctx) : childTag);
+            private Xml.Tag maybeUpdateConfiguration(Xml.Tag configuration) {
+                return mapTagChildren(configuration,
+                        childTag -> "annotationProcessorPaths".equals(childTag.getName()) ? maybeUpdateAnnotationProcessorPaths(childTag) : childTag);
             }
 
-            private Xml.Tag maybeUpdateAnnotationProcessorPaths(Xml.Tag annotationProcessorPaths, ExecutionContext ctx) {
-                return filterTagChildren(annotationProcessorPaths, childTag -> !("path".equals(childTag.getName()) && isPathMatch(childTag)));
+            private Xml.Tag maybeUpdateAnnotationProcessorPaths(Xml.Tag annotationProcessorPaths) {
+                return filterTagChildren(annotationProcessorPaths,
+                        childTag -> !("path".equals(childTag.getName()) && isPathMatch(childTag)));
             }
 
             private boolean isPathMatch(Xml.Tag path) {
                 return groupId.equals(path.getChildValue("groupId").orElse(null)) &&
-                        artifactId.equals(path.getChildValue("artifactId").orElse(null));
+                       artifactId.equals(path.getChildValue("artifactId").orElse(null));
             }
         };
     }
