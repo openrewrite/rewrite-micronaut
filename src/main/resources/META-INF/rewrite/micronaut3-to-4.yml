@@ -41,6 +41,7 @@ recipeList:
   - org.openrewrite.java.micronaut.RemoveUnnecessaryDependencies
   - org.openrewrite.java.micronaut.AddHttpRequestTypeParameter
   - org.openrewrite.java.micronaut.UpdateMavenAnnotationProcessors
+  - org.openrewrite.java.micronaut.AddTestResourcesClientDependencyIfNeeded
 ---
 type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.UpdateBuildToMicronaut4Version
