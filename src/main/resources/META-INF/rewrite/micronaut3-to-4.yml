@@ -136,6 +136,9 @@ recipeList:
   - org.openrewrite.java.dependencies.RemoveDependency:
       groupId: io.micronaut
       artifactId: micronaut-validation
+  - org.openrewrite.java.micronaut.RemoveAnnotationProcessorPath:
+      groupId: io.micronaut
+      artifactId: micronaut-validation
   - org.openrewrite.java.dependencies.AddDependency:
       groupId: io.micronaut.validation
       artifactId: micronaut-validation
