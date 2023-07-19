@@ -77,12 +77,7 @@ public class UpdateMavenAnnotationProcessorsTest extends Micronaut4RewriteTest {
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-compiler-plugin</artifactId>
                             <configuration>
-                                <annotationProcessorPaths combine.children="append">
-                                    <path>
-                                        <groupId>io.micronaut.data</groupId>
-                                        <artifactId>micronaut-data-processor</artifactId>
-                                        <version>${micronaut.data.version}</version>
-                                    </path> 
+                                <annotationProcessorPaths combine.children="append"> 
                                     <path>
                                         <groupId>io.micronaut</groupId>
                                         <artifactId>micronaut-inject-java</artifactId>
@@ -150,12 +145,7 @@ public class UpdateMavenAnnotationProcessorsTest extends Micronaut4RewriteTest {
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-compiler-plugin</artifactId>
                             <configuration>
-                                <annotationProcessorPaths combine.children="append">
-                                    <path>
-                                        <groupId>io.micronaut.data</groupId>
-                                        <artifactId>micronaut-data-processor</artifactId>
-                                        <version>${micronaut.data.version}</version>
-                                    </path>       
+                                <annotationProcessorPaths combine.children="append">       
                                     <path>
                                         <groupId>io.micronaut</groupId>
                                         <artifactId>micronaut-inject-java</artifactId>
@@ -232,6 +222,11 @@ public class UpdateMavenAnnotationProcessorsTest extends Micronaut4RewriteTest {
                             <configuration>
                                 <annotationProcessorPaths combine.children="append">
                                     <path>
+                                        <groupId>io.micronaut.data</groupId>
+                                        <artifactId>micronaut-data-processor</artifactId>
+                                        <version>${micronaut.data.version}</version>
+                                    </path>
+                                    <path>
                                         <groupId>io.micronaut</groupId>
                                         <artifactId>micronaut-inject-java</artifactId>
                                         <version>${micronaut.version}</version>
@@ -299,6 +294,11 @@ public class UpdateMavenAnnotationProcessorsTest extends Micronaut4RewriteTest {
                             <artifactId>maven-compiler-plugin</artifactId>
                             <configuration>
                                 <annotationProcessorPaths combine.children="append">
+                                    <path>
+                                        <groupId>io.micronaut.data</groupId>
+                                        <artifactId>micronaut-data-processor</artifactId>
+                                        <version>${micronaut.data.version}</version>
+                                    </path>
                                     <path>
                                         <groupId>io.micronaut</groupId>
                                         <artifactId>micronaut-inject-java</artifactId>
