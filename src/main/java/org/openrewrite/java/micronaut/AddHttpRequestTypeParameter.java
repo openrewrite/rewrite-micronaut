@@ -47,15 +47,6 @@ public class AddHttpRequestTypeParameter extends Recipe {
         CANDIDATE_INTERFACES.add("io.micronaut.security.token.reader.TokenReader");
         CANDIDATE_INTERFACES.add("io.micronaut.security.token.reader.TokenResolver");
         CANDIDATE_INTERFACES.add("io.micronaut.security.token.validator.TokenValidator");
-
-        /*
-        CANDIDATE_INTERFACES.add("io.micronaut.security.errors.PriorToLoginPersistence"); //TODO - This one also has a generic parameter for the HttpResponse
-        CANDIDATE_INTERFACES.add("io.micronaut.security.handlers.LoginHandler"); //TODO - This one also has a generic return type parameter
-        CANDIDATE_INTERFACES.add("io.micronaut.security.handlers.LogoutHandler"); //TODO - This one also has a generic return type parameter
-        CANDIDATE_INTERFACES.add("io.micronaut.security.handlers.RedirectingLoginHandler"); //TODO - This one also has a generic return type parameter
-        CANDIDATE_INTERFACES.add("io.micronaut.security.rules.SecurityRule"); //TODO - This one has a method parameter that must be removed
-        CANDIDATE_INTERFACES.add("io.micronaut.views.ViewsRenderer"); //TODO - The request was added as a second parameter here
-        */
     }
 
     @Override
