@@ -325,7 +325,13 @@ name: org.openrewrite.java.micronaut.UpdateMicronautData
 displayName: Update the Micronaut Data library
 description: This recipe will make the necessary updates for using Micronaut Data with Micronaut Framework 4.
 recipeList:
-  - org.openrewrite.java.migrate.jakarta.JavaxTransactionMigrationToJakartaTransaction
+  - org.openrewrite.xml.RemoveXmlTag:
+      xPath: /project/properties/micronaut.data.version
+      fileMatcher: '**/pom.xml'
+  - org.openrewrite.java.ChangePackage:
+      oldPackageName: javax.transaction
+      newPackageName: jakarta.transaction
+      recursive: true
   - org.openrewrite.java.ChangeType:
       oldFullyQualifiedTypeName: io.micronaut.data.jdbc.annotation.ColumnTransformer
       newFullyQualifiedTypeName: io.micronaut.data.annotation.sql.ColumnTransformer

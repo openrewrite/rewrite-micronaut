@@ -98,6 +98,9 @@ public class UpdateMicronautDataTest extends Micronaut4RewriteTest {
                     <artifactId>micronaut-parent</artifactId>
                     <version>%s</version>
                 </parent>
+                <properties>
+                    <micronaut.version>%1$s</micronaut.version>
+                </properties>
                 <dependencies>
                     <dependency>
                         <groupId>io.micronaut.data</groupId>
@@ -105,16 +108,59 @@ public class UpdateMicronautDataTest extends Micronaut4RewriteTest {
                         <scope>compile</scope>
                     </dependency>
                 </dependencies>
-                <build>
-                    <plugins>
-                        <plugin>
-                            <groupId>io.micronaut.build</groupId>
-                            <artifactId>micronaut-maven-plugin</artifactId>
-                        </plugin>
-                    </plugins>
-                </build>
             </project>
             """.formatted(latestMicronautVersion))));
+    }
+
+    @Test
+    void updateJavaCodeAndMavenDataVersion() {
+        rewriteRun(mavenProject("project", srcMainJava(java(annotatedJavaxTxRepository, annotatedJakartaTxRepository)),
+          //language=xml
+          pomXml("""
+              <project>
+                  <groupId>com.mycompany.app</groupId>
+                  <artifactId>my-app</artifactId>
+                  <version>1</version>
+                  <parent>
+                      <groupId>io.micronaut.platform</groupId>
+                      <artifactId>micronaut-parent</artifactId>
+                      <version>%1$s</version>
+                  </parent>
+                  <properties>
+                      <micronaut.version>%1$s</micronaut.version>
+                      <micronaut.data.version>%2$s</micronaut.data.version>
+                  </properties>
+                  <dependencies>
+                      <dependency>
+                          <groupId>io.micronaut.data</groupId>
+                          <artifactId>micronaut-data-jdbc</artifactId>
+                          <scope>compile</scope>
+                      </dependency>
+                  </dependencies>
+              </project>
+              """.formatted(latestMicronautVersion, "3.10.0"),
+            """
+              <project>
+                  <groupId>com.mycompany.app</groupId>
+                  <artifactId>my-app</artifactId>
+                  <version>1</version>
+                  <parent>
+                      <groupId>io.micronaut.platform</groupId>
+                      <artifactId>micronaut-parent</artifactId>
+                      <version>%1$s</version>
+                  </parent>
+                  <properties>
+                      <micronaut.version>%1$s</micronaut.version>
+                  </properties>
+                  <dependencies>
+                      <dependency>
+                          <groupId>io.micronaut.data</groupId>
+                          <artifactId>micronaut-data-jdbc</artifactId>
+                          <scope>compile</scope>
+                      </dependency>
+                  </dependencies>
+              </project>
+              """.formatted(latestMicronautVersion))));
     }
 
     @Test
