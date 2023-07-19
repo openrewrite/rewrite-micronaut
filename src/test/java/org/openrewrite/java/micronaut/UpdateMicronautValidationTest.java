@@ -32,7 +32,18 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
 
     @Override
     public void defaults(RecipeSpec spec) {
-        spec.parser(JavaParser.fromJavaVersion().classpathFromResources(new InMemoryExecutionContext(), "validation-api-2.*", "jakarta.validation-api-3.*", "jakarta.inject-api-2.*")).recipes(Environment.builder().scanRuntimeClasspath("org.openrewrite.java.micronaut").build().activateRecipes("org.openrewrite.java.micronaut.UpdateMicronautPlatformBom", "org.openrewrite.java.micronaut.UpdateBuildPlugins", "org.openrewrite.java.micronaut.UpdateMicronautValidation"));
+        spec.parser(JavaParser.fromJavaVersion()
+            .classpathFromResources(new InMemoryExecutionContext(),
+              "validation-api-2.*",
+              "jakarta.validation-api-3.*",
+              "jakarta.inject-api-2.*"))
+          .recipes(Environment.builder()
+            .scanRuntimeClasspath("org.openrewrite.java.micronaut")
+            .build()
+            .activateRecipes(
+              "org.openrewrite.java.micronaut.UpdateMicronautPlatformBom",
+              "org.openrewrite.java.micronaut.UpdateBuildPlugins",
+              "org.openrewrite.java.micronaut.UpdateMicronautValidation"));
     }
 
     @Language("java")
