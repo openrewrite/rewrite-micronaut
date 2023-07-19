@@ -17,19 +17,17 @@ package org.openrewrite.java.micronaut;
 
 import org.openrewrite.ExecutionContext;
 import org.openrewrite.Recipe;
+import org.openrewrite.Tree;
 import org.openrewrite.TreeVisitor;
+import org.openrewrite.internal.ListUtils;
 import org.openrewrite.java.JavaIsoVisitor;
-import org.openrewrite.java.JavaTemplate;
-import org.openrewrite.java.TreeVisitingPrinter;
-import org.openrewrite.java.tree.J;
-import org.openrewrite.java.tree.JavaType;
-import org.openrewrite.java.tree.TypeTree;
+import org.openrewrite.java.tree.*;
+import org.openrewrite.marker.Markers;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class AddHttpRequestTypeParameter extends Recipe {
 
@@ -68,30 +66,30 @@ public class AddHttpRequestTypeParameter extends Recipe {
     @Override
     public String getDescription() {
         return "This recipe adds an HttpRequest type parameter to a class implements statement for interfaces that have been generically parameterized " +
-          "where they previously specified HttpRequest explicitly.";
+               "where they previously specified HttpRequest explicitly.";
     }
 
     @Override
     public TreeVisitor<?, ExecutionContext> getVisitor() {
         return new JavaIsoVisitor<ExecutionContext>() {
-
-            private final JavaTemplate template = JavaTemplate.builder("#{}<HttpRequest<?>>").build();
-
             @Override
             public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext executionContext) {
                 J.ClassDeclaration c = super.visitClassDeclaration(classDecl, executionContext);
                 if (c.getImplements() != null) {
-                    List<TypeTree> newInterfaceTypes = c.getImplements().stream()
-                            .map(interfaceType -> {
-                                JavaType.FullyQualified fqInterfaceType = (JavaType.FullyQualified) interfaceType.getType();
-                                if (fqInterfaceType != null && isCandidateInterface(fqInterfaceType)) {
-                                    J.ClassDeclaration result = template.apply(getCursor(), c.getCoordinates().replaceImplementsClause(), fqInterfaceType.getClassName());
-                                    if (result.getImplements() != null && !result.getImplements().isEmpty()) {
-                                        return result.getImplements().get(0);
-                                    }
-                                }
-                                return interfaceType;
-                            }).collect(Collectors.toList());
+                    List<TypeTree> newInterfaceTypes = ListUtils.map(c.getImplements(), interfaceType -> {
+                        JavaType.FullyQualified fqInterfaceType = (JavaType.FullyQualified) interfaceType.getType();
+                        if (fqInterfaceType != null && isCandidateInterface(fqInterfaceType)) {
+                            JavaType httpRequestType = JavaType.buildType("io.micronaut.http.HttpRequest");
+                            J.Identifier httpRequestIdentifier = new J.Identifier(Tree.randomId(), Space.EMPTY, Markers.EMPTY, "HttpRequest", httpRequestType, null);
+                            J.ParameterizedType httpRequestParameterized = new J.ParameterizedType(Tree.randomId(), Space.EMPTY, Markers.EMPTY, httpRequestIdentifier,
+                                    JContainer.build(Collections.singletonList(JRightPadded.build(new J.Wildcard(Tree.randomId(), Space.EMPTY, Markers.EMPTY, null, null)))), httpRequestType);
+                            NameTree nameTree = new J.Identifier(Tree.randomId(), Space.EMPTY, Markers.EMPTY, fqInterfaceType.getClassName(), null, null);
+                            return new J.ParameterizedType(Tree.randomId(), Space.EMPTY, Markers.EMPTY, nameTree,
+                                    JContainer.build(Collections.singletonList(JRightPadded.build(httpRequestParameterized))), fqInterfaceType)
+                                    .withPrefix(interfaceType.getPrefix());
+                        }
+                        return interfaceType;
+                    });
                     return c.withImplements(newInterfaceTypes);
                 }
                 return c;
@@ -99,7 +97,8 @@ public class AddHttpRequestTypeParameter extends Recipe {
 
             private boolean isCandidateInterface(JavaType.FullyQualified fqInterfaceType) {
                 return CANDIDATE_INTERFACES.contains(fqInterfaceType.getFullyQualifiedName())
-                        && fqInterfaceType.getTypeParameters().stream().noneMatch(javaType -> javaType.isAssignableFrom(HTTP_REQUEST_TYPE));
+                       && fqInterfaceType.getTypeParameters().stream()
+                               .noneMatch(javaType -> javaType.isAssignableFrom(HTTP_REQUEST_TYPE));
             }
         };
     }
