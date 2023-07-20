@@ -16,6 +16,7 @@
 package org.openrewrite.java.micronaut;
 
 import org.junit.jupiter.api.Test;
+import org.openrewrite.config.Environment;
 import org.openrewrite.test.RecipeSpec;
 
 import static org.openrewrite.gradle.Assertions.buildGradle;
@@ -27,7 +28,10 @@ public class RemoveUnnecessaryDependenciesTest extends Micronaut4RewriteTest {
 
     @Override
     public void defaults(RecipeSpec spec) {
-        spec.recipeFromResource("/META-INF/rewrite/micronaut3-to-4.yml", "org.openrewrite.java.micronaut.RemoveUnnecessaryDependencies");
+        spec.recipes(Environment.builder()
+          .scanRuntimeClasspath("org.openrewrite.java.micronaut")
+          .build()
+          .activateRecipes( "org.openrewrite.java.micronaut.RemoveUnnecessaryDependencies"));
     }
 
     @Test

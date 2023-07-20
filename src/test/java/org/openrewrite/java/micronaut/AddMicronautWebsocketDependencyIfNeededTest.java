@@ -18,6 +18,7 @@ package org.openrewrite.java.micronaut;
 import org.intellij.lang.annotations.Language;
 import org.junit.jupiter.api.Test;
 import org.openrewrite.InMemoryExecutionContext;
+import org.openrewrite.config.Environment;
 import org.openrewrite.java.JavaParser;
 import org.openrewrite.test.RecipeSpec;
 
@@ -31,7 +32,10 @@ public class AddMicronautWebsocketDependencyIfNeededTest extends Micronaut4Rewri
     @Override
     public void defaults(RecipeSpec spec) {
         spec.parser(JavaParser.fromJavaVersion().classpathFromResources(new InMemoryExecutionContext(), "micronaut-websocket-4.*"));
-        spec.recipeFromResource("/META-INF/rewrite/micronaut3-to-4.yml", "org.openrewrite.java.micronaut.AddMicronautWebsocketDependencyIfNeeded");
+        spec.recipes(Environment.builder()
+          .scanRuntimeClasspath("org.openrewrite.java.micronaut")
+          .build()
+          .activateRecipes( "org.openrewrite.java.micronaut.AddMicronautWebsocketDependencyIfNeeded"));
     }
 
     @Language("java")
