@@ -16,6 +16,7 @@
 package org.openrewrite.java.micronaut;
 
 import org.junit.jupiter.api.Test;
+import org.openrewrite.config.Environment;
 import org.openrewrite.test.RecipeSpec;
 import org.openrewrite.test.RewriteTest;
 
@@ -27,7 +28,10 @@ public class RemoveWithJansiLogbackConfigurationTest implements RewriteTest {
 
     @Override
     public void defaults(RecipeSpec spec) {
-        spec.recipeFromResource("/META-INF/rewrite/micronaut3-to-4.yml", "org.openrewrite.java.micronaut.RemoveWithJansiLogbackConfiguration");
+        spec.recipes(Environment.builder()
+          .scanRuntimeClasspath("org.openrewrite.java.micronaut")
+          .build()
+          .activateRecipes( "org.openrewrite.java.micronaut.RemoveWithJansiLogbackConfiguration"));
     }
 
     @Test

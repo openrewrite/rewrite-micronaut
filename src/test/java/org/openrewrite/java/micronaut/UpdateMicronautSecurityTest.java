@@ -17,6 +17,7 @@ package org.openrewrite.java.micronaut;
 
 import org.intellij.lang.annotations.Language;
 import org.junit.jupiter.api.Test;
+import org.openrewrite.config.Environment;
 import org.openrewrite.test.RecipeSpec;
 import org.openrewrite.test.RewriteTest;
 
@@ -29,7 +30,10 @@ public class UpdateMicronautSecurityTest implements RewriteTest {
 
     @Override
     public void defaults(RecipeSpec spec) {
-        spec.recipeFromResource("/META-INF/rewrite/micronaut3-to-4.yml", "org.openrewrite.java.micronaut.UpdateMicronautSecurity");
+        spec.recipes(Environment.builder()
+          .scanRuntimeClasspath("org.openrewrite.java.micronaut")
+          .build()
+          .activateRecipes( "org.openrewrite.java.micronaut.UpdateMicronautSecurity"));
     }
 
     @Language("properties")
