@@ -41,10 +41,20 @@ public class UpdateMavenAnnotationProcessorsTest extends Micronaut4RewriteTest {
                 <artifactId>my-app</artifactId>
                 <version>1</version>
                 <parent>
-                    <groupId>io.micronaut.platform</groupId>
+                    <groupId>io.micronaut</groupId>
                     <artifactId>micronaut-parent</artifactId>
                     <version>%s</version>
                 </parent>
+                <properties>
+                    <packaging>jar</packaging>
+                    <jdk.version>11</jdk.version>
+                    <release.version>11</release.version>
+                    <micronaut.version>3.9.2</micronaut.version>
+                    <micronaut.test.resources.enabled>true</micronaut.test.resources.enabled>
+                    <micronaut.data.version>3.10.0</micronaut.data.version>
+                    <micronaut.runtime>netty</micronaut.runtime>
+                    <exec.mainClass>example.micronaut.Application</exec.mainClass>
+                </properties>
                 <dependencies>
                     <dependency>
                         <groupId>io.micronaut</groupId>
@@ -103,16 +113,26 @@ public class UpdateMavenAnnotationProcessorsTest extends Micronaut4RewriteTest {
                     </plugins>
                 </build>
             </project>
-            """.formatted(latestMicronautVersion), """
+            """.formatted(MicronautRewriteTestVersions.getLatestMN3Version()), """
             <project>
                 <groupId>com.mycompany.app</groupId>
                 <artifactId>my-app</artifactId>
                 <version>1</version>
                 <parent>
-                    <groupId>io.micronaut.platform</groupId>
+                    <groupId>io.micronaut</groupId>
                     <artifactId>micronaut-parent</artifactId>
                     <version>%s</version>
                 </parent>
+                <properties>
+                    <packaging>jar</packaging>
+                    <jdk.version>11</jdk.version>
+                    <release.version>11</release.version>
+                    <micronaut.version>3.9.2</micronaut.version>
+                    <micronaut.test.resources.enabled>true</micronaut.test.resources.enabled>
+                    <micronaut.data.version>3.10.0</micronaut.data.version>
+                    <micronaut.runtime>netty</micronaut.runtime>
+                    <exec.mainClass>example.micronaut.Application</exec.mainClass>
+                </properties>
                 <dependencies>
                     <dependency>
                         <groupId>io.micronaut</groupId>
@@ -171,7 +191,7 @@ public class UpdateMavenAnnotationProcessorsTest extends Micronaut4RewriteTest {
                     </plugins>
                 </build>
             </project>
-            """.formatted(latestMicronautVersion)));
+            """.formatted(MicronautRewriteTestVersions.getLatestMN3Version())));
     }
 
     @Test

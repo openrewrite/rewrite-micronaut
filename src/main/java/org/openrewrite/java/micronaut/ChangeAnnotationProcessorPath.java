@@ -29,7 +29,6 @@ import org.openrewrite.xml.tree.Xml;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.openrewrite.xml.FilterTagChildrenVisitor.filterTagChildren;
 import static org.openrewrite.xml.MapTagChildrenVisitor.mapTagChildren;
@@ -63,8 +62,8 @@ public class ChangeAnnotationProcessorPath extends Recipe {
     String newArtifactId;
 
     @Option(displayName = "New version",
-            description = "An exact version string for the annotation processor path.",
-            example = "${micronaut.validation}",
+            description = "An version string for the annotation processor path. Version strings that start with 'micronaut.' will be treated specially. ",
+            example = "micronaut.validation",
             required = false)
     @Nullable
     String newVersion;
@@ -112,49 +111,37 @@ public class ChangeAnnotationProcessorPath extends Recipe {
 
             private Xml.Tag maybeUpdateAnnotationProcessorPaths(Xml.Tag annotationProcessorPaths, ExecutionContext ctx) {
                 return mapTagChildren(annotationProcessorPaths, childTag -> {
-                   if ("path".equals(childTag.getName()) && isPathMatch(childTag)) {
-                       Xml.Tag path = childTag;
-                       if (newGroupId != null) {
-                           path = changeChildTagValue(path, "groupId", newGroupId, ctx);
-                       }
-                       if (newArtifactId != null) {
-                           path = changeChildTagValue(path, "artifactId", newArtifactId, ctx);
-                       }
-                       if (newVersion != null) {
-                           path = changeChildTagValue(path, "version", newVersion, ctx);
-                       }
-                       if (exclusions == null) {
-                           path = filterTagChildren(path, child -> !("exclusions".equals(child.getName())));
-                       } else if (exclusions != null) {
-                           path = addExclusionsToPath(path, ctx);
-                       }
-                       childTag = path;
-                   }
-                   return childTag;
+                    if ("path".equals(childTag.getName()) && isPathMatch(childTag)) {
+                        Xml.Tag path = childTag;
+                        if (newGroupId != null && !newGroupId.equals(path.getChildValue("groupId").orElse(""))) {
+                            path = changeChildTagValue(path, "groupId", newGroupId, ctx);
+                        }
+                        if (newArtifactId != null && !newArtifactId.equals(path.getChildValue("artifactId").orElse(""))) {
+                            path = changeChildTagValue(path, "artifactId", newArtifactId, ctx);
+                        }
+                        if (newVersion != null) {
+                            String versionToUpdate = newVersion.startsWith("micronaut.") ? "${" + newVersion + "}" : newVersion;
+                            if (!versionToUpdate.equals(path.getChildValue("version").orElse(""))) {
+                                path = changeChildTagValue(path, "version",
+                                        versionToUpdate,
+                                        ctx);
+                            }
+                        }
+                        if (exclusions == null) {
+                            path = filterTagChildren(path, child -> !("exclusions".equals(child.getName())));
+                        } else {
+                            path = addExclusionsToPath(path, ctx);
+                        }
+                        childTag = path;
+                    }
+                    return childTag;
                 });
             }
 
             private Xml.Tag addExclusionsToPath(Xml.Tag path, ExecutionContext ctx) {
-                Xml.Tag exclusionsTag = Xml.Tag.build("\n<exclusions>\n" + buildExclusionsContent() + "</exclusions>");
+                Xml.Tag exclusionsTag = Xml.Tag.build("\n<exclusions>\n" + MavenExclusions.buildContent(exclusions) + "</exclusions>");
                 doAfterVisit(new AddOrUpdateChild<>(path, exclusionsTag));
                 return path;
-            }
-
-            private String buildExclusionsContent() {
-                if (exclusions == null) {
-                    return "";
-                }
-                return exclusions.stream().map(exclusion -> {
-                    StringBuilder exclusionContent = new StringBuilder("<exclusion>\n");
-                    String[] exclusionParts = exclusion.split(":");
-                    if (exclusionParts.length != 2) {
-                        throw new IllegalStateException("Expected an exclusion in the form of groupId:artifactId but was '" + exclusion + "'");
-                    }
-                    exclusionContent.append("<groupId>").append(exclusionParts[0]).append("</groupId>\n")
-                            .append("<artifactId>").append(exclusionParts[1]).append("</artifactId>\n")
-                            .append("</exclusion>\n");
-                    return exclusionContent.toString();
-                }).collect(Collectors.joining());
             }
 
             private boolean isPathMatch(Xml.Tag path) {

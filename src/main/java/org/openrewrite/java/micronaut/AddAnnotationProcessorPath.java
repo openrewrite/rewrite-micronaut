@@ -28,7 +28,6 @@ import org.openrewrite.xml.XPathMatcher;
 import org.openrewrite.xml.tree.Xml;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
@@ -166,18 +165,9 @@ public class AddAnnotationProcessorPath extends ScanningRecipe<AddAnnotationProc
                 return "";
             }
             return "<exclusions>\n" +
-                    exclusions.stream().map(exclusion -> {
-                        StringBuilder exclusionContent = new StringBuilder("<exclusion>\n");
-                        String[] exclusionParts = exclusion.split(":");
-                        if (exclusionParts.length != 2) {
-                            throw new IllegalStateException("Expected an exclusion in the form of groupId:artifactId but was '" + exclusion + "'");
-                        }
-                        exclusionContent.append("<groupId>").append(exclusionParts[0]).append("</groupId>\n")
-                                .append("<artifactId>").append(exclusionParts[1]).append("</artifactId>\n")
-                                .append("</exclusion>\n");
-                        return exclusionContent.toString();
-                    }).collect(Collectors.joining()) +
+                    MavenExclusions.buildContent(exclusions) +
                     "</exclusions>";
         }
     }
+
 }
