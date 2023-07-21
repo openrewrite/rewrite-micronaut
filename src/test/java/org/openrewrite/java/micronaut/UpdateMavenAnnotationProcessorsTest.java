@@ -195,7 +195,7 @@ public class UpdateMavenAnnotationProcessorsTest extends Micronaut4RewriteTest {
     }
 
     @Test
-    void updateCoreMavenAnnotationProcessorsAndDontModifyModuleProcessors() {
+    void updateCoreMavenAnnotationProcessorsAndAddExclusionToModuleProcessors() {
         rewriteRun(
           //language=xml
           pomXml("""
@@ -318,6 +318,12 @@ public class UpdateMavenAnnotationProcessorsTest extends Micronaut4RewriteTest {
                                         <groupId>io.micronaut.data</groupId>
                                         <artifactId>micronaut-data-processor</artifactId>
                                         <version>${micronaut.data.version}</version>
+                                        <exclusions>
+                                            <exclusion>
+                                                <groupId>io.micronaut</groupId>
+                                                <artifactId>micronaut-inject</artifactId>
+                                            </exclusion>
+                                        </exclusions>
                                     </path>
                                     <path>
                                         <groupId>io.micronaut</groupId>
