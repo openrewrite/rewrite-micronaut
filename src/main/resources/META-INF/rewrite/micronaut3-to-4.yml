@@ -384,12 +384,12 @@ recipeList:
   - org.openrewrite.java.micronaut.ChangeAnnotationProcessorPath:
       oldGroupId: io.micronaut
       oldArtifactId: micronaut-inject-java
-      newVersion: ${micronaut.core.version}
+      newVersion: micronaut.core.version
   - org.openrewrite.java.micronaut.ChangeAnnotationProcessorPath:
       oldGroupId: io.micronaut
       oldArtifactId: micronaut-http-validation
-      newVersion: ${micronaut.core.version}
+      newVersion: micronaut.core.version
   - org.openrewrite.java.micronaut.ChangeAnnotationProcessorPath:
       oldGroupId: io.micronaut
       oldArtifactId: micronaut-graal
-      newVersion: ${micronaut.core.version}
+      newVersion: micronaut.core.version
