@@ -95,11 +95,7 @@ public class ChangeAnnotationProcessorPath extends Recipe {
 
         return new MavenVisitor<ExecutionContext>() {
 
-            final DependencyMatcher depMatcher;
-
-            {
-                this.depMatcher = Objects.requireNonNull(DependencyMatcher.build(ChangeAnnotationProcessorPath.this.oldGroupId + ":" + ChangeAnnotationProcessorPath.this.oldArtifactId).getValue());
-            }
+            final DependencyMatcher depMatcher = Objects.requireNonNull(DependencyMatcher.build(ChangeAnnotationProcessorPath.this.oldGroupId + ":" + ChangeAnnotationProcessorPath.this.oldArtifactId).getValue());
 
             @Override
             public Xml visitTag(Xml.Tag tag, ExecutionContext ctx) {
