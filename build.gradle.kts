@@ -21,6 +21,7 @@ dependencies {
     implementation("org.openrewrite:rewrite-gradle")
     implementation("org.openrewrite:rewrite-properties")
     implementation("org.openrewrite:rewrite-yaml")
+    implementation("org.openrewrite.recipe:rewrite-github-actions:${rewriteVersion}")
     implementation("org.openrewrite.recipe:rewrite-migrate-java:${rewriteVersion}")
     implementation("org.openrewrite.recipe:rewrite-java-dependencies:${rewriteVersion}")
 
