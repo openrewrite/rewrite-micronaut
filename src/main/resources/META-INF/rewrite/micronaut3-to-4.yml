@@ -393,3 +393,8 @@ recipeList:
       oldGroupId: io.micronaut
       oldArtifactId: micronaut-graal
       newVersion: micronaut.core.version
+  - org.openrewrite.java.micronaut.ChangeAnnotationProcessorPath:
+      oldGroupId: io.micronaut.*
+      oldArtifactId: micronaut-*
+      exclusions:
+        - io.micronaut:micronaut-inject

@@ -25,11 +25,13 @@ import org.openrewrite.internal.StringUtils;
 import org.openrewrite.internal.lang.NonNull;
 import org.openrewrite.internal.lang.Nullable;
 import org.openrewrite.maven.MavenVisitor;
+import org.openrewrite.semver.DependencyMatcher;
 import org.openrewrite.xml.AddOrUpdateChild;
 import org.openrewrite.xml.ChangeTagValueVisitor;
 import org.openrewrite.xml.tree.Xml;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -90,7 +92,10 @@ public class ChangeAnnotationProcessorPath extends Recipe {
 
     @Override
     public TreeVisitor<?, ExecutionContext> getVisitor() {
+
         return new MavenVisitor<ExecutionContext>() {
+
+            final DependencyMatcher depMatcher = Objects.requireNonNull(DependencyMatcher.build(ChangeAnnotationProcessorPath.this.oldGroupId + ":" + ChangeAnnotationProcessorPath.this.oldArtifactId).getValue());
 
             @Override
             public Xml visitTag(Xml.Tag tag, ExecutionContext ctx) {
@@ -151,8 +156,8 @@ public class ChangeAnnotationProcessorPath extends Recipe {
             }
 
             private boolean isPathMatch(Xml.Tag path) {
-                return oldGroupId.equals(path.getChildValue("groupId").orElse(null)) &&
-                        oldArtifactId.equals(path.getChildValue("artifactId").orElse(null));
+                return this.depMatcher.matches(path.getChildValue("groupId").orElse(""),
+                        path.getChildValue("artifactId").orElse(""));
             }
 
             private Xml.Tag changeChildTagValue(Xml.Tag tag, String childTagName, String newValue, ExecutionContext ctx) {
