@@ -21,6 +21,8 @@ import org.openrewrite.ExecutionContext;
 import org.openrewrite.Option;
 import org.openrewrite.Recipe;
 import org.openrewrite.TreeVisitor;
+import org.openrewrite.internal.StringUtils;
+import org.openrewrite.internal.lang.NonNull;
 import org.openrewrite.internal.lang.Nullable;
 import org.openrewrite.maven.MavenVisitor;
 import org.openrewrite.xml.AddOrUpdateChild;
@@ -29,6 +31,7 @@ import org.openrewrite.xml.tree.Xml;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.openrewrite.xml.FilterTagChildrenVisitor.filterTagChildren;
 import static org.openrewrite.xml.MapTagChildrenVisitor.mapTagChildren;
@@ -130,7 +133,7 @@ public class ChangeAnnotationProcessorPath extends Recipe {
                         if (exclusions == null) {
                             path = filterTagChildren(path, child -> !("exclusions".equals(child.getName())));
                         } else {
-                            path = addExclusionsToPath(path, ctx);
+                            maybeAddExclusionsToPath(path, exclusions.stream().filter(s -> !StringUtils.isBlank(s)).collect(Collectors.toList()));
                         }
                         childTag = path;
                     }
@@ -138,10 +141,13 @@ public class ChangeAnnotationProcessorPath extends Recipe {
                 });
             }
 
-            private Xml.Tag addExclusionsToPath(Xml.Tag path, ExecutionContext ctx) {
-                Xml.Tag exclusionsTag = Xml.Tag.build("\n<exclusions>\n" + MavenExclusions.buildContent(exclusions) + "</exclusions>");
-                doAfterVisit(new AddOrUpdateChild<>(path, exclusionsTag));
-                return path;
+            private void maybeAddExclusionsToPath(@NonNull Xml.Tag path, @NonNull List<String> exclusionsToAdd) {
+                if (!exclusionsToAdd.isEmpty()) {
+                    Xml.Tag exclusionsTag = Xml.Tag.build("\n<exclusions>\n" +
+                            MavenExclusions.buildContent(exclusionsToAdd) +
+                            "</exclusions>");
+                    doAfterVisit(new AddOrUpdateChild<>(path, exclusionsTag));
+                }
             }
 
             private boolean isPathMatch(Xml.Tag path) {
