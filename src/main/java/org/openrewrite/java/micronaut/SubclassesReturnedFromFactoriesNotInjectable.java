@@ -29,6 +29,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.Collections.emptyList;
+
 public class SubclassesReturnedFromFactoriesNotInjectable extends Recipe {
     private static final AnnotationMatcher FACTORY_ANNOTATION_MATCHER = new AnnotationMatcher("@io.micronaut.context.annotation.Factory");
 
@@ -100,7 +102,7 @@ public class SubclassesReturnedFromFactoriesNotInjectable extends Recipe {
                 JavaType.FullyQualified methodReturnType = md.getReturnTypeExpression() != null ? TypeUtils.asFullyQualified(md.getReturnTypeExpression().getType()) : null;
                 JavaType.FullyQualified returnedTypeFqn = TypeUtils.asFullyQualified(returnedType);
                 if (returnedTypeFqn != null && methodReturnType != null && !TypeUtils.isOfType(methodReturnType, returnedType)) {
-                    J.Identifier resolvedReturnType = new J.Identifier(UUID.randomUUID(), Space.EMPTY, Markers.EMPTY, returnedTypeFqn.getClassName(), returnedType, null);
+                    J.Identifier resolvedReturnType = new J.Identifier(UUID.randomUUID(), Space.EMPTY, Markers.EMPTY, emptyList(), returnedTypeFqn.getClassName(), returnedType, null);
                     if (returnedType instanceof JavaType.Parameterized && md.getReturnTypeExpression() instanceof J.ParameterizedType) {
                         J.ParameterizedType mdReturnTypeExpression = (J.ParameterizedType) md.getReturnTypeExpression();
                         mdReturnTypeExpression = mdReturnTypeExpression.withClazz(resolvedReturnType);
