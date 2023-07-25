@@ -28,6 +28,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static java.util.Collections.emptyList;
+
 public class AddHttpRequestTypeParameter extends Recipe {
 
     private static final String IO_MICRONAUT_HTTP_HTTP_REQUEST = "io.micronaut.http.HttpRequest";
@@ -65,10 +67,10 @@ public class AddHttpRequestTypeParameter extends Recipe {
                     JavaType.FullyQualified fqInterfaceType = (JavaType.FullyQualified) interfaceType.getType();
                     if (fqInterfaceType != null && isCandidateInterface(fqInterfaceType)) {
                         JavaType httpRequestType = JavaType.buildType(IO_MICRONAUT_HTTP_HTTP_REQUEST);
-                        J.Identifier httpRequestIdentifier = new J.Identifier(Tree.randomId(), Space.EMPTY, Markers.EMPTY, "HttpRequest", httpRequestType, null);
+                        J.Identifier httpRequestIdentifier = new J.Identifier(Tree.randomId(), Space.EMPTY, Markers.EMPTY, emptyList(), "HttpRequest", httpRequestType, null);
                         J.ParameterizedType httpRequestParameterized = new J.ParameterizedType(Tree.randomId(), Space.EMPTY, Markers.EMPTY, httpRequestIdentifier,
                                 JContainer.build(Collections.singletonList(JRightPadded.build(new J.Wildcard(Tree.randomId(), Space.EMPTY, Markers.EMPTY, null, null)))), httpRequestType);
-                        NameTree nameTree = new J.Identifier(Tree.randomId(), Space.EMPTY, Markers.EMPTY, fqInterfaceType.getClassName(), null, null);
+                        NameTree nameTree = new J.Identifier(Tree.randomId(), Space.EMPTY, Markers.EMPTY, emptyList(), fqInterfaceType.getClassName(), null, null);
                         return new J.ParameterizedType(Tree.randomId(), interfaceType.getPrefix(), Markers.EMPTY, nameTree,
                                 JContainer.build(Collections.singletonList(JRightPadded.build(httpRequestParameterized))), fqInterfaceType);
                     }
