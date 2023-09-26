@@ -35,7 +35,7 @@ public class AddMicronautWebsocketDependencyIfNeededTest extends Micronaut4Rewri
         spec.recipes(Environment.builder()
           .scanRuntimeClasspath("org.openrewrite.java.micronaut")
           .build()
-          .activateRecipes( "org.openrewrite.java.micronaut.AddMicronautWebsocketDependencyIfNeeded"));
+          .activateRecipes("org.openrewrite.java.micronaut.AddMicronautWebsocketDependencyIfNeeded"));
     }
 
     @Language("java")

@@ -33,7 +33,7 @@ public class UpdateMicronautSecurityTest implements RewriteTest {
         spec.recipes(Environment.builder()
           .scanRuntimeClasspath("org.openrewrite.java.micronaut")
           .build()
-          .activateRecipes( "org.openrewrite.java.micronaut.UpdateMicronautSecurity"));
+          .activateRecipes("org.openrewrite.java.micronaut.UpdateMicronautSecurity"));
     }
 
     @Language("properties")

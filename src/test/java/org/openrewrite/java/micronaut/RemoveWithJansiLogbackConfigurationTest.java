@@ -31,7 +31,7 @@ public class RemoveWithJansiLogbackConfigurationTest implements RewriteTest {
         spec.recipes(Environment.builder()
           .scanRuntimeClasspath("org.openrewrite.java.micronaut")
           .build()
-          .activateRecipes( "org.openrewrite.java.micronaut.RemoveWithJansiLogbackConfiguration"));
+          .activateRecipes("org.openrewrite.java.micronaut.RemoveWithJansiLogbackConfiguration"));
     }
 
     @Test

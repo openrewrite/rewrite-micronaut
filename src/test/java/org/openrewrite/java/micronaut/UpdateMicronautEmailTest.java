@@ -33,7 +33,7 @@ public class UpdateMicronautEmailTest implements RewriteTest {
         spec.recipes(Environment.builder()
           .scanRuntimeClasspath("org.openrewrite.java.micronaut")
           .build()
-          .activateRecipes( "org.openrewrite.java.micronaut.UpdateMicronautEmail"));
+          .activateRecipes("org.openrewrite.java.micronaut.UpdateMicronautEmail"));
     }
 
     @Language("java")

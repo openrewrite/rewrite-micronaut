@@ -35,7 +35,7 @@ public class AddMicronautRetryDependencyIfNeededTest extends Micronaut4RewriteTe
         spec.recipes(Environment.builder()
           .scanRuntimeClasspath("org.openrewrite.java.micronaut")
           .build()
-          .activateRecipes( "org.openrewrite.java.micronaut.AddMicronautRetryDependencyIfNeeded"));
+          .activateRecipes("org.openrewrite.java.micronaut.AddMicronautRetryDependencyIfNeeded"));
 
     }
 

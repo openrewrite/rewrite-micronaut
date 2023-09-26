@@ -31,7 +31,7 @@ public class RemoveUnnecessaryDependenciesTest extends Micronaut4RewriteTest {
         spec.recipes(Environment.builder()
           .scanRuntimeClasspath("org.openrewrite.java.micronaut")
           .build()
-          .activateRecipes( "org.openrewrite.java.micronaut.RemoveUnnecessaryDependencies"));
+          .activateRecipes("org.openrewrite.java.micronaut.RemoveUnnecessaryDependencies"));
     }
 
     @Test

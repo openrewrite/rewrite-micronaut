@@ -32,7 +32,7 @@ public class UpdateBuildToMicronaut4VersionTest extends Micronaut4RewriteTest {
         spec.recipes(Environment.builder()
           .scanRuntimeClasspath("org.openrewrite.java.micronaut")
           .build()
-          .activateRecipes( "org.openrewrite.java.micronaut.UpdateBuildToMicronaut4Version"));
+          .activateRecipes("org.openrewrite.java.micronaut.UpdateBuildToMicronaut4Version"));
     }
 
     @Test
