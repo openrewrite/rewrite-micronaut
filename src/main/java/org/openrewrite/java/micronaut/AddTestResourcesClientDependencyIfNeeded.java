@@ -65,7 +65,7 @@ public class AddTestResourcesClientDependencyIfNeeded extends ScanningRecipe<Add
             @Override
             public Xml.Document visitDocument(Xml.Document document, ExecutionContext executionContext) {
                 Xml.Document maven = super.visitDocument(document, executionContext);
-                Optional<Xml.Tag> testResourcesProp = FindProperties.find(document, "micronaut.test.resources.enabled").stream().findFirst();
+                Optional<Xml.Tag> testResourcesProp = FindProperties.find(document, "micronaut\\.test\\.resources\\.enabled").stream().findFirst();
                 if ("true".equals(testResourcesProp.flatMap(Xml.Tag::getValue).orElse("false"))) {
                     acc.isTestResourcesEnabled = true;
                 }
