@@ -185,7 +185,7 @@ class TypeRequiresIntrospectionTest implements RewriteTest {
                   @Client
                   public interface AbcClient {
                       @Get
-                      Optional<C> getC(long cId);
+                      Optional<String> getC(long cId);
                   }
               """
           )

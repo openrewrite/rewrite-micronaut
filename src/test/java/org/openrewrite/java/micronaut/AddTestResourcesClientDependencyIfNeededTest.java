@@ -29,7 +29,7 @@ public class AddTestResourcesClientDependencyIfNeededTest extends Micronaut4Rewr
     @Override
     public void defaults(RecipeSpec spec) {
         spec.parser(JavaParser.fromJavaVersion().classpathFromResources(new InMemoryExecutionContext(),
-            "micronaut-context-4.*"))
+            "micronaut-context-4.*", "micronaut-inject-4.*"))
           .recipe(new AddTestResourcesClientDependencyIfNeeded());
     }
 

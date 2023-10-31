@@ -55,6 +55,7 @@ recipeDependencies {
     parserClasspath("io.micronaut:micronaut-context:4.0.0")
     parserClasspath("io.micronaut:micronaut-websocket:4.0.0")
     parserClasspath("io.micronaut:micronaut-http:4.0.0")
+    parserClasspath("io.micronaut:micronaut-inject:4.0.0")
     parserClasspath("io.micronaut.validation:micronaut-validation:4.0.0")
     parserClasspath("io.micronaut:micronaut-retry:4.0.0")
     parserClasspath("io.micronaut.email:micronaut-email:2.0.0")
