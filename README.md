@@ -11,3 +11,7 @@
 This project implements a [Rewrite module](https://github.com/openrewrite/rewrite) that applies best practices and migrations for those projects using the [Micronaut framework](https://micronaut.io/).
 
 Browse [a selection of recipes available through this module in the recipe catalog](https://docs.openrewrite.org/recipes/java/micronaut).
+
+## Contributing
+
+We appreciate all types of contributions. See the [contributing guide](https://github.com/openrewrite/.github/blob/main/CONTRIBUTING.md) for detailed instructions on how to get started.
