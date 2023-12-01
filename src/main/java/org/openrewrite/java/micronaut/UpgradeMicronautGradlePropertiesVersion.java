@@ -58,7 +58,7 @@ public class UpgradeMicronautGradlePropertiesVersion extends Recipe {
 
     @Override
     public TreeVisitor<?, ExecutionContext> getVisitor() {
-        return Preconditions.check(new HasSourcePath<>(FILE_MATCHER), new ChangePropertyValueVisitor(newVersion));
+        return Preconditions.check(new HasSourcePath(FILE_MATCHER), new ChangePropertyValueVisitor(newVersion));
     }
 
     private static class ChangePropertyValueVisitor extends PropertiesVisitor<ExecutionContext> {

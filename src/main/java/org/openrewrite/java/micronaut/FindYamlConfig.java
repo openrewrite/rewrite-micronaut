@@ -34,6 +34,6 @@ public class FindYamlConfig extends Recipe {
 
     @Override
     public TreeVisitor<?, ExecutionContext> getVisitor() {
-        return new HasSourcePath<>("**/{application,application-*,bootstrap,bootstrap-*}.{yml,yaml}");
+        return new HasSourcePath("**/{application,application-*,bootstrap,bootstrap-*}.{yml,yaml}");
     }
 }
