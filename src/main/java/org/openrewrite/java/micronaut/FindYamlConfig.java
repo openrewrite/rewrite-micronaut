@@ -15,10 +15,7 @@
  */
 package org.openrewrite.java.micronaut;
 
-import org.openrewrite.ExecutionContext;
-import org.openrewrite.FindSourceFiles;
-import org.openrewrite.Recipe;
-import org.openrewrite.TreeVisitor;
+import org.openrewrite.*;
 
 public class FindYamlConfig extends Recipe {
 
@@ -34,6 +31,14 @@ public class FindYamlConfig extends Recipe {
 
     @Override
     public TreeVisitor<?, ExecutionContext> getVisitor() {
-        return new FindSourceFiles("**/{application,application-*,bootstrap,bootstrap-*}.{yml,yaml}").getVisitor();
+        return Preconditions.or(
+                new FindSourceFiles("**/application.yml").getVisitor(),
+                new FindSourceFiles("**/application-*.yml").getVisitor(),
+                new FindSourceFiles("**/bootstrap.yml").getVisitor(),
+                new FindSourceFiles("**/bootstrap-*.yml").getVisitor(),
+                new FindSourceFiles("**/application.yaml").getVisitor(),
+                new FindSourceFiles("**/application-*.yaml").getVisitor(),
+                new FindSourceFiles("**/bootstrap.yaml").getVisitor(),
+                new FindSourceFiles("**/bootstrap-*.yaml").getVisitor());
     }
 }
