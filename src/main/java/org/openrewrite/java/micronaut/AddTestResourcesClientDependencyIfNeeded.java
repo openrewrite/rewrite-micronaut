@@ -31,7 +31,7 @@ public class AddTestResourcesClientDependencyIfNeeded extends ScanningRecipe<Add
     private final List<Recipe> recipeList = new ArrayList<>();
 
     static class Scanned {
-        boolean isTestResourcesEnabled = false;
+        boolean isTestResourcesEnabled;
     }
 
     public AddTestResourcesClientDependencyIfNeeded() {

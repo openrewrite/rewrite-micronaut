@@ -48,7 +48,7 @@ public final class MicronautVersionHelper {
         VersionComparator versionComparator = Semver.validate(versionPattern, null).getValue();
         assert versionComparator != null;
 
-        String groupId = Semver.majorVersion(versionPattern).equals("4") ? V4_GROUP_ID : GROUP_ID;
+        String groupId = "4".equals(Semver.majorVersion(versionPattern)) ? V4_GROUP_ID : GROUP_ID;
 
         MavenMetadata mavenMetadata = new MavenPomDownloader(emptyMap(), ctx)
                 .downloadMetadata(new GroupArtifact(groupId, ARTIFACT_ID), null, emptyList());

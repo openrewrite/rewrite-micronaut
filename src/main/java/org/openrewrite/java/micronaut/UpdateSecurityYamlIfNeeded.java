@@ -42,7 +42,7 @@ public class UpdateSecurityYamlIfNeeded extends Recipe {
             "bearer:\n" +
             "  enabled:";
 
-    private final String TOKEN_PATH = "$.micronaut.security.token";
+    private static final String TOKEN_PATH = "$.micronaut.security.token";
 
     @Override
     public String getDisplayName() {

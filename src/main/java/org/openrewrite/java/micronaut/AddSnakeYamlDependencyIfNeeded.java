@@ -29,7 +29,7 @@ public class AddSnakeYamlDependencyIfNeeded extends ScanningRecipe<AddSnakeYamlD
     private final List<Recipe> recipeList = new ArrayList<>();
 
     static class YamlAccumulator {
-        boolean usingYamlConfig = false;
+        boolean usingYamlConfig;
     }
 
     public AddSnakeYamlDependencyIfNeeded() {

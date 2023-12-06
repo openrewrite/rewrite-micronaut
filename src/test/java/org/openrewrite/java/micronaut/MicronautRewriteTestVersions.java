@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.openrewrite.InMemoryExecutionContext;
 import org.openrewrite.maven.MavenDownloadingException;
 
-public class MicronautRewriteTestVersions {
+public final class MicronautRewriteTestVersions {
     private static final String MN_2_VERSION;
     private static final String MN_3_VERSION;
     private static final String MN_4_VERSION;
