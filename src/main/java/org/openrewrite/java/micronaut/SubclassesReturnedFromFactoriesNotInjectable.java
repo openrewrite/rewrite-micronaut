@@ -105,6 +105,9 @@ public class SubclassesReturnedFromFactoriesNotInjectable extends Recipe {
                     J.Identifier resolvedReturnType = new J.Identifier(UUID.randomUUID(), Space.EMPTY, Markers.EMPTY, emptyList(), returnedTypeFqn.getClassName(), returnedType, null);
                     if (returnedType instanceof JavaType.Parameterized && md.getReturnTypeExpression() instanceof J.ParameterizedType) {
                         J.ParameterizedType mdReturnTypeExpression = (J.ParameterizedType) md.getReturnTypeExpression();
+                        if (resolvedReturnType.getType() instanceof JavaType.Parameterized) {
+                            resolvedReturnType = resolvedReturnType.withType(((JavaType.Parameterized) resolvedReturnType.getType()).getType());
+                        }
                         mdReturnTypeExpression = mdReturnTypeExpression.withClazz(resolvedReturnType);
                         md = maybeAutoFormat(md, md.withReturnTypeExpression(mdReturnTypeExpression), md.getName(), executionContext, getCursor().getParent());
                     } else {
