@@ -29,16 +29,17 @@ class UpgradeMicronautMavenPropertyVersionTest implements RewriteTest {
         String latestMicronautVersion = MicronautRewriteTestVersions.getLatestMN2Version();
 
         rewriteRun(spec -> spec.recipe(new UpgradeMicronautMavenPropertyVersion("2.x")),
-          pomXml("""
-                  <project>
-                      <modelVersion>4.0.0</modelVersion>
-                      <groupId>com.mycompany.app</groupId>
-                      <artifactId>my-app</artifactId>
-                      <version>1</version>
-                      <properties>
-                          <micronaut.version>2.0.3</micronaut.version>
-                      </properties>
-                  </project>
+          pomXml(
+                """
+              <project>
+                  <modelVersion>4.0.0</modelVersion>
+                  <groupId>com.mycompany.app</groupId>
+                  <artifactId>my-app</artifactId>
+                  <version>1</version>
+                  <properties>
+                      <micronaut.version>2.0.3</micronaut.version>
+                  </properties>
+              </project>
               """,
                   """
                   <project>
@@ -59,16 +60,17 @@ class UpgradeMicronautMavenPropertyVersionTest implements RewriteTest {
         String latestMicronautVersion = MicronautRewriteTestVersions.getLatestMN3Version();
 
         rewriteRun(spec -> spec.recipe(new UpgradeMicronautMavenPropertyVersion("3.x")),
-          pomXml("""
-                  <project>
-                      <modelVersion>4.0.0</modelVersion>
-                      <groupId>com.mycompany.app</groupId>
-                      <artifactId>my-app</artifactId>
-                      <version>1</version>
-                      <properties>
-                          <micronaut.version>2.0.3</micronaut.version>
-                      </properties>
-                  </project>
+          pomXml(
+                """
+              <project>
+                  <modelVersion>4.0.0</modelVersion>
+                  <groupId>com.mycompany.app</groupId>
+                  <artifactId>my-app</artifactId>
+                  <version>1</version>
+                  <properties>
+                      <micronaut.version>2.0.3</micronaut.version>
+                  </properties>
+              </project>
               """,
                   """
                   <project>
@@ -90,16 +92,17 @@ class UpgradeMicronautMavenPropertyVersionTest implements RewriteTest {
 
         rewriteRun(
           spec -> spec.recipe(new UpgradeMicronautMavenPropertyVersion("4.x")),
-          pomXml("""
-                  <project>
-                      <modelVersion>4.0.0</modelVersion>
-                      <groupId>com.mycompany.app</groupId>
-                      <artifactId>my-app</artifactId>
-                      <version>1</version>
-                      <properties>
-                          <micronaut.version>3.9.1</micronaut.version>
-                      </properties>
-                  </project>
+          pomXml(
+                """
+              <project>
+                  <modelVersion>4.0.0</modelVersion>
+                  <groupId>com.mycompany.app</groupId>
+                  <artifactId>my-app</artifactId>
+                  <version>1</version>
+                  <properties>
+                      <micronaut.version>3.9.1</micronaut.version>
+                  </properties>
+              </project>
               """,
                   """
                   <project>

@@ -46,29 +46,29 @@ class FixDeprecatedExceptionHandlerConstructorsTest implements RewriteTest {
           spec -> spec.typeValidationOptions(TypeValidation.none()),
           java(
             """
-                  package abc;
-                  
-                  import io.micronaut.validation.exceptions.ConstraintExceptionHandler;
-                  
-                  public class ApiClientValidationExceptionHandler extends ConstraintExceptionHandler {
-                      private void someMethod(){}
-                  }
+              package abc;
+              
+              import io.micronaut.validation.exceptions.ConstraintExceptionHandler;
+              
+              public class ApiClientValidationExceptionHandler extends ConstraintExceptionHandler {
+                  private void someMethod(){}
+              }
               """,
             """
-                  package abc;
-                  
-                  import io.micronaut.http.server.exceptions.response.ErrorResponseProcessor;
-                  import io.micronaut.validation.exceptions.ConstraintExceptionHandler;
-                  import jakarta.inject.Inject;
-                  
-                  public class ApiClientValidationExceptionHandler extends ConstraintExceptionHandler {
-                  
-                      @Inject
-                      public ApiClientValidationExceptionHandler(ErrorResponseProcessor errorResponseProcessor) {
-                          super(errorResponseProcessor);
-                      }
-                      private void someMethod(){}
+              package abc;
+              
+              import io.micronaut.http.server.exceptions.response.ErrorResponseProcessor;
+              import io.micronaut.validation.exceptions.ConstraintExceptionHandler;
+              import jakarta.inject.Inject;
+              
+              public class ApiClientValidationExceptionHandler extends ConstraintExceptionHandler {
+              
+                  @Inject
+                  public ApiClientValidationExceptionHandler(ErrorResponseProcessor errorResponseProcessor) {
+                      super(errorResponseProcessor);
                   }
+                  private void someMethod(){}
+              }
               """)
         );
     }
@@ -79,30 +79,30 @@ class FixDeprecatedExceptionHandlerConstructorsTest implements RewriteTest {
           spec -> spec.typeValidationOptions(TypeValidation.none()),
           java(
             """
-                  package abc;
-                  
-                  import io.micronaut.validation.exceptions.ConstraintExceptionHandler;
-                  
-                  public class ApiClientValidationExceptionHandler extends ConstraintExceptionHandler {
-                  
-                      public ApiClientValidationExceptionHandler() {
-                      }
+              package abc;
+              
+              import io.micronaut.validation.exceptions.ConstraintExceptionHandler;
+              
+              public class ApiClientValidationExceptionHandler extends ConstraintExceptionHandler {
+              
+                  public ApiClientValidationExceptionHandler() {
                   }
+              }
               """,
             """
-                  package abc;
-                  
-                  import io.micronaut.http.server.exceptions.response.ErrorResponseProcessor;
-                  import io.micronaut.validation.exceptions.ConstraintExceptionHandler;
-                  import jakarta.inject.Inject;
-                  
-                  public class ApiClientValidationExceptionHandler extends ConstraintExceptionHandler {
-                  
-                      @Inject
-                      public ApiClientValidationExceptionHandler(ErrorResponseProcessor errorResponseProcessor) {
-                          super(errorResponseProcessor);
-                      }
+              package abc;
+              
+              import io.micronaut.http.server.exceptions.response.ErrorResponseProcessor;
+              import io.micronaut.validation.exceptions.ConstraintExceptionHandler;
+              import jakarta.inject.Inject;
+              
+              public class ApiClientValidationExceptionHandler extends ConstraintExceptionHandler {
+              
+                  @Inject
+                  public ApiClientValidationExceptionHandler(ErrorResponseProcessor errorResponseProcessor) {
+                      super(errorResponseProcessor);
                   }
+              }
               """
           )
         );
@@ -112,31 +112,31 @@ class FixDeprecatedExceptionHandlerConstructorsTest implements RewriteTest {
     void updatesErrorProcessorConstructor() {
         rewriteRun(java(
             """
-                  package abc;
-                  
-                  import io.micronaut.http.server.exceptions.ConversionErrorHandler;
-                  
-                  public class ApiClientValidationExceptionHandler extends ConversionErrorHandler {
-                  
-                      public ApiClientValidationExceptionHandler() {
-                          super();
-                      }
+              package abc;
+              
+              import io.micronaut.http.server.exceptions.ConversionErrorHandler;
+              
+              public class ApiClientValidationExceptionHandler extends ConversionErrorHandler {
+              
+                  public ApiClientValidationExceptionHandler() {
+                      super();
                   }
+              }
               """,
             """
-                  package abc;
-                  
-                  import io.micronaut.http.server.exceptions.ConversionErrorHandler;
-                  import io.micronaut.http.server.exceptions.response.ErrorResponseProcessor;
-                  import jakarta.inject.Inject;
-                  
-                  public class ApiClientValidationExceptionHandler extends ConversionErrorHandler {
-                  
-                      @Inject
-                      public ApiClientValidationExceptionHandler(ErrorResponseProcessor errorResponseProcessor) {
-                          super(errorResponseProcessor);
-                      }
+              package abc;
+              
+              import io.micronaut.http.server.exceptions.ConversionErrorHandler;
+              import io.micronaut.http.server.exceptions.response.ErrorResponseProcessor;
+              import jakarta.inject.Inject;
+              
+              public class ApiClientValidationExceptionHandler extends ConversionErrorHandler {
+              
+                  @Inject
+                  public ApiClientValidationExceptionHandler(ErrorResponseProcessor errorResponseProcessor) {
+                      super(errorResponseProcessor);
                   }
+              }
               """
           )
         );
@@ -148,34 +148,34 @@ class FixDeprecatedExceptionHandlerConstructorsTest implements RewriteTest {
           spec -> spec.typeValidationOptions(TypeValidation.none()),
           java(
             """
-                  package abc;
-                  import io.micronaut.validation.exceptions.ConstraintExceptionHandler;
-                  import jakarta.inject.Inject;
+              package abc;
+              import io.micronaut.validation.exceptions.ConstraintExceptionHandler;
+              import jakarta.inject.Inject;
+              
+              public class ApiClientValidationExceptionHandler extends ConstraintExceptionHandler {
+                  private final String conversionService;
                   
-                  public class ApiClientValidationExceptionHandler extends ConstraintExceptionHandler {
-                      private final String conversionService;
-                      
-                      @Inject
-                      public ApiClientValidationExceptionHandler(String conversionService) {
-                          this.conversionService = conversionService;
-                      }
+                  @Inject
+                  public ApiClientValidationExceptionHandler(String conversionService) {
+                      this.conversionService = conversionService;
                   }
+              }
               """,
             """
-                  package abc;
-                  import io.micronaut.http.server.exceptions.response.ErrorResponseProcessor;
-                  import io.micronaut.validation.exceptions.ConstraintExceptionHandler;
-                  import jakarta.inject.Inject;
-                  
-                  public class ApiClientValidationExceptionHandler extends ConstraintExceptionHandler {
-                      private final String conversionService;
-                  
-                      @Inject
-                      public ApiClientValidationExceptionHandler(String conversionService, ErrorResponseProcessor errorResponseProcessor) {
-                          super(errorResponseProcessor);
-                          this.conversionService = conversionService;
-                      }
+              package abc;
+              import io.micronaut.http.server.exceptions.response.ErrorResponseProcessor;
+              import io.micronaut.validation.exceptions.ConstraintExceptionHandler;
+              import jakarta.inject.Inject;
+              
+              public class ApiClientValidationExceptionHandler extends ConstraintExceptionHandler {
+                  private final String conversionService;
+              
+                  @Inject
+                  public ApiClientValidationExceptionHandler(String conversionService, ErrorResponseProcessor errorResponseProcessor) {
+                      super(errorResponseProcessor);
+                      this.conversionService = conversionService;
                   }
+              }
               """
 
           )

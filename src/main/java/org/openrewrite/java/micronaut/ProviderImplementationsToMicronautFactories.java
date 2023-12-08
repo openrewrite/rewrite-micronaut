@@ -60,7 +60,7 @@ public class ProviderImplementationsToMicronautFactories extends Recipe {
                 new UsesType<>("jakarta.inject.Provider", false)
         ), new JavaIsoVisitor<ExecutionContext>() {
             @Override
-            public J.CompilationUnit visitCompilationUnit(J.CompilationUnit cu, ExecutionContext executionContext) {
+            public J.CompilationUnit visitCompilationUnit(J.CompilationUnit cu, ExecutionContext ctx) {
                 if (cu.getClasses().stream().anyMatch(cd -> isProvider(cd) && cd.getLeadingAnnotations().stream()
                         .anyMatch(ProviderImplementationsToMicronautFactories::isBeanAnnotation))) {
                     doAfterVisit(new ProviderImplementationsGenerateFactoriesVisitor());
@@ -82,7 +82,7 @@ public class ProviderImplementationsToMicronautFactories extends Recipe {
 
     private static class ProviderImplementationsGenerateFactoriesVisitor extends JavaIsoVisitor<ExecutionContext> {
         @Override
-        public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext executionContext) {
+        public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext ctx) {
             List<J.Annotation> beanAnnotations = classDecl.getLeadingAnnotations().stream()
                     .filter(ProviderImplementationsToMicronautFactories::isBeanAnnotation)
                     .collect(Collectors.toList());
@@ -91,7 +91,7 @@ public class ProviderImplementationsToMicronautFactories extends Recipe {
             }
             getCursor().putMessage("provider-get", new MethodMatcher(classDecl.getType().getFullyQualifiedName() + " get()"));
             getCursor().putMessage("class-bean-annotations", beanAnnotations);
-            J.ClassDeclaration cd = super.visitClassDeclaration(classDecl, executionContext);
+            J.ClassDeclaration cd = super.visitClassDeclaration(classDecl, ctx);
 
             cd = cd.withLeadingAnnotations(ListUtils.map(cd.getLeadingAnnotations(), anno -> {
                 if (isBeanAnnotation(anno)) {
@@ -112,8 +112,8 @@ public class ProviderImplementationsToMicronautFactories extends Recipe {
         }
 
         @Override
-        public J.MethodDeclaration visitMethodDeclaration(J.MethodDeclaration method, ExecutionContext executionContext) {
-            J.MethodDeclaration md = super.visitMethodDeclaration(method, executionContext);
+        public J.MethodDeclaration visitMethodDeclaration(J.MethodDeclaration method, ExecutionContext ctx) {
+            J.MethodDeclaration md = super.visitMethodDeclaration(method, ctx);
             Cursor classDeclCursor = getCursor().dropParentUntil(J.ClassDeclaration.class::isInstance);
             MethodMatcher mm = classDeclCursor.getMessage("provider-get");
             List<J.Annotation> beanAnnotations = classDeclCursor.getMessage("class-bean-annotations");
@@ -121,7 +121,7 @@ public class ProviderImplementationsToMicronautFactories extends Recipe {
                 List<J.Annotation> newBeanAnnotations = beanAnnotations.stream().filter(anno -> !annotationExists(method.getLeadingAnnotations(), anno)).collect(Collectors.toList());
                 if (!newBeanAnnotations.isEmpty()) {
                     //noinspection ConstantConditions
-                    md = maybeAutoFormat(md, md.withLeadingAnnotations(ListUtils.concatAll(md.getLeadingAnnotations(), newBeanAnnotations)), executionContext, getCursor().getParent());
+                    md = maybeAutoFormat(md, md.withLeadingAnnotations(ListUtils.concatAll(md.getLeadingAnnotations(), newBeanAnnotations)), ctx, getCursor().getParent());
                 }
             }
             return md;

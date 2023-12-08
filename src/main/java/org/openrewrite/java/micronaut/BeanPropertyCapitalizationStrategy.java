@@ -47,8 +47,8 @@ public class BeanPropertyCapitalizationStrategy extends Recipe {
         private static final MethodMatcher REQUIRED_BEAN_PROPERTY_METHOD = new MethodMatcher("io.micronaut.core.beans.BeanIntrospection getRequiredProperty(..)");
 
         @Override
-        public J.MethodInvocation visitMethodInvocation(J.MethodInvocation method, ExecutionContext executionContext) {
-            J.MethodInvocation mi = super.visitMethodInvocation(method, executionContext);
+        public J.MethodInvocation visitMethodInvocation(J.MethodInvocation method, ExecutionContext ctx) {
+            J.MethodInvocation mi = super.visitMethodInvocation(method, ctx);
             if ((BEAN_PROPERTY_METHOD.matches(mi) || REQUIRED_BEAN_PROPERTY_METHOD.matches(mi)) && mi.getArguments().get(0) instanceof J.Literal) {
                 J.Literal propertyNameArg = (J.Literal) mi.getArguments().get(0);
                 String sVal = String.valueOf(propertyNameArg.getValue());

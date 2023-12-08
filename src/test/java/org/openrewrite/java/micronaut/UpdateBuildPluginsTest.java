@@ -41,24 +41,25 @@ public class UpdateBuildPluginsTest extends Micronaut4RewriteTest {
     void updateGradleBuildPlugins() {
         rewriteRun(spec -> spec.beforeRecipe(withToolingApi()), properties("micronautVersion=3.9.1", s -> s.path("gradle.properties")),
           //language=groovy
-          buildGradle("""
-                plugins {
-                    id("com.github.johnrengelman.shadow") version "7.1.2"
-                    id("io.micronaut.application") version "3.7.9"
-                    id("io.micronaut.minimal.application") version "3.7.9"
-                    id("io.micronaut.aot") version "3.7.9"
-                    id("io.micronaut.component") version "3.7.9"
-                    id("io.micronaut.crac") version "3.7.9"
-                    id("io.micronaut.docker") version "3.7.9"
-                    id("io.micronaut.graalvm") version "3.7.9"
-                    id("io.micronaut.library") version "3.7.9"
-                    id("io.micronaut.minimal.library") version "3.7.9"
-                    id("io.micronaut.test-resources") version "3.5.1"
-                }
-                
-                repositories {
-                    mavenCentral()
-                }
+          buildGradle(
+                """
+            plugins {
+                id("com.github.johnrengelman.shadow") version "7.1.2"
+                id("io.micronaut.application") version "3.7.9"
+                id("io.micronaut.minimal.application") version "3.7.9"
+                id("io.micronaut.aot") version "3.7.9"
+                id("io.micronaut.component") version "3.7.9"
+                id("io.micronaut.crac") version "3.7.9"
+                id("io.micronaut.docker") version "3.7.9"
+                id("io.micronaut.graalvm") version "3.7.9"
+                id("io.micronaut.library") version "3.7.9"
+                id("io.micronaut.minimal.library") version "3.7.9"
+                id("io.micronaut.test-resources") version "3.5.1"
+            }
+            
+            repositories {
+                mavenCentral()
+            }
             """, """
                 plugins {
                     id("com.github.johnrengelman.shadow") version "8.1.1"

@@ -37,18 +37,18 @@ class SubclassesReturnedFromFactoriesNotInjectableTest implements RewriteTest {
         rewriteRun(
           java(
             """
-                  import java.util.concurrent.ForkJoinPool;
-                  import javax.inject.Singleton;
-                  import io.micronaut.context.annotation.Factory;
-                  
-                  @Factory
-                  public class ExecutorFactory {
-                  
-                      @Singleton
-                      public ForkJoinPool executorService() {
-                          return ForkJoinPool.commonPool();
-                      }
+              import java.util.concurrent.ForkJoinPool;
+              import javax.inject.Singleton;
+              import io.micronaut.context.annotation.Factory;
+              
+              @Factory
+              public class ExecutorFactory {
+              
+                  @Singleton
+                  public ForkJoinPool executorService() {
+                      return ForkJoinPool.commonPool();
                   }
+              }
               """
           )
         );
@@ -59,18 +59,18 @@ class SubclassesReturnedFromFactoriesNotInjectableTest implements RewriteTest {
         rewriteRun(
           java(
             """
-                  import java.util.concurrent.ExecutorService;
-                  import java.util.concurrent.ForkJoinPool;
-                  import javax.inject.Singleton;
-                  import io.micronaut.context.annotation.Factory;
+              import java.util.concurrent.ExecutorService;
+              import java.util.concurrent.ForkJoinPool;
+              import javax.inject.Singleton;
+              import io.micronaut.context.annotation.Factory;
+              
+              public class ExecutorFactory {
                   
-                  public class ExecutorFactory {
-                      
-                      @Singleton
-                      public ExecutorService executorService() {
-                          return ForkJoinPool.commonPool();
-                      }
+                  @Singleton
+                  public ExecutorService executorService() {
+                      return ForkJoinPool.commonPool();
                   }
+              }
               """
           )
         );
@@ -82,33 +82,33 @@ class SubclassesReturnedFromFactoriesNotInjectableTest implements RewriteTest {
         rewriteRun(
           java(
             """
-                  import java.util.concurrent.ForkJoinPool;
-                  import java.util.concurrent.ExecutorService;
-                  import javax.inject.Singleton;
-                  import io.micronaut.context.annotation.Factory;
+              import java.util.concurrent.ForkJoinPool;
+              import java.util.concurrent.ExecutorService;
+              import javax.inject.Singleton;
+              import io.micronaut.context.annotation.Factory;
+              
+              @Factory
+              public class ExecutorFactory {
                   
-                  @Factory
-                  public class ExecutorFactory {
-                      
-                      @Singleton
-                      public ExecutorService executorService() {
-                          return ForkJoinPool.commonPool();
-                      }
+                  @Singleton
+                  public ExecutorService executorService() {
+                      return ForkJoinPool.commonPool();
                   }
+              }
               """,
             """
-                  import java.util.concurrent.ForkJoinPool;
-                  import javax.inject.Singleton;
-                  import io.micronaut.context.annotation.Factory;
-                  
-                  @Factory
-                  public class ExecutorFactory {
-                  
-                      @Singleton
-                      public ForkJoinPool executorService() {
-                          return ForkJoinPool.commonPool();
-                      }
+              import java.util.concurrent.ForkJoinPool;
+              import javax.inject.Singleton;
+              import io.micronaut.context.annotation.Factory;
+              
+              @Factory
+              public class ExecutorFactory {
+              
+                  @Singleton
+                  public ForkJoinPool executorService() {
+                      return ForkJoinPool.commonPool();
                   }
+              }
               """
           )
         );
@@ -119,33 +119,33 @@ class SubclassesReturnedFromFactoriesNotInjectableTest implements RewriteTest {
         rewriteRun(
           java(
             """
-                  import java.util.concurrent.ForkJoinPool;
-                  import java.util.concurrent.ExecutorService;
-                  import jakarta.inject.Singleton;
-                  import io.micronaut.context.annotation.Factory;
-                  
-                  @Factory
-                  public class ExecutorFactory {
-                  
-                      @Singleton
-                      public ExecutorService executorService() {
-                          return ForkJoinPool.commonPool();
-                      }
+              import java.util.concurrent.ForkJoinPool;
+              import java.util.concurrent.ExecutorService;
+              import jakarta.inject.Singleton;
+              import io.micronaut.context.annotation.Factory;
+              
+              @Factory
+              public class ExecutorFactory {
+              
+                  @Singleton
+                  public ExecutorService executorService() {
+                      return ForkJoinPool.commonPool();
                   }
+              }
               """,
             """
-                  import java.util.concurrent.ForkJoinPool;
-                  import jakarta.inject.Singleton;
-                  import io.micronaut.context.annotation.Factory;
-                  
-                  @Factory
-                  public class ExecutorFactory {
-                  
-                      @Singleton
-                      public ForkJoinPool executorService() {
-                          return ForkJoinPool.commonPool();
-                      }
+              import java.util.concurrent.ForkJoinPool;
+              import jakarta.inject.Singleton;
+              import io.micronaut.context.annotation.Factory;
+              
+              @Factory
+              public class ExecutorFactory {
+              
+                  @Singleton
+                  public ForkJoinPool executorService() {
+                      return ForkJoinPool.commonPool();
                   }
+              }
               """
           )
         );
@@ -157,60 +157,60 @@ class SubclassesReturnedFromFactoriesNotInjectableTest implements RewriteTest {
         rewriteRun(
           java(
             """
-                  package abc;
-                  public interface MyInterface {}
+              package abc;
+              public interface MyInterface {}
               """
           ),
           java(
             """
-                  package abc;
-                  public class MyThing implements MyInterface {
-                      private String name;
-                      public MyThing(String name) {
-                          if (name == null) {
-                              throw new IllegalArgumentException();
-                          }
-                          this.name = name;
+              package abc;
+              public class MyThing implements MyInterface {
+                  private String name;
+                  public MyThing(String name) {
+                      if (name == null) {
+                          throw new IllegalArgumentException();
                       }
+                      this.name = name;
                   }
+              }
               """
           ),
           java(
             """
-                  package abc;
-                  import jakarta.inject.Singleton;
-                  import io.micronaut.context.annotation.Factory;
-                  
-                  @Factory
-                  public class ExecutorFactory {
-                  
-                      @Singleton
-                      public MyInterface myInterface() {
-                          try {
-                              return new MyThing("some name");
-                          } catch (Exception ex) {
-                              return null;
-                          }
+              package abc;
+              import jakarta.inject.Singleton;
+              import io.micronaut.context.annotation.Factory;
+              
+              @Factory
+              public class ExecutorFactory {
+              
+                  @Singleton
+                  public MyInterface myInterface() {
+                      try {
+                          return new MyThing("some name");
+                      } catch (Exception ex) {
+                          return null;
                       }
                   }
+              }
               """,
             """
-                  package abc;
-                  import jakarta.inject.Singleton;
-                  import io.micronaut.context.annotation.Factory;
-                  
-                  @Factory
-                  public class ExecutorFactory {
-                  
-                      @Singleton
-                      public MyThing myInterface() {
-                          try {
-                              return new MyThing("some name");
-                          } catch (Exception ex) {
-                              return null;
-                          }
+              package abc;
+              import jakarta.inject.Singleton;
+              import io.micronaut.context.annotation.Factory;
+              
+              @Factory
+              public class ExecutorFactory {
+              
+                  @Singleton
+                  public MyThing myInterface() {
+                      try {
+                          return new MyThing("some name");
+                      } catch (Exception ex) {
+                          return null;
                       }
                   }
+              }
               """
           )
         );
@@ -221,69 +221,69 @@ class SubclassesReturnedFromFactoriesNotInjectableTest implements RewriteTest {
         rewriteRun(
           java(
             """
-                  package abc;
-                  public class MyConfig {
-                      public boolean isSomething() {
-                          return false;
-                      }
+              package abc;
+              public class MyConfig {
+                  public boolean isSomething() {
+                      return false;
                   }
+              }
               """),
           java(
             """
-                  package abc;
-                  public interface MyInterface {}
+              package abc;
+              public interface MyInterface {}
               """),
           java(
             """
-                  package abc;
-                  public class MyThing implements MyInterface {
-                      private String name;
-                      public MyThing(String name) {
-                          if (name == null) {
-                              throw new IllegalArgumentException();
-                          }
-                          this.name = name;
+              package abc;
+              public class MyThing implements MyInterface {
+                  private String name;
+                  public MyThing(String name) {
+                      if (name == null) {
+                          throw new IllegalArgumentException();
                       }
+                      this.name = name;
                   }
+              }
               """),
           java(
             """
-                  package abc;
-                  public class MyOtherThing implements MyInterface {
-                      private String name;
-                      public MyOtherThing(String name) {
-                          if (name == null) {
-                              throw new IllegalArgumentException();
-                          }
-                          this.name = name;
+              package abc;
+              public class MyOtherThing implements MyInterface {
+                  private String name;
+                  public MyOtherThing(String name) {
+                      if (name == null) {
+                          throw new IllegalArgumentException();
                       }
+                      this.name = name;
                   }
+              }
               """),
           java(
             """
-                  package abc;
-                  import jakarta.inject.Inject;
-                  import jakarta.inject.Singleton;
-                  import io.micronaut.context.annotation.Factory;
+              package abc;
+              import jakarta.inject.Inject;
+              import jakarta.inject.Singleton;
+              import io.micronaut.context.annotation.Factory;
+              
+              @Factory
+              public class ExecutorFactory {
+                  @Inject
+                  MyConfig myConfig;
                   
-                  @Factory
-                  public class ExecutorFactory {
-                      @Inject
-                      MyConfig myConfig;
-                      
-                      @Singleton
-                      public MyInterface myInterface() {
-                          try {
-                              if (myConfig.isSomething()) {
-                                  return new MyThing("some name");
-                              } else {
-                                  return new MyOtherThing("some other thing");
-                              }
-                          } catch (Exception ex) {
-                              return null;
+                  @Singleton
+                  public MyInterface myInterface() {
+                      try {
+                          if (myConfig.isSomething()) {
+                              return new MyThing("some name");
+                          } else {
+                              return new MyOtherThing("some other thing");
                           }
+                      } catch (Exception ex) {
+                          return null;
                       }
                   }
+              }
               """
           )
         );
@@ -294,58 +294,58 @@ class SubclassesReturnedFromFactoriesNotInjectableTest implements RewriteTest {
         rewriteRun(
           java(
             """
-                  package abc;
-                  public interface Qi<T> {}
+              package abc;
+              public interface Qi<T> {}
               """),
           java(
             """
-                  package abc;
-                  public class Kq<T> implements Qi<T> {
-                      T t;
-                      public Kq(T t) {
-                          this.t = t;
-                      }
+              package abc;
+              public class Kq<T> implements Qi<T> {
+                  T t;
+                  public Kq(T t) {
+                      this.t = t;
                   }
+              }
               """
           ),
           java(
             """
-                  package abc;
-                  import jakarta.inject.Singleton;
-                  import io.micronaut.context.annotation.Factory;
-                  
-                  @Factory
-                  public class ExecutorFactory {
-                  
-                      @Singleton
-                      public Qi<String> t() {
-                          return new Kq<>("b");
-                      }
-                      
-                      @Singleton
-                      public Qi t() {
-                          return new Kq<String>("b");
-                      }
+              package abc;
+              import jakarta.inject.Singleton;
+              import io.micronaut.context.annotation.Factory;
+              
+              @Factory
+              public class ExecutorFactory {
+              
+                  @Singleton
+                  public Qi<String> t() {
+                      return new Kq<>("b");
                   }
+                  
+                  @Singleton
+                  public Qi t() {
+                      return new Kq<String>("b");
+                  }
+              }
               """,
             """
-                  package abc;
-                  import jakarta.inject.Singleton;
-                  import io.micronaut.context.annotation.Factory;
-                  
-                  @Factory
-                  public class ExecutorFactory {
-                  
-                      @Singleton
-                      public Kq<String> t() {
-                          return new Kq<>("b");
-                      }
-                  
-                      @Singleton
-                      public Kq t() {
-                          return new Kq<String>("b");
-                      }
+              package abc;
+              import jakarta.inject.Singleton;
+              import io.micronaut.context.annotation.Factory;
+              
+              @Factory
+              public class ExecutorFactory {
+              
+                  @Singleton
+                  public Kq<String> t() {
+                      return new Kq<>("b");
                   }
+              
+                  @Singleton
+                  public Kq t() {
+                      return new Kq<String>("b");
+                  }
+              }
               """
           )
         );

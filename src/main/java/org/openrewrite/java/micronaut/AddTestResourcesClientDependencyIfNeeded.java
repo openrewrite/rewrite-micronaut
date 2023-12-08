@@ -63,8 +63,8 @@ public class AddTestResourcesClientDependencyIfNeeded extends ScanningRecipe<Add
     public TreeVisitor<?, ExecutionContext> getScanner(Scanned acc) {
         return new MavenIsoVisitor<ExecutionContext>() {
             @Override
-            public Xml.Document visitDocument(Xml.Document document, ExecutionContext executionContext) {
-                Xml.Document maven = super.visitDocument(document, executionContext);
+            public Xml.Document visitDocument(Xml.Document document, ExecutionContext ctx) {
+                Xml.Document maven = super.visitDocument(document, ctx);
                 Optional<Xml.Tag> testResourcesProp = FindProperties.find(document, "micronaut\\.test\\.resources\\.enabled").stream().findFirst();
                 if ("true".equals(testResourcesProp.flatMap(Xml.Tag::getValue).orElse("false"))) {
                     acc.isTestResourcesEnabled = true;
@@ -78,11 +78,11 @@ public class AddTestResourcesClientDependencyIfNeeded extends ScanningRecipe<Add
     public TreeVisitor<?, ExecutionContext> getVisitor(Scanned acc) {
         return Preconditions.check(!acc.isTestResourcesEnabled, new TreeVisitor<Tree, ExecutionContext>() {
             @Override
-            public @Nullable Tree visit(@Nullable Tree tree, ExecutionContext executionContext) {
+            public @Nullable Tree visit(@Nullable Tree tree, ExecutionContext ctx) {
                 if (!recipeList.isEmpty()) {
                     recipeList.clear();
                 }
-                return super.visit(tree, executionContext);
+                return super.visit(tree, ctx);
             }
         });
     }

@@ -158,8 +158,8 @@ public class CopyNonInheritedAnnotations extends ScanningRecipe<CopyNonInherited
         }
 
         @Override
-        public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext executionContext) {
-            J.ClassDeclaration cd = super.visitClassDeclaration(classDecl, executionContext);
+        public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext ctx) {
+            J.ClassDeclaration cd = super.visitClassDeclaration(classDecl, ctx);
 
             //First collect the names of all super classes and interfaces.
             Set<String> parentTypes = new HashSet<>();
@@ -203,7 +203,7 @@ public class CopyNonInheritedAnnotations extends ScanningRecipe<CopyNonInherited
             List<J.Annotation> afterAnnotationList = ListUtils.concatAll(cd.getLeadingAnnotations(), annotationsFromParentClass);
             if (afterAnnotationList != cd.getLeadingAnnotations()) {
                 cd = cd.withLeadingAnnotations(afterAnnotationList);
-                cd = autoFormat(cd, cd.getName(), executionContext, getCursor());
+                cd = autoFormat(cd, cd.getName(), ctx, getCursor());
                 for (J.Annotation annotation : annotationsFromParentClass) {
                     JavaType.FullyQualified fullyQualified = TypeUtils.asFullyQualified(annotation.getType());
                     if (fullyQualified != null) {

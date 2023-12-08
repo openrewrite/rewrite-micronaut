@@ -79,8 +79,8 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
             private final String errorResponseProcessorFqn = "io.micronaut.http.server.exceptions.response.ErrorResponseProcessor";
 
             @Override
-            public J.MethodInvocation visitMethodInvocation(J.MethodInvocation method, ExecutionContext executionContext) {
-                J.MethodInvocation mi = super.visitMethodInvocation(method, executionContext);
+            public J.MethodInvocation visitMethodInvocation(J.MethodInvocation method, ExecutionContext ctx) {
+                J.MethodInvocation mi = super.visitMethodInvocation(method, ctx);
                 J.ClassDeclaration cd = getCursor().firstEnclosing(J.ClassDeclaration.class);
                 if (cd != null && "super".equals(mi.getSimpleName()) && isClassExceptionHandler(cd)) {
                     if (mi.getArguments().stream().noneMatch(exp -> TypeUtils.isOfClassType(exp.getType(), errorResponseProcessorFqn))) {
@@ -94,8 +94,8 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
             }
 
             @Override
-            public J.MethodDeclaration visitMethodDeclaration(J.MethodDeclaration method, ExecutionContext executionContext) {
-                J.MethodDeclaration md = super.visitMethodDeclaration(method, executionContext);
+            public J.MethodDeclaration visitMethodDeclaration(J.MethodDeclaration method, ExecutionContext ctx) {
+                J.MethodDeclaration md = super.visitMethodDeclaration(method, ctx);
                 J.ClassDeclaration cd = getCursor().firstEnclosing(J.ClassDeclaration.class);
                 if (cd != null && isClassExceptionHandler(cd)) {
                     if (md.isConstructor()) {
@@ -133,7 +133,7 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
                                                 getCursor(),
                                                 md.getBody().getCoordinates().lastStatement(),
                                                 errorResponseVar.get()),
-                                        executionContext, getCursor().getParent());
+                                        ctx, getCursor().getParent());
                                 assert md.getBody() != null;
                                 md = md.withBody(moveLastStatementToFirst(md.getBody()));
                             }
@@ -145,8 +145,8 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
             }
 
             @Override
-            public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext executionContext) {
-                J.ClassDeclaration cd = super.visitClassDeclaration(classDecl, executionContext);
+            public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext ctx) {
+                J.ClassDeclaration cd = super.visitClassDeclaration(classDecl, ctx);
                 JavaType.FullyQualified cdFq = cd.getExtends() != null ? TypeUtils.asFullyQualified(cd.getExtends().getType()) : null;
                 if (cdFq != null && exception_handlers.stream().anyMatch(fqn -> TypeUtils.isOfClassType(cdFq, fqn))) {
                     if (!Boolean.TRUE.equals(getCursor().pollMessage("constructor-exists"))) {

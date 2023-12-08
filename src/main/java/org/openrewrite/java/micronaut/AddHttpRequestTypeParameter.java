@@ -61,8 +61,8 @@ public class AddHttpRequestTypeParameter extends Recipe {
     public TreeVisitor<?, ExecutionContext> getVisitor() {
         return new JavaIsoVisitor<ExecutionContext>() {
             @Override
-            public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext executionContext) {
-                J.ClassDeclaration c = super.visitClassDeclaration(classDecl, executionContext);
+            public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext ctx) {
+                J.ClassDeclaration c = super.visitClassDeclaration(classDecl, ctx);
                 List<TypeTree> mappedInterfaceTypes = ListUtils.map(c.getImplements(), interfaceType -> {
                     JavaType.FullyQualified fqInterfaceType = (JavaType.FullyQualified) interfaceType.getType();
                     if (fqInterfaceType != null && isCandidateInterface(fqInterfaceType)) {

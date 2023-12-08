@@ -55,11 +55,11 @@ public class UpdateSecurityPropertiesIfNeeded extends Recipe {
     public TreeVisitor<?, ExecutionContext> getVisitor() {
         return Preconditions.check(Preconditions.not(new FindPropertiesConfig().getVisitor()), new TreeVisitor<Tree, ExecutionContext>() {
             @Override
-            public @Nullable Tree visit(@Nullable Tree tree, ExecutionContext executionContext) {
+            public @Nullable Tree visit(@Nullable Tree tree, ExecutionContext ctx) {
                 if (!recipeList.isEmpty()) {
                     recipeList.clear();
                 }
-                return super.visit(tree, executionContext);
+                return super.visit(tree, ctx);
             }
         });
     }

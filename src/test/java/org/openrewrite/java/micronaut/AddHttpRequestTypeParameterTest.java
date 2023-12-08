@@ -39,7 +39,8 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
     void testAuthenticationProviderNoChangesNeeded() {
         rewriteRun(
           //language=java
-          java("""
+          java(
+                """
             import io.micronaut.http.HttpRequest;
             import io.micronaut.security.authentication.AuthenticationProvider;
             import io.micronaut.security.authentication.AuthenticationRequest;
@@ -61,7 +62,8 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
     void testAuthenticationProvider() {
         rewriteRun(
           //language=java
-          java("""
+          java(
+                """
             import io.micronaut.http.HttpRequest;
             import io.micronaut.security.authentication.AuthenticationProvider;
             import io.micronaut.security.authentication.AuthenticationRequest;
@@ -98,7 +100,8 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
     void testAuthenticationProviderWithAdditionalInterface() {
         rewriteRun(
           //language=java
-          java("""
+          java(
+                """
             import io.micronaut.http.HttpRequest;
             import io.micronaut.security.authentication.AuthenticationProvider;
             import io.micronaut.security.authentication.AuthenticationRequest;
@@ -139,7 +142,8 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
     void testGenericJwtClaimsValidator() {
         rewriteRun(
           //language=java
-          java("""
+          java(
+                """
             import io.micronaut.http.HttpRequest;
             import io.micronaut.security.token.Claims;
             import io.micronaut.security.token.jwt.validator.GenericJwtClaimsValidator;
@@ -168,7 +172,8 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
     void testJwtClaimsValidator() {
         rewriteRun(
           //language=java
-          java("""
+          java(
+                """
             import io.micronaut.http.HttpRequest;
             import io.micronaut.security.token.Claims;
             import io.micronaut.security.token.jwt.validator.JwtClaimsValidator;
@@ -197,7 +202,8 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
     void testEndSessionCallbackUrlBuilder() {
         rewriteRun(
           //language=java
-          java("""
+          java(
+                """
             import io.micronaut.http.HttpRequest;
             import io.micronaut.security.oauth2.endpoint.endsession.response.EndSessionCallbackUrlBuilder;
             
@@ -228,7 +234,8 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
     void testAbsoluteUrlBuilder() {
         rewriteRun(
           //language=java
-          java("""
+          java(
+                """
             import io.micronaut.http.HttpRequest;
             import io.micronaut.security.oauth2.url.AbsoluteUrlBuilder;
             
@@ -259,7 +266,8 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
     void testOauthRouteUrlBuilder() {
         rewriteRun(
           //language=java
-          java("""
+          java(
+                """
             import io.micronaut.http.HttpRequest;
             import io.micronaut.security.oauth2.url.OauthRouteUrlBuilder;
             
@@ -334,7 +342,8 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
     void testIntrospectionProcessor() {
         rewriteRun(
           //language=java
-          java("""
+          java(
+                """
             import io.micronaut.http.HttpRequest;
             import io.micronaut.security.authentication.Authentication;
             import io.micronaut.security.endpoints.introspection.IntrospectionProcessor;
@@ -381,7 +390,8 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
     void testAuthenticationFetcher() {
         rewriteRun(
           //language=java
-          java("""
+          java(
+                """
             import io.micronaut.http.HttpRequest;
             import io.micronaut.security.authentication.Authentication;
             import io.micronaut.security.filters.AuthenticationFetcher;
@@ -412,7 +422,8 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
     void testTokenReader() {
         rewriteRun(
           //language=java
-          java("""
+          java(
+                """
             import io.micronaut.http.HttpRequest;
             import io.micronaut.security.token.reader.TokenReader;
             
@@ -443,7 +454,8 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
     void testTokenResolver() {
         rewriteRun(
           //language=java
-          java("""
+          java(
+                """
             import io.micronaut.http.HttpRequest;
             import io.micronaut.security.token.reader.TokenResolver;
             
@@ -474,7 +486,8 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
     void testTokenValidator() {
         rewriteRun(
           //language=java
-          java("""
+          java(
+                """
             import io.micronaut.http.HttpRequest;
             import io.micronaut.security.authentication.Authentication;
             import io.micronaut.security.token.validator.TokenValidator;

@@ -48,8 +48,8 @@ public class SubclassesReturnedFromFactoriesNotInjectable extends Recipe {
     public TreeVisitor<?, ExecutionContext> getVisitor() {
         return Preconditions.check(new UsesType<>("io.micronaut.context.annotation.Factory", false), new JavaIsoVisitor<ExecutionContext>() {
             @Override
-            public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext executionContext) {
-                J.ClassDeclaration cd = super.visitClassDeclaration(classDecl, executionContext);
+            public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext ctx) {
+                J.ClassDeclaration cd = super.visitClassDeclaration(classDecl, ctx);
                 if (cd.getLeadingAnnotations().stream().anyMatch(FACTORY_ANNOTATION_MATCHER::matches)) {
                     doAfterVisit(new FactoryBeansAreTypeVisitor());
                 }
@@ -76,8 +76,8 @@ public class SubclassesReturnedFromFactoriesNotInjectable extends Recipe {
         }
 
         @Override
-        public J.Return visitReturn(J.Return _return, ExecutionContext executionContext) {
-            J.Return rtn = super.visitReturn(_return, executionContext);
+        public J.Return visitReturn(J.Return _return, ExecutionContext ctx) {
+            J.Return rtn = super.visitReturn(_return, ctx);
             J.MethodDeclaration md = getCursor().firstEnclosing(J.MethodDeclaration.class);
             Expression returnExpression = rtn.getExpression();
             if (md != null && returnExpression != null
@@ -94,8 +94,8 @@ public class SubclassesReturnedFromFactoriesNotInjectable extends Recipe {
 
         @SuppressWarnings("ConstantConditions")
         @Override
-        public J.MethodDeclaration visitMethodDeclaration(J.MethodDeclaration method, ExecutionContext executionContext) {
-            J.MethodDeclaration md = super.visitMethodDeclaration(method, executionContext);
+        public J.MethodDeclaration visitMethodDeclaration(J.MethodDeclaration method, ExecutionContext ctx) {
+            J.MethodDeclaration md = super.visitMethodDeclaration(method, ctx);
             Set<JavaType> returnTypes = getCursor().pollMessage("return-types");
             if (returnTypes != null && returnTypes.size() == 1) {
                 JavaType returnedType = returnTypes.iterator().next();
@@ -109,9 +109,9 @@ public class SubclassesReturnedFromFactoriesNotInjectable extends Recipe {
                             resolvedReturnType = resolvedReturnType.withType(((JavaType.Parameterized) resolvedReturnType.getType()).getType());
                         }
                         mdReturnTypeExpression = mdReturnTypeExpression.withClazz(resolvedReturnType);
-                        md = maybeAutoFormat(md, md.withReturnTypeExpression(mdReturnTypeExpression), md.getName(), executionContext, getCursor().getParent());
+                        md = maybeAutoFormat(md, md.withReturnTypeExpression(mdReturnTypeExpression), md.getName(), ctx, getCursor().getParent());
                     } else {
-                        md = maybeAutoFormat(md, md.withReturnTypeExpression(resolvedReturnType), md.getName(), executionContext, getCursor().getParent());
+                        md = maybeAutoFormat(md, md.withReturnTypeExpression(resolvedReturnType), md.getName(), ctx, getCursor().getParent());
                     }
                     maybeRemoveImport(methodReturnType.getFullyQualifiedName());
                 }
