@@ -145,7 +145,7 @@ public class UpdateMicronautSecurityTest implements RewriteTest {
 
     @Test
     void updatePartialYamlConfig() {
-        rewriteRun(spec -> spec.expectedCyclesThatMakeChanges(2), mavenProject("project", srcMainResources(yaml(initialSecurityYamlPartial, expectedSecurityYamlPartial, s -> s.path("application.yml")))));
+        rewriteRun(mavenProject("project", srcMainResources(yaml(initialSecurityYamlPartial, expectedSecurityYamlPartial, s -> s.path("application.yml")))));
     }
 
     @Test

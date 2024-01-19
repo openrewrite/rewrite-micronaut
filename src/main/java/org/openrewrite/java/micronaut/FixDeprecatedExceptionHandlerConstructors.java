@@ -61,7 +61,7 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
 
     @Override
     public TreeVisitor<?, ExecutionContext> getVisitor() {
-        return Preconditions.check(precondition, new JavaIsoVisitor<ExecutionContext>() {
+        return Preconditions.check(precondition, Repeat.repeatUntilStable(new JavaIsoVisitor<ExecutionContext>() {
 
             final JavaParser.Builder<?, ?> parser =
                     JavaParser.fromJavaVersion()
@@ -185,6 +185,6 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
                 }
                 return block;
             }
-        });
+        }));
     }
 }
