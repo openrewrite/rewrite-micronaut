@@ -74,7 +74,8 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
 
     @Test
     void updateJavaCodeAndModifyGradleDependencies() {
-        rewriteRun(spec -> spec.beforeRecipe(withToolingApi()), mavenProject("project", properties("micronautVersion=" + MicronautRewriteTestVersions.getLatestMN3Version(), s -> s.path("gradle.properties")), srcMainJava(java(annotatedJavaxClass, annotatedJakartaClass)),
+        rewriteRun(spec -> spec.beforeRecipe(withToolingApi()).expectedCyclesThatMakeChanges(2),
+          mavenProject("project", properties("micronautVersion=" + MicronautRewriteTestVersions.getLatestMN3Version(), s -> s.path("gradle.properties")), srcMainJava(java(annotatedJavaxClass, annotatedJakartaClass)),
           //language=groovy
           buildGradle("""
             plugins {
@@ -114,7 +115,8 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
 
     @Test
     void updateJavaCodeAndAddMissingGradleDependencies() {
-        rewriteRun(spec -> spec.beforeRecipe(withToolingApi()), mavenProject("project", properties("micronautVersion=" + MicronautRewriteTestVersions.getLatestMN3Version(), s -> s.path("gradle.properties")), srcMainJava(java(annotatedJavaxClass, annotatedJakartaClass)),
+        rewriteRun(spec -> spec.beforeRecipe(withToolingApi()).expectedCyclesThatMakeChanges(2),
+          mavenProject("project", properties("micronautVersion=" + MicronautRewriteTestVersions.getLatestMN3Version(), s -> s.path("gradle.properties")), srcMainJava(java(annotatedJavaxClass, annotatedJakartaClass)),
           //language=groovy
           buildGradle("""
             plugins {
@@ -153,7 +155,9 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
 
     @Test
     void updateJavaCodeAndModifyMavenDependencies() {
-        rewriteRun(mavenProject("project", srcMainJava(java(annotatedJavaxClass, annotatedJakartaClass)),
+        rewriteRun(
+          spec -> spec.expectedCyclesThatMakeChanges(2),
+          mavenProject("project", srcMainJava(java(annotatedJavaxClass, annotatedJakartaClass)),
           //language=xml
           pomXml("""
             <project>
@@ -296,7 +300,9 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
 
     @Test
     void updateJavaCodeAndModifyMavenDependenciesAndAnnotationProcessor() {
-        rewriteRun(mavenProject("project", srcMainJava(java(annotatedJavaxClass, annotatedJakartaClass)),
+        rewriteRun(
+          spec -> spec.expectedCyclesThatMakeChanges(2),
+          mavenProject("project", srcMainJava(java(annotatedJavaxClass, annotatedJakartaClass)),
           //language=xml
           pomXml("""
             <project>
@@ -444,7 +450,9 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
 
     @Test
     void updateJavaCodeAndAddMissingMavenDependencies() {
-        rewriteRun(mavenProject("project", srcMainJava(java(annotatedJavaxClass, annotatedJakartaClass)),
+        rewriteRun(
+          spec -> spec.expectedCyclesThatMakeChanges(2),
+          mavenProject("project", srcMainJava(java(annotatedJavaxClass, annotatedJakartaClass)),
           //language=xml
           pomXml("""
             <project>
