@@ -33,11 +33,13 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
           "micronaut-security-oauth2-4.*",
           "micronaut-http-4.*"));
         spec.recipe(new AddHttpRequestTypeParameter());
+        spec.expectedCyclesThatMakeChanges(2);
     }
 
     @Test
     void testAuthenticationProviderNoChangesNeeded() {
         rewriteRun(
+          spec -> spec.expectedCyclesThatMakeChanges(0),
           //language=java
           java(
                 """

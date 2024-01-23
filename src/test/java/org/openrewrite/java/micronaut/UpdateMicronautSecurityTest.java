@@ -67,7 +67,7 @@ public class UpdateMicronautSecurityTest implements RewriteTest {
                             generator:
                                 access-token:
                                     expiration: 1d
-                            cookie: 
+                            cookie:
                                 enabled: true
                                 cookie-max-age: 1d
                                 cookie-path: foo
@@ -85,7 +85,7 @@ public class UpdateMicronautSecurityTest implements RewriteTest {
                         generator:
                             access-token:
                                 expiration: 1d
-                        cookie: 
+                        cookie:
                             enabled: true
                             cookie-max-age: 1d
                             cookie-path: foo
@@ -104,7 +104,7 @@ public class UpdateMicronautSecurityTest implements RewriteTest {
                             generator:
                                 access-token:
                                     expiration: 1d
-                            cookie: 
+                            cookie:
                                 enabled: false
                             bearer:
                                 enabled: true
@@ -118,7 +118,7 @@ public class UpdateMicronautSecurityTest implements RewriteTest {
                         generator:
                             access-token:
                                 expiration: 1d
-                        cookie: 
+                        cookie:
                             enabled: false
                         bearer:
                             enabled: true
@@ -145,7 +145,9 @@ public class UpdateMicronautSecurityTest implements RewriteTest {
 
     @Test
     void updatePartialYamlConfig() {
-        rewriteRun(mavenProject("project", srcMainResources(yaml(initialSecurityYamlPartial, expectedSecurityYamlPartial, s -> s.path("application.yml")))));
+        rewriteRun(
+          spec -> spec.expectedCyclesThatMakeChanges(2),
+          mavenProject("project", srcMainResources(yaml(initialSecurityYamlPartial, expectedSecurityYamlPartial, s -> s.path("application.yml")))));
     }
 
     @Test
