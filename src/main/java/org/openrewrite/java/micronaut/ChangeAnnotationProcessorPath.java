@@ -39,7 +39,7 @@ import static org.openrewrite.xml.FilterTagChildrenVisitor.filterTagChildren;
 import static org.openrewrite.xml.MapTagChildrenVisitor.mapTagChildren;
 
 @Value
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = false)
 public class ChangeAnnotationProcessorPath extends Recipe {
 
     @Option(displayName = "Old groupId",

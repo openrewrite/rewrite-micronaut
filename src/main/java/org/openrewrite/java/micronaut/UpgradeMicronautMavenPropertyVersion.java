@@ -27,7 +27,7 @@ import org.openrewrite.semver.Semver;
 import org.openrewrite.xml.tree.Xml;
 
 @Value
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = false)
 public class UpgradeMicronautMavenPropertyVersion extends Recipe {
     @Option(displayName = "New version",
             description = "An exact version number, or node-style semver selector used to select the version number.",

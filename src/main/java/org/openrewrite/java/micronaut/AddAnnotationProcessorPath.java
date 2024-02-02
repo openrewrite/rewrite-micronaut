@@ -32,7 +32,7 @@ import java.util.List;
 import static java.util.Objects.requireNonNull;
 
 @Value
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = false)
 public class AddAnnotationProcessorPath extends ScanningRecipe<AddAnnotationProcessorPath.Scanned> {
 
     @Option(displayName = "GroupId",
