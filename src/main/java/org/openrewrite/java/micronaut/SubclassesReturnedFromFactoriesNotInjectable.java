@@ -25,7 +25,6 @@ import org.openrewrite.marker.Markers;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -102,7 +101,7 @@ public class SubclassesReturnedFromFactoriesNotInjectable extends Recipe {
                 JavaType.FullyQualified methodReturnType = md.getReturnTypeExpression() != null ? TypeUtils.asFullyQualified(md.getReturnTypeExpression().getType()) : null;
                 JavaType.FullyQualified returnedTypeFqn = TypeUtils.asFullyQualified(returnedType);
                 if (returnedTypeFqn != null && methodReturnType != null && !TypeUtils.isOfType(methodReturnType, returnedType)) {
-                    J.Identifier resolvedReturnType = new J.Identifier(UUID.randomUUID(), Space.EMPTY, Markers.EMPTY, emptyList(), returnedTypeFqn.getClassName(), returnedType, null);
+                    J.Identifier resolvedReturnType = new J.Identifier(Tree.randomId(), Space.EMPTY, Markers.EMPTY, emptyList(), returnedTypeFqn.getClassName(), returnedType, null);
                     if (returnedType instanceof JavaType.Parameterized && md.getReturnTypeExpression() instanceof J.ParameterizedType) {
                         J.ParameterizedType mdReturnTypeExpression = (J.ParameterizedType) md.getReturnTypeExpression();
                         if (resolvedReturnType.getType() instanceof JavaType.Parameterized) {

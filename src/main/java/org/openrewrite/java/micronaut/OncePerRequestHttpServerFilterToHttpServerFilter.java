@@ -15,10 +15,7 @@
  */
 package org.openrewrite.java.micronaut;
 
-import org.openrewrite.ExecutionContext;
-import org.openrewrite.Preconditions;
-import org.openrewrite.Recipe;
-import org.openrewrite.TreeVisitor;
+import org.openrewrite.*;
 import org.openrewrite.internal.ListUtils;
 import org.openrewrite.java.ChangeMethodName;
 import org.openrewrite.java.JavaIsoVisitor;
@@ -26,8 +23,6 @@ import org.openrewrite.java.MethodMatcher;
 import org.openrewrite.java.search.UsesType;
 import org.openrewrite.java.tree.*;
 import org.openrewrite.marker.Markers;
-
-import java.util.UUID;
 
 import static java.util.Collections.emptyList;
 
@@ -60,7 +55,7 @@ public class OncePerRequestHttpServerFilterToHttpServerFilter extends Recipe {
             if (cd.getExtends() != null && cd.getExtends().getType() != null
                     && TypeUtils.isOfClassType(cd.getExtends().getType(), oncePerRequestHttpServerFilterFqn)) {
                 cd = cd.withExtends(null);
-                J.Identifier newImplementsIdentifier = new J.Identifier(UUID.randomUUID(), Space.format(" "), Markers.EMPTY,
+                J.Identifier newImplementsIdentifier = new J.Identifier(Tree.randomId(), Space.format(" "), Markers.EMPTY,
                         emptyList(), "HttpServerFilter", JavaType.buildType("io.micronaut.http.filter.HttpServerFilter"), null);
                 J.Block body = cd.getBody();
                 //noinspection ConstantConditions
