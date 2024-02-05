@@ -36,7 +36,7 @@ public class UpdateBuildToMicronaut4VersionTest extends Micronaut4RewriteTest {
     }
 
     @Test
-    public void updateGradleProperties() {
+    void updateGradleProperties() {
         rewriteRun(properties("""
               micronautVersion=%s
           """.formatted(MicronautRewriteTestVersions.getLatestMN3Version()), """
@@ -45,7 +45,7 @@ public class UpdateBuildToMicronaut4VersionTest extends Micronaut4RewriteTest {
     }
 
     @Test
-    public void updatePomXmlProperties() {
+    void updatePomXmlProperties() {
         rewriteRun(
           //language=xml
           pomXml("""
