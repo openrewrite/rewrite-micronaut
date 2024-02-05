@@ -37,7 +37,7 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
     }
 
     @Test
-    void testAuthenticationProviderNoChangesNeeded() {
+    void authenticationProviderNoChangesNeeded() {
         rewriteRun(
           spec -> spec.expectedCyclesThatMakeChanges(0),
           //language=java
@@ -61,7 +61,7 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
     }
 
     @Test
-    void testAuthenticationProvider() {
+    void authenticationProvider() {
         rewriteRun(
           //language=java
           java(
@@ -99,7 +99,7 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
     }
 
     @Test
-    void testAuthenticationProviderWithAdditionalInterface() {
+    void authenticationProviderWithAdditionalInterface() {
         rewriteRun(
           //language=java
           java(
@@ -141,7 +141,7 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
     }
 
     @Test
-    void testGenericJwtClaimsValidator() {
+    void genericJwtClaimsValidator() {
         rewriteRun(
           //language=java
           java(
@@ -171,7 +171,7 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
     }
 
     @Test
-    void testJwtClaimsValidator() {
+    void jwtClaimsValidator() {
         rewriteRun(
           //language=java
           java(
@@ -201,7 +201,7 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
     }
 
     @Test
-    void testEndSessionCallbackUrlBuilder() {
+    void endSessionCallbackUrlBuilder() {
         rewriteRun(
           //language=java
           java(
@@ -233,7 +233,7 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
     }
 
     @Test
-    void testAbsoluteUrlBuilder() {
+    void absoluteUrlBuilder() {
         rewriteRun(
           //language=java
           java(
@@ -265,7 +265,7 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
     }
 
     @Test
-    void testOauthRouteUrlBuilder() {
+    void oauthRouteUrlBuilder() {
         rewriteRun(
           //language=java
           java(
@@ -341,7 +341,7 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
     }
 
     @Test
-    void testIntrospectionProcessor() {
+    void introspectionProcessor() {
         rewriteRun(
           //language=java
           java(
@@ -389,7 +389,7 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
     }
 
     @Test
-    void testAuthenticationFetcher() {
+    void authenticationFetcher() {
         rewriteRun(
           //language=java
           java(
@@ -421,7 +421,7 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
     }
 
     @Test
-    void testTokenReader() {
+    void tokenReader() {
         rewriteRun(
           //language=java
           java(
@@ -453,7 +453,7 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
     }
 
     @Test
-    void testTokenResolver() {
+    void tokenResolver() {
         rewriteRun(
           //language=java
           java(
@@ -485,7 +485,7 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
     }
 
     @Test
-    void testTokenValidator() {
+    void tokenValidator() {
         rewriteRun(
           //language=java
           java(
