@@ -25,7 +25,7 @@ import org.openrewrite.test.RewriteTest;
 
 import static org.openrewrite.java.Assertions.*;
 
-public class UpdateMicronautEmailTest implements RewriteTest {
+class UpdateMicronautEmailTest implements RewriteTest {
 
     @Override
     public void defaults(RecipeSpec spec) {

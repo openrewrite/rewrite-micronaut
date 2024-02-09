@@ -27,7 +27,7 @@ import static org.openrewrite.gradle.Assertions.withToolingApi;
 import static org.openrewrite.java.Assertions.*;
 import static org.openrewrite.maven.Assertions.pomXml;
 
-public class UpdateJakartaAnnotationsTest extends Micronaut4RewriteTest {
+class UpdateJakartaAnnotationsTest extends Micronaut4RewriteTest {
 
     @Override
     public void defaults(RecipeSpec spec) {

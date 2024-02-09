@@ -24,7 +24,7 @@ import static org.openrewrite.gradle.Assertions.withToolingApi;
 import static org.openrewrite.java.Assertions.mavenProject;
 import static org.openrewrite.maven.Assertions.pomXml;
 
-public class RemoveUnnecessaryDependenciesTest extends Micronaut4RewriteTest {
+class RemoveUnnecessaryDependenciesTest extends Micronaut4RewriteTest {
 
     @Override
     public void defaults(RecipeSpec spec) {

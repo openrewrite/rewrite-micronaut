@@ -28,7 +28,7 @@ import static org.openrewrite.maven.Assertions.pomXml;
 import static org.openrewrite.properties.Assertions.properties;
 import static org.openrewrite.yaml.Assertions.yaml;
 
-public class AddSnakeYamlDependencyIfNeededTest extends Micronaut4RewriteTest {
+class AddSnakeYamlDependencyIfNeededTest extends Micronaut4RewriteTest {
 
     @Override
     public void defaults(RecipeSpec spec) {

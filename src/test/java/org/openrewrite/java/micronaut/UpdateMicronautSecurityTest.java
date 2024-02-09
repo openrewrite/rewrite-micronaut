@@ -26,7 +26,7 @@ import static org.openrewrite.java.Assertions.srcMainResources;
 import static org.openrewrite.properties.Assertions.properties;
 import static org.openrewrite.yaml.Assertions.yaml;
 
-public class UpdateMicronautSecurityTest implements RewriteTest {
+class UpdateMicronautSecurityTest implements RewriteTest {
 
     @Override
     public void defaults(RecipeSpec spec) {

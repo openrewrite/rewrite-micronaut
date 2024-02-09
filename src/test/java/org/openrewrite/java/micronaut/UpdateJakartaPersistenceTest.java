@@ -28,7 +28,7 @@ import static org.openrewrite.java.Assertions.*;
 import static org.openrewrite.maven.Assertions.pomXml;
 import static org.openrewrite.properties.Assertions.properties;
 
-public class UpdateJakartaPersistenceTest implements RewriteTest {
+class UpdateJakartaPersistenceTest implements RewriteTest {
 
     @Override
     public void defaults(RecipeSpec spec) {

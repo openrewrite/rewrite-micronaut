@@ -23,7 +23,7 @@ import static org.openrewrite.gradle.Assertions.buildGradle;
 import static org.openrewrite.java.Assertions.mavenProject;
 import static org.openrewrite.maven.Assertions.pomXml;
 
-public class UpdateMicronautSessionTest extends Micronaut4RewriteTest {
+class UpdateMicronautSessionTest extends Micronaut4RewriteTest {
 
     @Override
     public void defaults(RecipeSpec spec) {

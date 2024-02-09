@@ -24,7 +24,7 @@ import static org.openrewrite.java.Assertions.mavenProject;
 import static org.openrewrite.java.Assertions.srcMainResources;
 import static org.openrewrite.xml.Assertions.xml;
 
-public class RemoveWithJansiLogbackConfigurationTest implements RewriteTest {
+class RemoveWithJansiLogbackConfigurationTest implements RewriteTest {
 
     @Override
     public void defaults(RecipeSpec spec) {

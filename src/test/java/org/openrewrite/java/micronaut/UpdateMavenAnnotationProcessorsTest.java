@@ -21,7 +21,7 @@ import org.openrewrite.test.RecipeSpec;
 
 import static org.openrewrite.maven.Assertions.pomXml;
 
-public class UpdateMavenAnnotationProcessorsTest extends Micronaut4RewriteTest {
+class UpdateMavenAnnotationProcessorsTest extends Micronaut4RewriteTest {
 
     @Override
     public void defaults(RecipeSpec spec) {

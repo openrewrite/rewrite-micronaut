@@ -24,7 +24,7 @@ import static org.openrewrite.gradle.Assertions.buildGradle;
 import static org.openrewrite.java.Assertions.mavenProject;
 import static org.openrewrite.maven.Assertions.pomXml;
 
-public class UpdateBuildToJava17Test implements RewriteTest {
+class UpdateBuildToJava17Test implements RewriteTest {
 
     @Override
     public void defaults(RecipeSpec spec) {

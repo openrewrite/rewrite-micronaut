@@ -24,7 +24,7 @@ import org.openrewrite.test.RecipeSpec;
 import static org.openrewrite.java.Assertions.*;
 import static org.openrewrite.maven.Assertions.pomXml;
 
-public class AddTestResourcesClientDependencyIfNeededTest extends Micronaut4RewriteTest {
+class AddTestResourcesClientDependencyIfNeededTest extends Micronaut4RewriteTest {
 
     @Override
     public void defaults(RecipeSpec spec) {
