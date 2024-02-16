@@ -28,7 +28,7 @@ import java.util.List;
 public class UpdateSecurityYamlIfNeeded extends Recipe {
 
     private final List<Recipe> recipeList = new ArrayList<>();
-    
+
     private final String newYamlKeysSnippet =
             "generator:\n" +
             "  access-token:\n" +
@@ -61,13 +61,13 @@ public class UpdateSecurityYamlIfNeeded extends Recipe {
 
     public UpdateSecurityYamlIfNeeded() {
         this.recipeList.add(new MergeYaml("$.micronaut.security.token", newYamlKeysSnippet, Boolean.TRUE, null));
-        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.generator.access-token.expiration", TOKEN_PATH + ".generator.access-token.expiration"));
-        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.enabled", TOKEN_PATH + ".cookie.enabled"));
-        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.cookie-max-age", TOKEN_PATH + ".cookie.cookie-max-age"));
-        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.cookie-path", TOKEN_PATH + ".cookie.cookie-path"));
-        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.cookie-domain", TOKEN_PATH + ".cookie.cookie-domain"));
-        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.cookie-same-site", TOKEN_PATH + ".cookie.cookie-same-site"));
-        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.bearer.enabled", TOKEN_PATH + ".bearer.enabled"));
+        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.generator.access-token.expiration", null, TOKEN_PATH + ".generator.access-token.expiration", null));
+        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.enabled", null, TOKEN_PATH + ".cookie.enabled", null));
+        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.cookie-max-age", null, TOKEN_PATH + ".cookie.cookie-max-age", null));
+        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.cookie-path", null, TOKEN_PATH + ".cookie.cookie-path", null));
+        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.cookie-domain", null, TOKEN_PATH + ".cookie.cookie-domain", null));
+        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.cookie-same-site", null, TOKEN_PATH + ".cookie.cookie-same-site", null));
+        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.bearer.enabled", null, TOKEN_PATH + ".bearer.enabled", null));
         this.recipeList.add(new DeleteKey(TOKEN_PATH + ".jwt.generator"));
         this.recipeList.add(new DeleteKey(TOKEN_PATH + ".jwt.cookie"));
         this.recipeList.add(new DeleteKey(TOKEN_PATH + ".jwt.bearer"));
