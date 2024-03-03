@@ -15,7 +15,10 @@
  */
 package org.openrewrite.java.micronaut;
 
-import org.openrewrite.*;
+import org.openrewrite.ExecutionContext;
+import org.openrewrite.FindSourceFiles;
+import org.openrewrite.Recipe;
+import org.openrewrite.TreeVisitor;
 
 public class FindPropertiesConfig extends Recipe {
 
@@ -31,10 +34,6 @@ public class FindPropertiesConfig extends Recipe {
 
     @Override
     public TreeVisitor<?, ExecutionContext> getVisitor() {
-        return Preconditions.or(
-                new FindSourceFiles("**/application.properties").getVisitor(),
-                new FindSourceFiles("**/application-*.properties").getVisitor(),
-                new FindSourceFiles("**/bootstrap.properties").getVisitor(),
-                new FindSourceFiles("**/bootstrap-*.properties").getVisitor());
+        return new FindSourceFiles("**/{application,application-*,bootstrap,bootstrap-*}.{properties}").getVisitor();
     }
 }
