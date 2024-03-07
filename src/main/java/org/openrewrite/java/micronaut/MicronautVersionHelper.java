@@ -16,10 +16,13 @@
 package org.openrewrite.java.micronaut;
 
 import org.openrewrite.ExecutionContext;
-import org.openrewrite.gradle.plugins.AddPluginVisitor;
+import org.openrewrite.gradle.DependencyVersionSelector;
+import org.openrewrite.gradle.marker.GradlePluginDescriptor;
+import org.openrewrite.gradle.marker.GradleSettings;
 import org.openrewrite.maven.MavenDownloadingException;
 import org.openrewrite.maven.internal.MavenPomDownloader;
 import org.openrewrite.maven.tree.GroupArtifact;
+import org.openrewrite.maven.tree.GroupArtifactVersion;
 import org.openrewrite.maven.tree.MavenMetadata;
 import org.openrewrite.maven.tree.MavenRepository;
 import org.openrewrite.semver.LatestRelease;
@@ -28,11 +31,10 @@ import org.openrewrite.semver.VersionComparator;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Optional;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
+import static java.util.Collections.*;
+import static org.openrewrite.Tree.randomId;
 
 public final class MicronautVersionHelper {
 
@@ -66,7 +68,10 @@ public final class MicronautVersionHelper {
     }
 
     public static Optional<String> getNewerGradlePluginVersion(String pluginId, String versionPattern, String currentVersion, ExecutionContext ctx) throws MavenDownloadingException {
-        return AddPluginVisitor.resolvePluginVersion(pluginId, currentVersion, versionPattern, null, Collections.singletonList(GRADLE_PLUGIN_REPO), ctx);
+        MavenRepository gradlePluginsRepo = new MavenRepository("gradle-plugins", "https://plugins.gradle.org/m2/", "true", "false", true, null, null, true);
+        GradleSettings gradleSettings = new GradleSettings(randomId(), singletonList(gradlePluginsRepo), singletonList(new GradlePluginDescriptor("io.micronaut.gradle.MicronautApplicationPlugin", null)), emptyMap());
+        return Optional.ofNullable(new DependencyVersionSelector(null, null, gradleSettings)
+                .select(new GroupArtifactVersion(pluginId, pluginId + ".gradle.plugin", currentVersion), "classpath", versionPattern, null, ctx));
     }
 
     private MicronautVersionHelper() {
