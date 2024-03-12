@@ -136,7 +136,7 @@ public class ChangeAnnotationProcessorPath extends Recipe {
                             }
                         }
                         if (exclusions == null) {
-                            path = filterTagChildren(path, child -> !("exclusions".equals(child.getName())));
+                            path = filterTagChildren(path, child -> !"exclusions".equals(child.getName()));
                         } else {
                             maybeAddExclusionsToPath(path, exclusions.stream().filter(s -> !StringUtils.isBlank(s)).collect(Collectors.toList()));
                         }
