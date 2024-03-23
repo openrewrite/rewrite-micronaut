@@ -112,9 +112,6 @@ recipeList:
       oldArtifactId: micronaut-parent
       newGroupId: io.micronaut.platform
       newVersion: 4.x
-      retainVersions:
-        - io.micronaut:micronaut-validation
-        - io.micronaut:micronaut-session
 ---
 type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.UpdateJakartaAnnotations
