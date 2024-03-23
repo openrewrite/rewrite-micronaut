@@ -79,6 +79,15 @@ class UpdateMicronautSessionTest extends Micronaut4RewriteTest {
                         <artifactId>micronaut-parent</artifactId>
                         <version>%s</version>
                     </parent>
+                    <dependencyManagement>
+                        <dependencies>
+                            <dependency>
+                                <groupId>io.micronaut.session</groupId>
+                                <artifactId>micronaut-session</artifactId>
+                                <version>LATEST</version>
+                            </dependency>
+                        </dependencies>
+                    </dependencyManagement>
                     <dependencies>
                         <dependency>
                             <groupId>io.micronaut.session</groupId>
