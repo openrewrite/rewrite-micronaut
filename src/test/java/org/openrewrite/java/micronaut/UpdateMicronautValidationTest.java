@@ -235,29 +235,9 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
                 <dependencyManagement>
                     <dependencies>
                         <dependency>
-                            <groupId>ch.qos.logback</groupId>
-                            <artifactId>logback-classic</artifactId>
-                            <version>1.2.11</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>io.micronaut</groupId>
-                            <artifactId>micronaut-http-client</artifactId>
-                            <version>3.10.3</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>io.micronaut</groupId>
-                            <artifactId>micronaut-http-server-netty</artifactId>
-                            <version>3.10.3</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>io.micronaut</groupId>
-                            <artifactId>micronaut-jackson-databind</artifactId>
-                            <version>3.10.3</version>
-                        </dependency>
-                        <dependency>
                             <groupId>io.micronaut</groupId>
                             <artifactId>micronaut-validation</artifactId>
-                            <version>3.10.3</version>
+                            <version>3.10.4</version>
                         </dependency>
                     </dependencies>
                 </dependencyManagement>
@@ -414,29 +394,9 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
                 <dependencyManagement>
                     <dependencies>
                         <dependency>
-                            <groupId>ch.qos.logback</groupId>
-                            <artifactId>logback-classic</artifactId>
-                            <version>1.2.11</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>io.micronaut</groupId>
-                            <artifactId>micronaut-http-client</artifactId>
-                            <version>3.10.3</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>io.micronaut</groupId>
-                            <artifactId>micronaut-http-server-netty</artifactId>
-                            <version>3.10.3</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>io.micronaut</groupId>
-                            <artifactId>micronaut-jackson-databind</artifactId>
-                            <version>3.10.3</version>
-                        </dependency>
-                        <dependency>
                             <groupId>io.micronaut</groupId>
                             <artifactId>micronaut-validation</artifactId>
-                            <version>3.10.3</version>
+                            <version>3.10.4</version>
                         </dependency>
                     </dependencies>
                 </dependencyManagement>
@@ -580,30 +540,6 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
                     <artifactId>micronaut-parent</artifactId>
                     <version>%s</version>
                 </parent>
-                <dependencyManagement>
-                    <dependencies>
-                        <dependency>
-                            <groupId>ch.qos.logback</groupId>
-                            <artifactId>logback-classic</artifactId>
-                            <version>1.2.11</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>io.micronaut</groupId>
-                            <artifactId>micronaut-http-client</artifactId>
-                            <version>3.10.3</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>io.micronaut</groupId>
-                            <artifactId>micronaut-http-server-netty</artifactId>
-                            <version>3.10.3</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>io.micronaut</groupId>
-                            <artifactId>micronaut-jackson-databind</artifactId>
-                            <version>3.10.3</version>
-                        </dependency>
-                    </dependencies>
-                </dependencyManagement>
                 <dependencies>
                     <dependency>
                         <groupId>io.micronaut</groupId>
