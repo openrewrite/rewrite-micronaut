@@ -38,100 +38,98 @@ class UpdateMicronautSecurityTest implements RewriteTest {
 
     @Language("properties")
     private final String initialSecurityProps = """
-            micronaut.security.token.jwt.generator.access-token.expiration=1d
-            micronaut.security.token.jwt.cookie.enabled=true
-            micronaut.security.token.jwt.cookie.cookie-max-age=1d
-            micronaut.security.token.jwt.cookie.cookie-path=foo
-            micronaut.security.token.jwt.cookie.cookie-domain=bar.com
-            micronaut.security.token.jwt.cookie.cookie-same-site=true
-            micronaut.security.token.jwt.bearer.enabled=true
-        """;
+      micronaut.security.token.jwt.generator.access-token.expiration=1d
+      micronaut.security.token.jwt.cookie.enabled=true
+      micronaut.security.token.jwt.cookie.cookie-max-age=1d
+      micronaut.security.token.jwt.cookie.cookie-path=foo
+      micronaut.security.token.jwt.cookie.cookie-domain=bar.com
+      micronaut.security.token.jwt.cookie.cookie-same-site=true
+      micronaut.security.token.jwt.bearer.enabled=true
+      """;
 
     @Language("properties")
     private final String expectedSecurityProps = """
-            micronaut.security.token.generator.access-token.expiration=1d
-            micronaut.security.token.cookie.enabled=true
-            micronaut.security.token.cookie.cookie-max-age=1d
-            micronaut.security.token.cookie.cookie-path=foo
-            micronaut.security.token.cookie.cookie-domain=bar.com
-            micronaut.security.token.cookie.cookie-same-site=true
-            micronaut.security.token.bearer.enabled=true
-        """;
+      micronaut.security.token.generator.access-token.expiration=1d
+      micronaut.security.token.cookie.enabled=true
+      micronaut.security.token.cookie.cookie-max-age=1d
+      micronaut.security.token.cookie.cookie-path=foo
+      micronaut.security.token.cookie.cookie-domain=bar.com
+      micronaut.security.token.cookie.cookie-same-site=true
+      micronaut.security.token.bearer.enabled=true
+      """;
 
     @Language("yml")
     private final String initialSecurityYaml = """
-            micronaut:
-                security:
-                    token:
-                        jwt:
-                            generator:
-                                access-token:
-                                    expiration: 1d
-                            cookie:
-                                enabled: true
-                                cookie-max-age: 1d
-                                cookie-path: foo
-                                cookie-domain: bar.com
-                                cookie-same-site: true
-                            bearer:
-                                enabled: true
-        """;
+      micronaut:
+        security:
+          token:
+            jwt:
+              generator:
+                access-token:
+                  expiration: 1d
+              cookie:
+                enabled: true
+                cookie-max-age: 1d
+                cookie-path: foo
+                cookie-domain: bar.com
+                cookie-same-site: true
+              bearer:
+                enabled: true
+      """;
 
     @Language("yml")
     private final String expectedSecurityYaml = """
-            micronaut:
-                security:
-                    token:
-                        generator:
-                            access-token:
-                                expiration: 1d
-                        cookie:
-                            enabled: true
-                            cookie-max-age: 1d
-                            cookie-path: foo
-                            cookie-domain: bar.com
-                            cookie-same-site: true
-                        bearer:
-                            enabled: true
-        """;
+      micronaut:
+        security:
+          token:
+            generator:
+              access-token:
+                expiration: 1d
+            cookie:
+              enabled: true
+              cookie-max-age: 1d
+              cookie-path: foo
+              cookie-domain: bar.com
+              cookie-same-site: true
+            bearer:
+              enabled: true
+      """;
 
     @Language("yml")
     private final String initialSecurityYamlPartial = """
-            micronaut:
-                security:
-                    token:
-                        jwt:
-                            generator:
-                                access-token:
-                                    expiration: 1d
-                            cookie:
-                                enabled: false
-                            bearer:
-                                enabled: true
-        """;
+      micronaut:
+        security:
+          token:
+            jwt:
+              generator:
+                access-token:
+                  expiration: 1d
+              cookie:
+                enabled: false
+              bearer:
+                enabled: true
+      """;
 
     @Language("yml")
     private final String expectedSecurityYamlPartial = """
-            micronaut:
-                security:
-                    token:
-                        generator:
-                            access-token:
-                                expiration: 1d
-                        cookie:
-                            enabled: false
-                        bearer:
-                            enabled: true
-        """;
+      micronaut:
+        security:
+          token:
+            generator:
+              access-token:
+                expiration: 1d
+            cookie:
+              enabled: false
+            bearer:
+              enabled: true
+      """;
 
     @Language("yml")
     private final String noJwtConfig = """
-            micronaut:
-                application:
-                    name: foo
-        """;
-
-
+      micronaut:
+        application:
+          name: foo
+      """;
 
     @Test
     void updatePropertyConfig() {
