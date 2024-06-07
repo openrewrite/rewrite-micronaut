@@ -15,7 +15,6 @@
  */
 package org.openrewrite.java.micronaut;
 
-import org.jetbrains.annotations.NotNull;
 import org.openrewrite.InMemoryExecutionContext;
 import org.openrewrite.maven.MavenDownloadingException;
 
@@ -53,7 +52,6 @@ public final class MicronautRewriteTestVersions {
         return resolvePluginVersion(pluginId);
     }
 
-    @NotNull
     private static String resolveVersion(String versionPattern, String currentVersion) {
         try {
             return MicronautVersionHelper.getNewerVersion(versionPattern, currentVersion, new InMemoryExecutionContext()).orElse(currentVersion);
@@ -62,7 +60,6 @@ public final class MicronautRewriteTestVersions {
         }
     }
 
-    @NotNull
     private static String resolvePluginVersion(String pluginId) {
         try {
             return MicronautVersionHelper.getNewerGradlePluginVersion(pluginId, "4.x", "4.0.0", new InMemoryExecutionContext()).orElse("4.0.0");
