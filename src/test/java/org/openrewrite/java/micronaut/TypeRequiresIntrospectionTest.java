@@ -44,6 +44,7 @@ class TypeRequiresIntrospectionTest implements RewriteTest {
                 void setName(String name) {this.name = name;}
             }
         """;
+
     @Language("java")
     String controllerClass =
       """

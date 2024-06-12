@@ -42,6 +42,7 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
             "io.micronaut.validation.exceptions.ConstraintExceptionHandler",
             "io.micronaut.validation.exceptions.ValidationExceptionHandler"
     );
+
     @SuppressWarnings("unchecked")
     private static final TreeVisitor<?, ExecutionContext> precondition =
             Preconditions.or(exception_handlers.stream().map(fqn -> new UsesType<>(fqn, false)).toArray(TreeVisitor[]::new));
