@@ -68,9 +68,9 @@ public class UpdateSecurityYamlIfNeeded extends Recipe {
         this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.cookie-domain", null, TOKEN_PATH + ".cookie.cookie-domain", null));
         this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.cookie-same-site", null, TOKEN_PATH + ".cookie.cookie-same-site", null));
         this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.bearer.enabled", null, TOKEN_PATH + ".bearer.enabled", null));
-        this.recipeList.add(new DeleteKey(TOKEN_PATH + ".jwt.generator"));
-        this.recipeList.add(new DeleteKey(TOKEN_PATH + ".jwt.cookie"));
-        this.recipeList.add(new DeleteKey(TOKEN_PATH + ".jwt.bearer"));
+        this.recipeList.add(new DeleteKey(TOKEN_PATH + ".jwt.generator", null));
+        this.recipeList.add(new DeleteKey(TOKEN_PATH + ".jwt.cookie", null));
+        this.recipeList.add(new DeleteKey(TOKEN_PATH + ".jwt.bearer", null));
         this.recipeList.add(new RemoveUnused());
     }
 
