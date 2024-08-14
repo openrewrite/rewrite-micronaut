@@ -17,13 +17,13 @@ package org.openrewrite.java.micronaut;
 
 import lombok.EqualsAndHashCode;
 import lombok.Value;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.openrewrite.ExecutionContext;
 import org.openrewrite.Option;
 import org.openrewrite.Recipe;
 import org.openrewrite.TreeVisitor;
 import org.openrewrite.internal.StringUtils;
-import org.openrewrite.internal.lang.NonNull;
-import org.openrewrite.internal.lang.Nullable;
 import org.openrewrite.maven.MavenVisitor;
 import org.openrewrite.semver.DependencyMatcher;
 import org.openrewrite.xml.AddOrUpdateChild;
