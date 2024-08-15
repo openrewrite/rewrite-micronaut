@@ -16,11 +16,11 @@
 package org.openrewrite.java.micronaut;
 
 import lombok.Data;
+import org.jspecify.annotations.Nullable;
 import org.openrewrite.ExecutionContext;
 import org.openrewrite.ScanningRecipe;
 import org.openrewrite.Tree;
 import org.openrewrite.TreeVisitor;
-import org.openrewrite.internal.lang.Nullable;
 import org.openrewrite.java.AnnotationMatcher;
 import org.openrewrite.java.JavaIsoVisitor;
 import org.openrewrite.java.JavaParser;
@@ -42,7 +42,7 @@ public class TypeRequiresIntrospection extends ScanningRecipe<TypeRequiresIntros
         return "In Micronaut 2.x a reflection-based strategy was used to retrieve that information if the class was not annotated with `@Introspected`. As of Micronaut 3.x it is required to annotate classes with `@Introspected` that are used in this way.";
     }
 
-    private static boolean parentRequiresIntrospection(@Nullable JavaType.FullyQualified type) {
+    private static boolean parentRequiresIntrospection(JavaType.@Nullable FullyQualified type) {
         if (type == null) {
             return false;
         }
@@ -98,7 +98,7 @@ public class TypeRequiresIntrospection extends ScanningRecipe<TypeRequiresIntros
     }
 
     private static final class FindParamsAndReturnTypes extends JavaIsoVisitor<Set<JavaType.FullyQualified>> {
-        private void maybeAddType(@Nullable JavaType.FullyQualified type, Set<JavaType.FullyQualified> foundTypes) {
+        private void maybeAddType(JavaType.@Nullable FullyQualified type, Set<JavaType.FullyQualified> foundTypes) {
             if (type != null && !TypeRequiresIntrospection.parentRequiresIntrospection(type)) {
                 foundTypes.add(type);
             }
