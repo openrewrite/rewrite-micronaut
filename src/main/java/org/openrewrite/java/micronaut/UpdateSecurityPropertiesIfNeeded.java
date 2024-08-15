@@ -15,8 +15,8 @@
  */
 package org.openrewrite.java.micronaut;
 
+import org.jspecify.annotations.Nullable;
 import org.openrewrite.*;
-import org.openrewrite.internal.lang.Nullable;
 import org.openrewrite.properties.ChangePropertyKey;
 
 import java.util.ArrayList;
