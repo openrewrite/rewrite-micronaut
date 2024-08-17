@@ -32,7 +32,10 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
           "micronaut-security-4.*",
           "micronaut-security-jwt-4.*",
           "micronaut-security-oauth2-4.*",
-          "micronaut-http-4.*"));
+          "micronaut-http-4.*",
+          "reactive-streams",
+          "reactor-core"
+        ));
         spec.recipe(new AddHttpRequestTypeParameter());
         spec.expectedCyclesThatMakeChanges(2);
     }
@@ -43,22 +46,24 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
           spec -> spec.expectedCyclesThatMakeChanges(0),
           //language=java
           java(
-                """
-            import io.micronaut.http.HttpRequest;
-            import io.micronaut.security.authentication.AuthenticationProvider;
-            import io.micronaut.security.authentication.AuthenticationRequest;
-            import io.micronaut.security.authentication.AuthenticationResponse;
-            import org.reactivestreams.Publisher;
-                      
-            public class AuthenticationProviderUserPassword implements AuthenticationProvider<HttpRequest<?>> {
-                      
-                @Override
-                public Publisher<AuthenticationResponse> authenticate(HttpRequest<?> httpRequest,
-                                                                      AuthenticationRequest<?, ?> authenticationRequest) {
-                    return null;
-                }
-            }
-            """));
+            """
+              import io.micronaut.http.HttpRequest;
+              import io.micronaut.security.authentication.AuthenticationProvider;
+              import io.micronaut.security.authentication.AuthenticationRequest;
+              import io.micronaut.security.authentication.AuthenticationResponse;
+              import org.reactivestreams.Publisher;
+
+              public class AuthenticationProviderUserPassword implements AuthenticationProvider<HttpRequest<?>> {
+
+                  @Override
+                  public Publisher<AuthenticationResponse> authenticate(HttpRequest<?> httpRequest,
+                                                                        AuthenticationRequest<?, ?> authenticationRequest) {
+                      return null;
+                  }
+              }
+              """
+          )
+        );
     }
 
     @DocumentExample
@@ -67,37 +72,39 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
         rewriteRun(
           //language=java
           java(
-                """
-            import io.micronaut.http.HttpRequest;
-            import io.micronaut.security.authentication.AuthenticationProvider;
-            import io.micronaut.security.authentication.AuthenticationRequest;
-            import io.micronaut.security.authentication.AuthenticationResponse;
-            import org.reactivestreams.Publisher;
-                      
-            public class AuthenticationProviderUserPassword implements AuthenticationProvider {
-                      
-                @Override
-                public Publisher<AuthenticationResponse> authenticate(HttpRequest<?> httpRequest,
-                                                                      AuthenticationRequest<?, ?> authenticationRequest) {
-                    return null;
-                }
-            }
-            """, """
-            import io.micronaut.http.HttpRequest;
-            import io.micronaut.security.authentication.AuthenticationProvider;
-            import io.micronaut.security.authentication.AuthenticationRequest;
-            import io.micronaut.security.authentication.AuthenticationResponse;
-            import org.reactivestreams.Publisher;
-                      
-            public class AuthenticationProviderUserPassword implements AuthenticationProvider<HttpRequest<?>> {
-                      
-                @Override
-                public Publisher<AuthenticationResponse> authenticate(HttpRequest<?> httpRequest,
-                                                                      AuthenticationRequest<?, ?> authenticationRequest) {
-                    return null;
-                }
-            }
-            """));
+            """
+              import io.micronaut.http.HttpRequest;
+              import io.micronaut.security.authentication.AuthenticationProvider;
+              import io.micronaut.security.authentication.AuthenticationRequest;
+              import io.micronaut.security.authentication.AuthenticationResponse;
+              import org.reactivestreams.Publisher;
+
+              public class AuthenticationProviderUserPassword implements AuthenticationProvider {
+
+                  @Override
+                  public Publisher<AuthenticationResponse> authenticate(HttpRequest<?> httpRequest,
+                                                                        AuthenticationRequest<?, ?> authenticationRequest) {
+                      return null;
+                  }
+              }
+              """, """
+              import io.micronaut.http.HttpRequest;
+              import io.micronaut.security.authentication.AuthenticationProvider;
+              import io.micronaut.security.authentication.AuthenticationRequest;
+              import io.micronaut.security.authentication.AuthenticationResponse;
+              import org.reactivestreams.Publisher;
+
+              public class AuthenticationProviderUserPassword implements AuthenticationProvider<HttpRequest<?>> {
+
+                  @Override
+                  public Publisher<AuthenticationResponse> authenticate(HttpRequest<?> httpRequest,
+                                                                        AuthenticationRequest<?, ?> authenticationRequest) {
+                      return null;
+                  }
+              }
+              """
+          )
+        );
     }
 
     @Test
@@ -105,41 +112,43 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
         rewriteRun(
           //language=java
           java(
-                """
-            import io.micronaut.http.HttpRequest;
-            import io.micronaut.security.authentication.AuthenticationProvider;
-            import io.micronaut.security.authentication.AuthenticationRequest;
-            import io.micronaut.security.authentication.AuthenticationResponse;
-            import org.reactivestreams.Publisher;
-                        
-            import java.io.Serializable;
-                      
-            public class AuthenticationProviderUserPassword implements AuthenticationProvider, Serializable {
-                      
-                @Override
-                public Publisher<AuthenticationResponse> authenticate(HttpRequest<?> httpRequest,
-                                                                      AuthenticationRequest<?, ?> authenticationRequest) {
-                    return null;
-                }
-            }
-            """, """
-            import io.micronaut.http.HttpRequest;
-            import io.micronaut.security.authentication.AuthenticationProvider;
-            import io.micronaut.security.authentication.AuthenticationRequest;
-            import io.micronaut.security.authentication.AuthenticationResponse;
-            import org.reactivestreams.Publisher;
-                      
-            import java.io.Serializable;
-                      
-            public class AuthenticationProviderUserPassword implements AuthenticationProvider<HttpRequest<?>>, Serializable {
-                      
-                @Override
-                public Publisher<AuthenticationResponse> authenticate(HttpRequest<?> httpRequest,
-                                                                      AuthenticationRequest<?, ?> authenticationRequest) {
-                    return null;
-                }
-            }
-            """));
+            """
+              import io.micronaut.http.HttpRequest;
+              import io.micronaut.security.authentication.AuthenticationProvider;
+              import io.micronaut.security.authentication.AuthenticationRequest;
+              import io.micronaut.security.authentication.AuthenticationResponse;
+              import org.reactivestreams.Publisher;
+
+              import java.io.Serializable;
+
+              public class AuthenticationProviderUserPassword implements AuthenticationProvider, Serializable {
+
+                  @Override
+                  public Publisher<AuthenticationResponse> authenticate(HttpRequest<?> httpRequest,
+                                                                        AuthenticationRequest<?, ?> authenticationRequest) {
+                      return null;
+                  }
+              }
+              """, """
+              import io.micronaut.http.HttpRequest;
+              import io.micronaut.security.authentication.AuthenticationProvider;
+              import io.micronaut.security.authentication.AuthenticationRequest;
+              import io.micronaut.security.authentication.AuthenticationResponse;
+              import org.reactivestreams.Publisher;
+
+              import java.io.Serializable;
+
+              public class AuthenticationProviderUserPassword implements AuthenticationProvider<HttpRequest<?>>, Serializable {
+
+                  @Override
+                  public Publisher<AuthenticationResponse> authenticate(HttpRequest<?> httpRequest,
+                                                                        AuthenticationRequest<?, ?> authenticationRequest) {
+                      return null;
+                  }
+              }
+              """
+          )
+        );
     }
 
     @Test
@@ -147,29 +156,31 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
         rewriteRun(
           //language=java
           java(
-                """
-            import io.micronaut.http.HttpRequest;
-            import io.micronaut.security.token.Claims;
-            import io.micronaut.security.token.jwt.validator.GenericJwtClaimsValidator;
-                        
-            public class CustomHttpRequestImpl implements GenericJwtClaimsValidator {
-                @Override
-                public boolean validate(Claims claims, HttpRequest<?> request) {
-                    return false;
-                }
-            }
-            """, """
-            import io.micronaut.http.HttpRequest;
-            import io.micronaut.security.token.Claims;
-            import io.micronaut.security.token.jwt.validator.GenericJwtClaimsValidator;
-                        
-            public class CustomHttpRequestImpl implements GenericJwtClaimsValidator<HttpRequest<?>> {
-                @Override
-                public boolean validate(Claims claims, HttpRequest<?> request) {
-                    return false;
-                }
-            }
-            """));
+            """
+              import io.micronaut.http.HttpRequest;
+              import io.micronaut.security.token.Claims;
+              import io.micronaut.security.token.jwt.validator.GenericJwtClaimsValidator;
+
+              public class CustomHttpRequestImpl implements GenericJwtClaimsValidator {
+                  @Override
+                  public boolean validate(Claims claims, HttpRequest<?> request) {
+                      return false;
+                  }
+              }
+              """, """
+              import io.micronaut.http.HttpRequest;
+              import io.micronaut.security.token.Claims;
+              import io.micronaut.security.token.jwt.validator.GenericJwtClaimsValidator;
+
+              public class CustomHttpRequestImpl implements GenericJwtClaimsValidator<HttpRequest<?>> {
+                  @Override
+                  public boolean validate(Claims claims, HttpRequest<?> request) {
+                      return false;
+                  }
+              }
+              """
+          )
+        );
     }
 
     @Test
@@ -177,29 +188,31 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
         rewriteRun(
           //language=java
           java(
-                """
-            import io.micronaut.http.HttpRequest;
-            import io.micronaut.security.token.Claims;
-            import io.micronaut.security.token.jwt.validator.JwtClaimsValidator;
-                        
-            public class CustomHttpRequestImpl implements JwtClaimsValidator {
-                @Override
-                public boolean validate(Claims claims, HttpRequest<?> request) {
-                    return false;
-                }
-            }
-            """, """
-            import io.micronaut.http.HttpRequest;
-            import io.micronaut.security.token.Claims;
-            import io.micronaut.security.token.jwt.validator.JwtClaimsValidator;
-                        
-            public class CustomHttpRequestImpl implements JwtClaimsValidator<HttpRequest<?>> {
-                @Override
-                public boolean validate(Claims claims, HttpRequest<?> request) {
-                    return false;
-                }
-            }
-            """));
+            """
+              import io.micronaut.http.HttpRequest;
+              import io.micronaut.security.token.Claims;
+              import io.micronaut.security.token.jwt.validator.JwtClaimsValidator;
+
+              public class CustomHttpRequestImpl implements JwtClaimsValidator {
+                  @Override
+                  public boolean validate(Claims claims, HttpRequest<?> request) {
+                      return false;
+                  }
+              }
+              """, """
+              import io.micronaut.http.HttpRequest;
+              import io.micronaut.security.token.Claims;
+              import io.micronaut.security.token.jwt.validator.JwtClaimsValidator;
+
+              public class CustomHttpRequestImpl implements JwtClaimsValidator<HttpRequest<?>> {
+                  @Override
+                  public boolean validate(Claims claims, HttpRequest<?> request) {
+                      return false;
+                  }
+              }
+              """
+          )
+        );
     }
 
     @Test
@@ -207,31 +220,33 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
         rewriteRun(
           //language=java
           java(
-                """
-            import io.micronaut.http.HttpRequest;
-            import io.micronaut.security.oauth2.endpoint.endsession.response.EndSessionCallbackUrlBuilder;
-            
-            import java.net.URL;
-            
-            public class CustomHttpRequestImpl implements EndSessionCallbackUrlBuilder {
-                @Override
-                public URL build(HttpRequest<?> originating) {
-                    return null;
-                }
-            }
-            """, """
-            import io.micronaut.http.HttpRequest;
-            import io.micronaut.security.oauth2.endpoint.endsession.response.EndSessionCallbackUrlBuilder;
-            
-            import java.net.URL;
-            
-            public class CustomHttpRequestImpl implements EndSessionCallbackUrlBuilder<HttpRequest<?>> {
-                @Override
-                public URL build(HttpRequest<?> originating) {
-                    return null;
-                }
-            }
-            """));
+            """
+              import io.micronaut.http.HttpRequest;
+              import io.micronaut.security.oauth2.endpoint.endsession.response.EndSessionCallbackUrlBuilder;
+
+              import java.net.URL;
+
+              public class CustomHttpRequestImpl implements EndSessionCallbackUrlBuilder {
+                  @Override
+                  public URL build(HttpRequest<?> originating) {
+                      return null;
+                  }
+              }
+              """, """
+              import io.micronaut.http.HttpRequest;
+              import io.micronaut.security.oauth2.endpoint.endsession.response.EndSessionCallbackUrlBuilder;
+
+              import java.net.URL;
+
+              public class CustomHttpRequestImpl implements EndSessionCallbackUrlBuilder<HttpRequest<?>> {
+                  @Override
+                  public URL build(HttpRequest<?> originating) {
+                      return null;
+                  }
+              }
+              """
+          )
+        );
     }
 
     @Test
@@ -239,31 +254,33 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
         rewriteRun(
           //language=java
           java(
-                """
-            import io.micronaut.http.HttpRequest;
-            import io.micronaut.security.oauth2.url.AbsoluteUrlBuilder;
-            
-            import java.net.URL;
-            
-            public class CustomHttpRequestImpl implements AbsoluteUrlBuilder {
-                @Override
-                public URL buildUrl(HttpRequest<?> current, String path) {
-                    return null;
-                }
-            }
-            """, """
-            import io.micronaut.http.HttpRequest;
-            import io.micronaut.security.oauth2.url.AbsoluteUrlBuilder;
-            
-            import java.net.URL;
-            
-            public class CustomHttpRequestImpl implements AbsoluteUrlBuilder<HttpRequest<?>> {
-                @Override
-                public URL buildUrl(HttpRequest<?> current, String path) {
-                    return null;
-                }
-            }
-            """));
+            """
+              import io.micronaut.http.HttpRequest;
+              import io.micronaut.security.oauth2.url.AbsoluteUrlBuilder;
+
+              import java.net.URL;
+
+              public class CustomHttpRequestImpl implements AbsoluteUrlBuilder {
+                  @Override
+                  public URL buildUrl(HttpRequest<?> current, String path) {
+                      return null;
+                  }
+              }
+              """, """
+              import io.micronaut.http.HttpRequest;
+              import io.micronaut.security.oauth2.url.AbsoluteUrlBuilder;
+
+              import java.net.URL;
+
+              public class CustomHttpRequestImpl implements AbsoluteUrlBuilder<HttpRequest<?>> {
+                  @Override
+                  public URL buildUrl(HttpRequest<?> current, String path) {
+                      return null;
+                  }
+              }
+              """
+          )
+        );
     }
 
     @Test
@@ -271,75 +288,77 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
         rewriteRun(
           //language=java
           java(
-                """
-            import io.micronaut.http.HttpRequest;
-            import io.micronaut.security.oauth2.url.OauthRouteUrlBuilder;
-            
-            import java.net.URI;
-            import java.net.URL;
-            
-            public class CustomHttpRequestImpl implements OauthRouteUrlBuilder {
-            
-                @Override
-                public URL buildLoginUrl(HttpRequest<?> originating, String providerName) {
-                    return null;
-                }
-            
-                @Override
-                public URL buildCallbackUrl(HttpRequest<?> originating, String providerName) {
-                    return null;
-                }
-            
-                @Override
-                public URI buildLoginUri(String providerName) {
-                    return null;
-                }
-            
-                @Override
-                public URI buildCallbackUri(String providerName) {
-                    return null;
-                }
-            
-                @Override
-                public URL buildUrl(HttpRequest<?> current, String path) {
-                    return null;
-                }
-            }
-            """, """
-            import io.micronaut.http.HttpRequest;
-            import io.micronaut.security.oauth2.url.OauthRouteUrlBuilder;
-            
-            import java.net.URI;
-            import java.net.URL;
-            
-            public class CustomHttpRequestImpl implements OauthRouteUrlBuilder<HttpRequest<?>> {
-            
-                @Override
-                public URL buildLoginUrl(HttpRequest<?> originating, String providerName) {
-                    return null;
-                }
-            
-                @Override
-                public URL buildCallbackUrl(HttpRequest<?> originating, String providerName) {
-                    return null;
-                }
-            
-                @Override
-                public URI buildLoginUri(String providerName) {
-                    return null;
-                }
-            
-                @Override
-                public URI buildCallbackUri(String providerName) {
-                    return null;
-                }
-            
-                @Override
-                public URL buildUrl(HttpRequest<?> current, String path) {
-                    return null;
-                }
-            }
-            """));
+            """
+              import io.micronaut.http.HttpRequest;
+              import io.micronaut.security.oauth2.url.OauthRouteUrlBuilder;
+
+              import java.net.URI;
+              import java.net.URL;
+
+              public class CustomHttpRequestImpl implements OauthRouteUrlBuilder {
+
+                  @Override
+                  public URL buildLoginUrl(HttpRequest<?> originating, String providerName) {
+                      return null;
+                  }
+
+                  @Override
+                  public URL buildCallbackUrl(HttpRequest<?> originating, String providerName) {
+                      return null;
+                  }
+
+                  @Override
+                  public URI buildLoginUri(String providerName) {
+                      return null;
+                  }
+
+                  @Override
+                  public URI buildCallbackUri(String providerName) {
+                      return null;
+                  }
+
+                  @Override
+                  public URL buildUrl(HttpRequest<?> current, String path) {
+                      return null;
+                  }
+              }
+              """, """
+              import io.micronaut.http.HttpRequest;
+              import io.micronaut.security.oauth2.url.OauthRouteUrlBuilder;
+
+              import java.net.URI;
+              import java.net.URL;
+
+              public class CustomHttpRequestImpl implements OauthRouteUrlBuilder<HttpRequest<?>> {
+
+                  @Override
+                  public URL buildLoginUrl(HttpRequest<?> originating, String providerName) {
+                      return null;
+                  }
+
+                  @Override
+                  public URL buildCallbackUrl(HttpRequest<?> originating, String providerName) {
+                      return null;
+                  }
+
+                  @Override
+                  public URI buildLoginUri(String providerName) {
+                      return null;
+                  }
+
+                  @Override
+                  public URI buildCallbackUri(String providerName) {
+                      return null;
+                  }
+
+                  @Override
+                  public URL buildUrl(HttpRequest<?> current, String path) {
+                      return null;
+                  }
+              }
+              """
+          )
+        );
     }
 
     @Test
@@ -347,47 +366,49 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
         rewriteRun(
           //language=java
           java(
-                """
-            import io.micronaut.http.HttpRequest;
-            import io.micronaut.security.authentication.Authentication;
-            import io.micronaut.security.endpoints.introspection.IntrospectionProcessor;
-            import io.micronaut.security.endpoints.introspection.IntrospectionRequest;
-            import io.micronaut.security.endpoints.introspection.IntrospectionResponse;
-            import org.reactivestreams.Publisher;
-            
-            public class CustomHttpRequestImpl implements IntrospectionProcessor {
-            
-                @Override
-                public Publisher<IntrospectionResponse> introspect(IntrospectionRequest introspectionRequest, HttpRequest<?> httpRequest) {
-                    return null;
-                }
-            
-                @Override
-                public Publisher<IntrospectionResponse> introspect(Authentication authentication, HttpRequest<?> httpRequest) {
-                    return null;
-                }
-            }
-            """, """
-            import io.micronaut.http.HttpRequest;
-            import io.micronaut.security.authentication.Authentication;
-            import io.micronaut.security.endpoints.introspection.IntrospectionProcessor;
-            import io.micronaut.security.endpoints.introspection.IntrospectionRequest;
-            import io.micronaut.security.endpoints.introspection.IntrospectionResponse;
-            import org.reactivestreams.Publisher;
-            
-            public class CustomHttpRequestImpl implements IntrospectionProcessor<HttpRequest<?>> {
-            
-                @Override
-                public Publisher<IntrospectionResponse> introspect(IntrospectionRequest introspectionRequest, HttpRequest<?> httpRequest) {
-                    return null;
-                }
-            
-                @Override
-                public Publisher<IntrospectionResponse> introspect(Authentication authentication, HttpRequest<?> httpRequest) {
-                    return null;
-                }
-            }
-            """));
+            """
+              import io.micronaut.http.HttpRequest;
+              import io.micronaut.security.authentication.Authentication;
+              import io.micronaut.security.endpoints.introspection.IntrospectionProcessor;
+              import io.micronaut.security.endpoints.introspection.IntrospectionRequest;
+              import io.micronaut.security.endpoints.introspection.IntrospectionResponse;
+              import org.reactivestreams.Publisher;
+
+              public class CustomHttpRequestImpl implements IntrospectionProcessor {
+
+                  @Override
+                  public Publisher<IntrospectionResponse> introspect(IntrospectionRequest introspectionRequest, HttpRequest<?> httpRequest) {
+                      return null;
+                  }
+
+                  @Override
+                  public Publisher<IntrospectionResponse> introspect(Authentication authentication, HttpRequest<?> httpRequest) {
+                      return null;
+                  }
+              }
+              """, """
+              import io.micronaut.http.HttpRequest;
+              import io.micronaut.security.authentication.Authentication;
+              import io.micronaut.security.endpoints.introspection.IntrospectionProcessor;
+              import io.micronaut.security.endpoints.introspection.IntrospectionRequest;
+              import io.micronaut.security.endpoints.introspection.IntrospectionResponse;
+              import org.reactivestreams.Publisher;
+
+              public class CustomHttpRequestImpl implements IntrospectionProcessor<HttpRequest<?>> {
+
+                  @Override
+                  public Publisher<IntrospectionResponse> introspect(IntrospectionRequest introspectionRequest, HttpRequest<?> httpRequest) {
+                      return null;
+                  }
+
+                  @Override
+                  public Publisher<IntrospectionResponse> introspect(Authentication authentication, HttpRequest<?> httpRequest) {
+                      return null;
+                  }
+              }
+              """
+          )
+        );
     }
 
     @Test
@@ -395,31 +416,33 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
         rewriteRun(
           //language=java
           java(
-                """
-            import io.micronaut.http.HttpRequest;
-            import io.micronaut.security.authentication.Authentication;
-            import io.micronaut.security.filters.AuthenticationFetcher;
-            import org.reactivestreams.Publisher;
-            
-            public class CustomHttpRequestImpl implements AuthenticationFetcher {
-                @Override
-                public Publisher<Authentication> fetchAuthentication(HttpRequest<?> request) {
-                    return null;
-                }
-            }
-            """, """
-            import io.micronaut.http.HttpRequest;
-            import io.micronaut.security.authentication.Authentication;
-            import io.micronaut.security.filters.AuthenticationFetcher;
-            import org.reactivestreams.Publisher;
-             
-            public class CustomHttpRequestImpl implements AuthenticationFetcher<HttpRequest<?>> {
-                @Override
-                public Publisher<Authentication> fetchAuthentication(HttpRequest<?> request) {
-                    return null;
-                }
-            }
-            """));
+            """
+              import io.micronaut.http.HttpRequest;
+              import io.micronaut.security.authentication.Authentication;
+              import io.micronaut.security.filters.AuthenticationFetcher;
+              import org.reactivestreams.Publisher;
+
+              public class CustomHttpRequestImpl implements AuthenticationFetcher {
+                  @Override
+                  public Publisher<Authentication> fetchAuthentication(HttpRequest<?> request) {
+                      return null;
+                  }
+              }
+              """, """
+              import io.micronaut.http.HttpRequest;
+              import io.micronaut.security.authentication.Authentication;
+              import io.micronaut.security.filters.AuthenticationFetcher;
+              import org.reactivestreams.Publisher;
+
+              public class CustomHttpRequestImpl implements AuthenticationFetcher<HttpRequest<?>> {
+                  @Override
+                  public Publisher<Authentication> fetchAuthentication(HttpRequest<?> request) {
+                      return null;
+                  }
+              }
+              """
+          )
+        );
     }
 
     @Test
@@ -427,31 +450,33 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
         rewriteRun(
           //language=java
           java(
-                """
-            import io.micronaut.http.HttpRequest;
-            import io.micronaut.security.token.reader.TokenReader;
-            
-            import java.util.Optional;
-            
-            public class CustomHttpRequestImpl implements TokenReader {
-                @Override
-                public Optional<String> findToken(HttpRequest<?> request) {
-                    return Optional.empty();
-                }
-            }
-            """, """
-            import io.micronaut.http.HttpRequest;
-            import io.micronaut.security.token.reader.TokenReader;
-            
-            import java.util.Optional;
-            
-            public class CustomHttpRequestImpl implements TokenReader<HttpRequest<?>> {
-                @Override
-                public Optional<String> findToken(HttpRequest<?> request) {
-                    return Optional.empty();
-                }
-            }
-            """));
+            """
+              import io.micronaut.http.HttpRequest;
+              import io.micronaut.security.token.reader.TokenReader;
+
+              import java.util.Optional;
+
+              public class CustomHttpRequestImpl implements TokenReader {
+                  @Override
+                  public Optional<String> findToken(HttpRequest<?> request) {
+                      return Optional.empty();
+                  }
+              }
+              """, """
+              import io.micronaut.http.HttpRequest;
+              import io.micronaut.security.token.reader.TokenReader;
+
+              import java.util.Optional;
+
+              public class CustomHttpRequestImpl implements TokenReader<HttpRequest<?>> {
+                  @Override
+                  public Optional<String> findToken(HttpRequest<?> request) {
+                      return Optional.empty();
+                  }
+              }
+              """
+          )
+        );
     }
 
     @Test
@@ -459,31 +484,33 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
         rewriteRun(
           //language=java
           java(
-                """
-            import io.micronaut.http.HttpRequest;
-            import io.micronaut.security.token.reader.TokenResolver;
-            
-            import java.util.Optional;
-            
-            public class CustomHttpRequestImpl implements TokenResolver {
-                @Override
-                public Optional<String> resolveToken(HttpRequest<?> request) {
-                    return Optional.empty();
-                }
-            }
-            """, """
-            import io.micronaut.http.HttpRequest;
-            import io.micronaut.security.token.reader.TokenResolver;
-            
-            import java.util.Optional;
-            
-            public class CustomHttpRequestImpl implements TokenResolver<HttpRequest<?>> {
-                @Override
-                public Optional<String> resolveToken(HttpRequest<?> request) {
-                    return Optional.empty();
-                }
-            }
-            """));
+            """
+              import io.micronaut.http.HttpRequest;
+              import io.micronaut.security.token.reader.TokenResolver;
+
+              import java.util.Optional;
+
+              public class CustomHttpRequestImpl implements TokenResolver {
+                  @Override
+                  public Optional<String> resolveToken(HttpRequest<?> request) {
+                      return Optional.empty();
+                  }
+              }
+              """, """
+              import io.micronaut.http.HttpRequest;
+              import io.micronaut.security.token.reader.TokenResolver;
+
+              import java.util.Optional;
+
+              public class CustomHttpRequestImpl implements TokenResolver<HttpRequest<?>> {
+                  @Override
+                  public Optional<String> resolveToken(HttpRequest<?> request) {
+                      return Optional.empty();
+                  }
+              }
+              """
+          )
+        );
     }
 
     @Test
@@ -491,30 +518,32 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
         rewriteRun(
           //language=java
           java(
-                """
-            import io.micronaut.http.HttpRequest;
-            import io.micronaut.security.authentication.Authentication;
-            import io.micronaut.security.token.validator.TokenValidator;
-            import org.reactivestreams.Publisher;
-            
-            public class CustomHttpRequestImpl implements TokenValidator {
-                @Override
-                public Publisher<Authentication> validateToken(String token, HttpRequest<?> request) {
-                    return null;
-                }
-            }
-            """, """
-            import io.micronaut.http.HttpRequest;
-            import io.micronaut.security.authentication.Authentication;
-            import io.micronaut.security.token.validator.TokenValidator;
-            import org.reactivestreams.Publisher;
-            
-            public class CustomHttpRequestImpl implements TokenValidator<HttpRequest<?>> {
-                @Override
-                public Publisher<Authentication> validateToken(String token, HttpRequest<?> request) {
-                    return null;
-                }
-            }
-            """));
+            """
+              import io.micronaut.http.HttpRequest;
+              import io.micronaut.security.authentication.Authentication;
+              import io.micronaut.security.token.validator.TokenValidator;
+              import org.reactivestreams.Publisher;
+
+              public class CustomHttpRequestImpl implements TokenValidator {
+                  @Override
+                  public Publisher<Authentication> validateToken(String token, HttpRequest<?> request) {
+                      return null;
+                  }
+              }
+              """, """
+              import io.micronaut.http.HttpRequest;
+              import io.micronaut.security.authentication.Authentication;
+              import io.micronaut.security.token.validator.TokenValidator;
+              import org.reactivestreams.Publisher;
+
+              public class CustomHttpRequestImpl implements TokenValidator<HttpRequest<?>> {
+                  @Override
+                  public Publisher<Authentication> validateToken(String token, HttpRequest<?> request) {
+                      return null;
+                  }
+              }
+              """
+          )
+        );
     }
 }

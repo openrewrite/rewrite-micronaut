@@ -52,6 +52,7 @@ recipeDependencies {
     parserClasspath("javax.inject:javax.inject:1")
     parserClasspath("jakarta.inject:jakarta.inject-api:2.+")
     parserClasspath("org.reactivestreams:reactive-streams:1.0.4")
+    parserClasspath("io.projectreactor:reactor-core:3.4.39")
 
     parserClasspath("io.micronaut:micronaut-context:4.0.0")
     parserClasspath("io.micronaut:micronaut-websocket:4.0.0")
