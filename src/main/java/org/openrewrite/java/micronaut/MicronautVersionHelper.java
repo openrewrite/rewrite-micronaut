@@ -17,6 +17,7 @@ package org.openrewrite.java.micronaut;
 
 import org.openrewrite.ExecutionContext;
 import org.openrewrite.gradle.DependencyVersionSelector;
+import org.openrewrite.gradle.marker.GradleBuildscript;
 import org.openrewrite.gradle.marker.GradlePluginDescriptor;
 import org.openrewrite.gradle.marker.GradleSettings;
 import org.openrewrite.maven.MavenDownloadingException;
@@ -69,7 +70,12 @@ public final class MicronautVersionHelper {
 
     public static Optional<String> getNewerGradlePluginVersion(String pluginId, String versionPattern, String currentVersion, ExecutionContext ctx) throws MavenDownloadingException {
         MavenRepository gradlePluginsRepo = new MavenRepository("gradle-plugins", "https://plugins.gradle.org/m2/", "true", "false", true, null, null, true);
-        GradleSettings gradleSettings = new GradleSettings(randomId(), singletonList(gradlePluginsRepo), singletonList(new GradlePluginDescriptor("io.micronaut.gradle.MicronautApplicationPlugin", null)), emptyMap());
+        GradleSettings gradleSettings = new GradleSettings(
+                randomId(),
+                singletonList(gradlePluginsRepo),
+                singletonList(new GradlePluginDescriptor("io.micronaut.gradle.MicronautApplicationPlugin", null)),
+                emptyMap(),
+                new GradleBuildscript(randomId(), singletonList(gradlePluginsRepo), emptyMap()));
         return Optional.ofNullable(new DependencyVersionSelector(null, null, gradleSettings)
                 .select(new GroupArtifactVersion(pluginId, pluginId + ".gradle.plugin", currentVersion), "classpath", versionPattern, null, ctx));
     }
