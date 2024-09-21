@@ -75,9 +75,9 @@ public class ProviderImplementationsToMicronautFactories extends Recipe {
     }
 
     private static boolean isProvider(J.ClassDeclaration classDecl) {
-        return classDecl.getType() != null && classDecl.getImplements() != null
-                && (classDecl.getImplements().stream().anyMatch(impl -> TypeUtils.isOfClassType(impl.getType(), "javax.inject.Provider"))
-                || classDecl.getImplements().stream().anyMatch(impl -> TypeUtils.isOfClassType(impl.getType(), "jakarta.inject.Provider")));
+        return classDecl.getType() != null && classDecl.getImplements() != null &&
+                (classDecl.getImplements().stream().anyMatch(impl -> TypeUtils.isOfClassType(impl.getType(), "javax.inject.Provider")) ||
+                classDecl.getImplements().stream().anyMatch(impl -> TypeUtils.isOfClassType(impl.getType(), "jakarta.inject.Provider")));
     }
 
     private static class ProviderImplementationsGenerateFactoriesVisitor extends JavaIsoVisitor<ExecutionContext> {

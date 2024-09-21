@@ -79,9 +79,9 @@ public class SubclassesReturnedFromFactoriesNotInjectable extends Recipe {
             J.Return rtn = super.visitReturn(_return, ctx);
             J.MethodDeclaration md = getCursor().firstEnclosing(J.MethodDeclaration.class);
             Expression returnExpression = rtn.getExpression();
-            if (md != null && returnExpression != null
-                    && !(returnExpression.getType() instanceof JavaType.Primitive)
-                    && md.getLeadingAnnotations().stream().anyMatch(FactoryBeansAreTypeVisitor::isBeanAnnotation)) {
+            if (md != null && returnExpression != null &&
+                    !(returnExpression.getType() instanceof JavaType.Primitive) &&
+                    md.getLeadingAnnotations().stream().anyMatch(FactoryBeansAreTypeVisitor::isBeanAnnotation)) {
                 Cursor methodDeclCursor = getCursor().dropParentUntil(J.MethodDeclaration.class::isInstance);
                 JavaType returnedType = returnExpression.getType();
                 if (returnedType != null) {

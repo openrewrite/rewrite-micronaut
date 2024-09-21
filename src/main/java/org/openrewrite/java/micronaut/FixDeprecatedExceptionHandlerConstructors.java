@@ -167,8 +167,8 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
             }
 
             private boolean isErrorProcessorParameter(Statement statement) {
-                return statement instanceof J.VariableDeclarations
-                       && TypeUtils.isOfClassType(((J.VariableDeclarations) statement).getType(), errorResponseProcessorFqn);
+                return statement instanceof J.VariableDeclarations &&
+                       TypeUtils.isOfClassType(((J.VariableDeclarations) statement).getType(), errorResponseProcessorFqn);
             }
 
             private boolean isClassExceptionHandler(J.ClassDeclaration cd) {

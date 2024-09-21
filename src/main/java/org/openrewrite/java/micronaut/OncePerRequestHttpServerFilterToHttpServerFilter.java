@@ -52,8 +52,8 @@ public class OncePerRequestHttpServerFilterToHttpServerFilter extends Recipe {
         @Override
         public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext ctx) {
             J.ClassDeclaration cd = super.visitClassDeclaration(classDecl, ctx);
-            if (cd.getExtends() != null && cd.getExtends().getType() != null
-                    && TypeUtils.isOfClassType(cd.getExtends().getType(), oncePerRequestHttpServerFilterFqn)) {
+            if (cd.getExtends() != null && cd.getExtends().getType() != null &&
+                    TypeUtils.isOfClassType(cd.getExtends().getType(), oncePerRequestHttpServerFilterFqn)) {
                 cd = cd.withExtends(null);
                 J.Identifier newImplementsIdentifier = new J.Identifier(Tree.randomId(), Space.format(" "), Markers.EMPTY,
                         emptyList(), "HttpServerFilter", JavaType.buildType("io.micronaut.http.filter.HttpServerFilter"), null);
