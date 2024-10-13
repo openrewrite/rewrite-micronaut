@@ -70,7 +70,7 @@ public class TypeRequiresIntrospection extends ScanningRecipe<TypeRequiresIntros
                     J.CompilationUnit cu = (J.CompilationUnit) tree;
                     for (J.ClassDeclaration classDeclaration : cu.getClasses()) {
                         if (parentRequiresIntrospection(classDeclaration.getType())) {
-                            findParamsAndReturnTypes.visit(classDeclaration, acc.getIntrospectableTypes());
+                            findParamsAndReturnTypes.visit(classDeclaration, acc.getIntrospectableTypes(), getCursor());
                         }
                     }
                 }
@@ -88,7 +88,7 @@ public class TypeRequiresIntrospection extends ScanningRecipe<TypeRequiresIntros
                     J.CompilationUnit cu = (J.CompilationUnit) tree;
                     for (J.ClassDeclaration aClass : cu.getClasses()) {
                         if (acc.getIntrospectableTypes().contains(aClass.getType())) {
-                            return new AddIntrospectionAnnotationVisitor().visit(cu, acc.getIntrospectableTypes());
+                            return new AddIntrospectionAnnotationVisitor().visit(cu, acc.getIntrospectableTypes(), getCursor());
                         }
                     }
                 }
@@ -141,9 +141,9 @@ public class TypeRequiresIntrospection extends ScanningRecipe<TypeRequiresIntros
     }
 
     private static class AddIntrospectionAnnotationVisitor extends JavaIsoVisitor<Set<JavaType.FullyQualified>> {
-        final String introspectedAnnotationFqn = "io.micronaut.core.annotation.Introspected";
-        final AnnotationMatcher INTROSPECTION_ANNOTATION_MATCHER = new AnnotationMatcher("@" + introspectedAnnotationFqn);
-        final JavaTemplate templ = JavaTemplate.builder("@Introspected")
+        String introspectedAnnotationFqn = "io.micronaut.core.annotation.Introspected";
+        AnnotationMatcher INTROSPECTION_ANNOTATION_MATCHER = new AnnotationMatcher("@" + introspectedAnnotationFqn);
+        JavaTemplate templ = JavaTemplate.builder("@Introspected")
                 .imports(introspectedAnnotationFqn)
                 .javaParser(JavaParser.fromJavaVersion().dependsOn("package io.micronaut.core.annotation; public @interface Introspected {}"))
                 .build();

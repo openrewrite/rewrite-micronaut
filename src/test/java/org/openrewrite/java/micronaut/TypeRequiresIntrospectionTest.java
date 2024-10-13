@@ -51,7 +51,7 @@ class TypeRequiresIntrospectionTest implements RewriteTest {
             package a.b;
             import io.micronaut.http.annotation.Controller;
             import io.micronaut.http.annotation.Get;
-            
+        
             @Controller
             public class AbController {
                 @Get
@@ -69,6 +69,7 @@ class TypeRequiresIntrospectionTest implements RewriteTest {
 
     @Test
     void hasIntrospectionAnnotation() {
+        //language=java
         rewriteRun(
           java(controllerClass),
           java(pojoD),
@@ -91,6 +92,7 @@ class TypeRequiresIntrospectionTest implements RewriteTest {
 
     @Test
     void addsIntrospectionAnnotationFromParameter() {
+        //language=java
         rewriteRun(
           java(controllerClass),
           java(pojoD),
@@ -122,6 +124,7 @@ class TypeRequiresIntrospectionTest implements RewriteTest {
 
     @Test
     void addsIntrospectionAnnotationForOptional() {
+        //language=java
         rewriteRun(
           java(
             """
@@ -159,6 +162,7 @@ class TypeRequiresIntrospectionTest implements RewriteTest {
 
     @Test
     void doesNotChangeServiceOrController() {
+        //language=java
         rewriteRun(
           java(
             """
@@ -168,7 +172,7 @@ class TypeRequiresIntrospectionTest implements RewriteTest {
               @Controller
               public class AbController {
                   AbcClient abcClient;
-                  
+              
                   public AbcClient client() {
                       return abcClient;
                   }
@@ -195,6 +199,7 @@ class TypeRequiresIntrospectionTest implements RewriteTest {
 
     @Test
     void addsIntrospectionAnnotationFromReturnType() {
+        //language=java
         rewriteRun(
           java(pojoD),
           java(
@@ -242,6 +247,7 @@ class TypeRequiresIntrospectionTest implements RewriteTest {
 
     @Test
     void addsIntrospectionAnnotationForParameterizedParam() {
+        //language=java
         rewriteRun(
           java(
             pojoD),
@@ -281,6 +287,7 @@ class TypeRequiresIntrospectionTest implements RewriteTest {
 
     @Test
     void serviceShouldNotBeIntrospected() {
+        //language=java
         rewriteRun(
           java(
             """
@@ -299,7 +306,7 @@ class TypeRequiresIntrospectionTest implements RewriteTest {
           java(
             """
               package a.b;
-
+              
               import io.micronaut.http.client.annotation.Client;
               
               @Client
@@ -312,11 +319,12 @@ class TypeRequiresIntrospectionTest implements RewriteTest {
 
     @Test
     void serviceShouldNotBeIntrospectedBecauseOfTest() {
+        //language=java
         rewriteRun(
           java(
             """
               package api.model;
-
+              
               import io.micronaut.core.annotation.Introspected;
               
               @Introspected
@@ -327,7 +335,7 @@ class TypeRequiresIntrospectionTest implements RewriteTest {
           java(
             """
               package api.services.support;
-
+              
               import api.model.Event;
               import api.services.EventsService;
               import io.micronaut.http.annotation.Controller;
@@ -349,19 +357,19 @@ class TypeRequiresIntrospectionTest implements RewriteTest {
           java(
             """
                   package api.services;
-
+              
                   import api.model.Event;
                   import io.micronaut.http.annotation.Controller;
                   import io.micronaut.http.annotation.Post;
                   import io.micronaut.http.client.annotation.Client;
-                  
+              
                   @Controller("/api")
                   @Client("eventService")
                   public interface EventsService {
                       @Post("/events")
                       Boolean trackEvents(String source, String track, Event... events);
                   }
-
+              
               """
           )
         );

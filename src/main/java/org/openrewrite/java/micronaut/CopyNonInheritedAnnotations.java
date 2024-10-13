@@ -143,7 +143,7 @@ public class CopyNonInheritedAnnotations extends ScanningRecipe<CopyNonInherited
             @Override
             public @Nullable Tree visit(@Nullable Tree tree, ExecutionContext ctx) {
                 if (tree instanceof J.CompilationUnit) {
-                    return copyAnnoVisitor.visit(tree, ctx);
+                    return copyAnnoVisitor.visit(tree, ctx, getCursor().getParentOrThrow());
                 }
                 return tree;
             }
