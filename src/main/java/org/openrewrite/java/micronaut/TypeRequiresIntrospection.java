@@ -70,7 +70,7 @@ public class TypeRequiresIntrospection extends ScanningRecipe<TypeRequiresIntros
                     J.CompilationUnit cu = (J.CompilationUnit) tree;
                     for (J.ClassDeclaration classDeclaration : cu.getClasses()) {
                         if (parentRequiresIntrospection(classDeclaration.getType())) {
-                            findParamsAndReturnTypes.visit(classDeclaration, acc.getIntrospectableTypes(), getCursor());
+                            findParamsAndReturnTypes.visitNonNull(classDeclaration, acc.getIntrospectableTypes());
                         }
                     }
                 }
@@ -88,7 +88,7 @@ public class TypeRequiresIntrospection extends ScanningRecipe<TypeRequiresIntros
                     J.CompilationUnit cu = (J.CompilationUnit) tree;
                     for (J.ClassDeclaration aClass : cu.getClasses()) {
                         if (acc.getIntrospectableTypes().contains(aClass.getType())) {
-                            return new AddIntrospectionAnnotationVisitor().visit(cu, acc.getIntrospectableTypes(), getCursor());
+                            return new AddIntrospectionAnnotationVisitor().visitNonNull(cu, acc.getIntrospectableTypes());
                         }
                     }
                 }
