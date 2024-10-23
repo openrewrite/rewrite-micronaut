@@ -20,7 +20,6 @@ import org.junit.jupiter.api.io.TempDir;
 import org.openrewrite.DocumentExample;
 import org.openrewrite.test.RewriteTest;
 
-import java.io.IOException;
 import java.nio.file.Path;
 
 import static org.openrewrite.properties.Assertions.properties;
@@ -30,7 +29,7 @@ class UpgradeMicronautGradlePropertiesVersionTest implements RewriteTest {
 
     @DocumentExample
     @Test
-    void upgradeMicronaut2(@TempDir Path tempDir) throws IOException {
+    void upgradeMicronaut2(@TempDir Path tempDir) {
         String latestMicronautVersion = MicronautRewriteTestVersions.getLatestMN2Version();
 
         rewriteRun(spec -> spec.recipe(new UpgradeMicronautGradlePropertiesVersion("2.x")),

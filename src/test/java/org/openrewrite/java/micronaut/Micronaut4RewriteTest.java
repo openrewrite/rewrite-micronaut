@@ -17,7 +17,6 @@ package org.openrewrite.java.micronaut;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.openrewrite.maven.MavenDownloadingException;
 import org.openrewrite.test.RewriteTest;
 import org.openrewrite.test.SourceSpecs;
 
@@ -29,7 +28,7 @@ public abstract class Micronaut4RewriteTest implements RewriteTest {
     private SourceSpecs gradleProperties;
 
     @BeforeAll
-    static void init() throws MavenDownloadingException {
+    static void init() {
         latestApplicationPluginVersion = MicronautRewriteTestVersions.getLatestMN4ApplicationPluginVersion();
         latestMicronautVersion = MicronautRewriteTestVersions.getLatestMN4Version();
     }
