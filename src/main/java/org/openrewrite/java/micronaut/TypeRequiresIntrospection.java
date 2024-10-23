@@ -16,6 +16,7 @@
 package org.openrewrite.java.micronaut;
 
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
 import org.openrewrite.ExecutionContext;
 import org.openrewrite.ScanningRecipe;
@@ -70,7 +71,7 @@ public class TypeRequiresIntrospection extends ScanningRecipe<TypeRequiresIntros
                     J.CompilationUnit cu = (J.CompilationUnit) tree;
                     for (J.ClassDeclaration classDeclaration : cu.getClasses()) {
                         if (parentRequiresIntrospection(classDeclaration.getType())) {
-                            findParamsAndReturnTypes.visitNonNull(classDeclaration, acc.getIntrospectableTypes());
+                            findParamsAndReturnTypes.visit(classDeclaration, acc.getIntrospectableTypes());
                         }
                     }
                 }
@@ -81,20 +82,7 @@ public class TypeRequiresIntrospection extends ScanningRecipe<TypeRequiresIntros
 
     @Override
     public TreeVisitor<?, ExecutionContext> getVisitor(Accumulator acc) {
-        return new TreeVisitor<Tree, ExecutionContext>() {
-            @Override
-            public @Nullable Tree visit(@Nullable Tree tree, ExecutionContext ctx) {
-                if (tree instanceof J.CompilationUnit) {
-                    J.CompilationUnit cu = (J.CompilationUnit) tree;
-                    for (J.ClassDeclaration aClass : cu.getClasses()) {
-                        if (acc.getIntrospectableTypes().contains(aClass.getType())) {
-                            return new AddIntrospectionAnnotationVisitor().visitNonNull(cu, acc.getIntrospectableTypes());
-                        }
-                    }
-                }
-                return tree;
-            }
-        };
+        return new AddIntrospectionAnnotationVisitor(acc.getIntrospectableTypes());
     }
 
     private static final class FindParamsAndReturnTypes extends JavaIsoVisitor<Set<JavaType.FullyQualified>> {
@@ -140,24 +128,28 @@ public class TypeRequiresIntrospection extends ScanningRecipe<TypeRequiresIntros
         }
     }
 
-    private static class AddIntrospectionAnnotationVisitor extends JavaIsoVisitor<Set<JavaType.FullyQualified>> {
-        String introspectedAnnotationFqn = "io.micronaut.core.annotation.Introspected";
-        AnnotationMatcher INTROSPECTION_ANNOTATION_MATCHER = new AnnotationMatcher("@" + introspectedAnnotationFqn);
-        JavaTemplate templ = JavaTemplate.builder("@Introspected")
-                .imports(introspectedAnnotationFqn)
-                .javaParser(JavaParser.fromJavaVersion().dependsOn("package io.micronaut.core.annotation; public @interface Introspected {}"))
-                .build();
+    @RequiredArgsConstructor
+    private static class AddIntrospectionAnnotationVisitor extends JavaIsoVisitor<ExecutionContext> {
+        private static final String INTROSPECTED = "io.micronaut.core.annotation.Introspected";
+        private static final AnnotationMatcher INTROSPECTION_ANNOTATION_MATCHER = new AnnotationMatcher("@" + INTROSPECTED);
+
+        final Set<JavaType.FullyQualified> introspectableTypes;
 
         @Override
-        public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, Set<JavaType.FullyQualified> introspectableTypes) {
+        public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext ctx) {
             if (!introspectableTypes.contains(TypeUtils.asFullyQualified(classDecl.getType()))) {
                 return classDecl;
             }
 
-            J.ClassDeclaration cd = super.visitClassDeclaration(classDecl, introspectableTypes);
+            J.ClassDeclaration cd = super.visitClassDeclaration(classDecl, ctx);
             if (cd.getLeadingAnnotations().stream().noneMatch(INTROSPECTION_ANNOTATION_MATCHER::matches)) {
-                cd = templ.apply(getCursor(), cd.getCoordinates().addAnnotation(Comparator.comparing(J.Annotation::getSimpleName)));
-                maybeAddImport(introspectedAnnotationFqn);
+                maybeAddImport(INTROSPECTED);
+                J.ClassDeclaration annotated = JavaTemplate.builder("@Introspected")
+                        .imports(INTROSPECTED)
+                        .javaParser(JavaParser.fromJavaVersion().dependsOn("package io.micronaut.core.annotation; public @interface Introspected {}"))
+                        .build()
+                        .apply(getCursor(), cd.getCoordinates().addAnnotation(Comparator.comparing(J.Annotation::getSimpleName)));
+                return maybeAutoFormat(classDecl, annotated, annotated.getName(), ctx, getCursor().getParentTreeCursor());
             }
             return cd;
         }
