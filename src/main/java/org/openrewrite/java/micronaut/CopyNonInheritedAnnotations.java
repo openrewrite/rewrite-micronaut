@@ -16,10 +16,8 @@
 package org.openrewrite.java.micronaut;
 
 import lombok.Data;
-import org.jspecify.annotations.Nullable;
 import org.openrewrite.ExecutionContext;
 import org.openrewrite.ScanningRecipe;
-import org.openrewrite.Tree;
 import org.openrewrite.TreeVisitor;
 import org.openrewrite.internal.ListUtils;
 import org.openrewrite.java.JavaIsoVisitor;
@@ -138,16 +136,7 @@ public class CopyNonInheritedAnnotations extends ScanningRecipe<CopyNonInherited
             return TreeVisitor.noop();
         }
 
-        CopyAnnoVisitor copyAnnoVisitor = new CopyAnnoVisitor(acc.getParentAnnotationsByType());
-        return new TreeVisitor<Tree, ExecutionContext>() {
-            @Override
-            public @Nullable Tree visit(@Nullable Tree tree, ExecutionContext ctx) {
-                if (tree instanceof J.CompilationUnit) {
-                    return copyAnnoVisitor.visit(tree, ctx, getCursor().getParentOrThrow());
-                }
-                return tree;
-            }
-        };
+        return new CopyAnnoVisitor(acc.getParentAnnotationsByType());
     }
 
     private static final class CopyAnnoVisitor extends JavaIsoVisitor<ExecutionContext> {
@@ -203,7 +192,7 @@ public class CopyNonInheritedAnnotations extends ScanningRecipe<CopyNonInherited
             List<J.Annotation> afterAnnotationList = ListUtils.concatAll(cd.getLeadingAnnotations(), annotationsFromParentClass);
             if (afterAnnotationList != cd.getLeadingAnnotations()) {
                 cd = cd.withLeadingAnnotations(afterAnnotationList);
-                cd = autoFormat(cd, cd.getName(), ctx, getCursor());
+                cd = autoFormat(cd, cd.getName(), ctx, getCursor().getParentTreeCursor());
                 for (J.Annotation annotation : annotationsFromParentClass) {
                     JavaType.FullyQualified fullyQualified = TypeUtils.asFullyQualified(annotation.getType());
                     if (fullyQualified != null) {

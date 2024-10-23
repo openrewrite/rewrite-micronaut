@@ -42,6 +42,7 @@ class CopyNonInheritedAnnotationsTest implements RewriteTest {
 
     @Test
     void refreshableControllerExtends() {
+        //language=java
         rewriteRun(
           java(
             """
@@ -92,6 +93,7 @@ class CopyNonInheritedAnnotationsTest implements RewriteTest {
 
     @Test
     void refreshableParameterized() {
+        //language=java
         rewriteRun(
           java(
             """
@@ -138,6 +140,7 @@ class CopyNonInheritedAnnotationsTest implements RewriteTest {
 
     @Test
     void refreshableController() {
+        //language=java
         rewriteRun(
           java(
             """
@@ -184,6 +187,7 @@ class CopyNonInheritedAnnotationsTest implements RewriteTest {
 
     @Test
     void refreshableNestedClass() {
+        //language=java
         rewriteRun(
           java(
             """
@@ -237,6 +241,7 @@ class CopyNonInheritedAnnotationsTest implements RewriteTest {
     @DocumentExample
     @Test
     void refreshableFromGrandparent() {
+        //language=java
         rewriteRun(
           java(
             """
@@ -304,7 +309,7 @@ class CopyNonInheritedAnnotationsTest implements RewriteTest {
 
     @Test
     void noDuplicateAnnotations() {
-
+        //language=java
         rewriteRun(
           java(
             """
@@ -355,6 +360,7 @@ class CopyNonInheritedAnnotationsTest implements RewriteTest {
 
     @Test
     void combineAnnotationsFromSuperAndInterface() {
+        //language=java
         rewriteRun(
           java(
             """
@@ -409,6 +415,7 @@ class CopyNonInheritedAnnotationsTest implements RewriteTest {
 
     @Test
     void doNothingIfAnnotationsAlreadyInPlace() {
+        //language=java
         rewriteRun(
           java(
             """
@@ -447,6 +454,7 @@ class CopyNonInheritedAnnotationsTest implements RewriteTest {
     @Disabled("JavaType.Class does not contain method info.  https://github.com/openrewrite/rewrite/issues/150")
     @Test
     void refreshableMethodOverride() {
+        //language=java
         rewriteRun(
           java(
             """
