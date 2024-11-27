@@ -15,57 +15,14 @@
  */
 package org.openrewrite.java.micronaut;
 
+import lombok.Value;
 import org.jspecify.annotations.Nullable;
 import org.openrewrite.*;
 import org.openrewrite.java.dependencies.AddDependency;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-import static java.util.Objects.requireNonNull;
-
-public class AddSnakeYamlDependencyIfNeeded extends ScanningRecipe<AddSnakeYamlDependencyIfNeeded.YamlAccumulator> {
-
-    private final List<Recipe> recipeList = new ArrayList<>();
-
-    static class YamlAccumulator {
-        boolean usingYamlConfig;
-    }
-
-    public AddSnakeYamlDependencyIfNeeded() {
-        recipeList.add(new AddDependency("org.yaml", "snakeyaml", null, null, "io.micronaut.runtime.Micronaut",
-                null, null, null, "runtimeOnly", "runtime", null, null, null, null));
-    }
-
-    @Override
-    public YamlAccumulator getInitialValue(ExecutionContext ctx) {
-        return new YamlAccumulator();
-    }
-
-    @Override
-    public TreeVisitor<?, ExecutionContext> getScanner(YamlAccumulator acc) {
-        return new TreeVisitor<Tree, ExecutionContext>() {
-            @Override
-            public @Nullable Tree visit(@Nullable Tree tree, ExecutionContext ctx) {
-                SourceFile sourceFile = (SourceFile) requireNonNull(tree);
-                acc.usingYamlConfig |= sourceFile != new FindYamlConfig().getVisitor().visit(sourceFile, ctx);
-                return tree;
-            }
-        };
-    }
-
-    @Override
-    public TreeVisitor<?, ExecutionContext> getVisitor(YamlAccumulator acc) {
-        return Preconditions.check(!acc.usingYamlConfig, new TreeVisitor<Tree, ExecutionContext>() {
-            @Override
-            public @Nullable Tree visit(@Nullable Tree tree, ExecutionContext ctx) {
-                if (!recipeList.isEmpty()) {
-                    recipeList.clear();
-                }
-                return super.visit(tree, ctx);
-            }
-        });
-    }
+public class AddSnakeYamlDependencyIfNeeded extends ScanningRecipe<AddSnakeYamlDependencyIfNeeded.Accumulator> {
 
     @Override
     public String getDisplayName() {
@@ -78,7 +35,44 @@ public class AddSnakeYamlDependencyIfNeeded extends ScanningRecipe<AddSnakeYamlD
     }
 
     @Override
-    public List<Recipe> getRecipeList() {
-        return this.recipeList;
+    public AddSnakeYamlDependencyIfNeeded.Accumulator getInitialValue(ExecutionContext ctx) {
+        return new Accumulator(addDependencyRecipe().getInitialValue(ctx));
+    }
+
+    @Override
+    public TreeVisitor<?, ExecutionContext> getScanner(AddSnakeYamlDependencyIfNeeded.Accumulator acc) {
+        AddDependency addDependencyRecipe = addDependencyRecipe();
+        return new TreeVisitor<Tree, ExecutionContext>() {
+            @Override
+            public @Nullable Tree visit(@Nullable Tree tree, ExecutionContext ctx) {
+                if (tree instanceof SourceFile) {
+                    if (!acc.usesYamlConfig.get()) {
+                        acc.usesYamlConfig.set(tree != new FindYamlConfig().getVisitor().visit(tree, ctx));
+                    }
+                    TreeVisitor<?, ExecutionContext> addDependencyScanner = addDependencyRecipe.getScanner(acc.getAddDependencyAccumulator());
+                    if (addDependencyScanner.isAcceptable((SourceFile) tree, ctx)) {
+                        addDependencyScanner.visit(tree, ctx);
+                    }
+                }
+                return super.visit(tree, ctx);
+            }
+        };
+    }
+
+    @Override
+    public TreeVisitor<?, ExecutionContext> getVisitor(AddSnakeYamlDependencyIfNeeded.Accumulator acc) {
+        return Preconditions.check(acc.usesYamlConfig.get(), addDependencyRecipe().getVisitor(acc.getAddDependencyAccumulator()));
+    }
+
+    private static AddDependency addDependencyRecipe() {
+        return new AddDependency(
+                "org.yaml", "snakeyaml", null, null, null,
+                null, null, null, "runtimeOnly", "runtime", null, null, null, null);
+    }
+
+    @Value
+    public static class Accumulator {
+        AtomicBoolean usesYamlConfig = new AtomicBoolean(false);
+        AddDependency.Accumulator addDependencyAccumulator;
     }
 }
