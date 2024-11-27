@@ -36,9 +36,9 @@ class AddTestResourcesClientDependencyIfNeededTest extends Micronaut4RewriteTest
     @Language("java")
     private final String micronautApplication = """
             import io.micronaut.runtime.Micronaut;
-            
+
             public class Application {
-            
+
                 public static void main(String[] args) {
                     Micronaut.run(Application.class, args);
                 }

@@ -15,75 +15,46 @@
  */
 package org.openrewrite.java.micronaut;
 
-import org.jspecify.annotations.Nullable;
-import org.openrewrite.*;
+
+import org.openrewrite.ExecutionContext;
+import org.openrewrite.Preconditions;
+import org.openrewrite.Recipe;
+import org.openrewrite.TreeVisitor;
+import org.openrewrite.marker.SearchResult;
 import org.openrewrite.maven.AddDependency;
 import org.openrewrite.maven.MavenIsoVisitor;
 import org.openrewrite.maven.search.FindProperties;
 import org.openrewrite.xml.tree.Xml;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
-public class AddTestResourcesClientDependencyIfNeeded extends ScanningRecipe<AddTestResourcesClientDependencyIfNeeded.Scanned> {
-
-    private final List<Recipe> recipeList = new ArrayList<>();
-
-    static class Scanned {
-        boolean isTestResourcesEnabled;
-    }
-
-    public AddTestResourcesClientDependencyIfNeeded() {
-        recipeList.add(new AddDependency("io.micronaut.testresources", "micronaut-test-resources-client", "LATEST",
-                null, "provided", null, "io.micronaut.runtime.Micronaut", null, null, null, null, null));
-    }
+public class AddTestResourcesClientDependencyIfNeeded extends Recipe {
 
     @Override
     public String getDisplayName() {
-        return "Add Test Resources Client dependency if needed";
+        return "Add `micronaut-test-resources-client` if needed";
     }
 
     @Override
     public String getDescription() {
-        return "This recipe adds the Test Resources Client dependency to pom.xml if test.resources.client.enabled property is true.";
+        return "Add the `micronaut-test-resources-client` dependency to pom.xml if `test.resources.client.enabled property=true`.";
     }
 
     @Override
-    public List<Recipe> getRecipeList() {
-        return this.recipeList;
-    }
-
-    @Override
-    public Scanned getInitialValue(ExecutionContext ctx) {
-        return new Scanned();
-    }
-
-    @Override
-    public TreeVisitor<?, ExecutionContext> getScanner(Scanned acc) {
-        return new MavenIsoVisitor<ExecutionContext>() {
+    public TreeVisitor<?, ExecutionContext> getVisitor() {
+        MavenIsoVisitor<ExecutionContext> resourcesEnabled = new MavenIsoVisitor<ExecutionContext>() {
             @Override
             public Xml.Document visitDocument(Xml.Document document, ExecutionContext ctx) {
                 Xml.Document maven = super.visitDocument(document, ctx);
                 Optional<Xml.Tag> testResourcesProp = FindProperties.find(document, "micronaut\\.test\\.resources\\.enabled").stream().findFirst();
                 if ("true".equals(testResourcesProp.flatMap(Xml.Tag::getValue).orElse("false"))) {
-                    acc.isTestResourcesEnabled = true;
+                    return SearchResult.found(maven);
                 }
                 return maven;
             }
         };
-    }
-
-    @Override
-    public TreeVisitor<?, ExecutionContext> getVisitor(Scanned acc) {
-        return Preconditions.check(!acc.isTestResourcesEnabled, new TreeVisitor<Tree, ExecutionContext>() {
-            @Override
-            public @Nullable Tree visit(@Nullable Tree tree, ExecutionContext ctx) {
-                if (!recipeList.isEmpty()) {
-                    recipeList.clear();
-                }
-                return super.visit(tree, ctx);
-            }
-        });
+        AddDependency addDependency = new AddDependency("io.micronaut.testresources", "micronaut-test-resources-client", "LATEST",
+                null, "provided", null, null, null, null, null, null, null);
+        return Preconditions.check(resourcesEnabled, addDependency.getVisitor());
     }
 }
