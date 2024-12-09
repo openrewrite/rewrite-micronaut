@@ -35,24 +35,38 @@ class UpdateMicronautSessionTest extends Micronaut4RewriteTest {
 
     @Test
     void updateGradleDependencies() {
-        rewriteRun(mavenProject("project",
-          //language=groovy
-          buildGradle("""
+        rewriteRun(
+          mavenProject("project",
+            //language=groovy
+            buildGradle(
+              """
                 dependencies {
                     implementation("io.micronaut:micronaut-session")
                 }
-            """, """
+                repositories {
+                    mavenCentral()
+                }
+                """,
+              """
                 dependencies {
                     implementation("io.micronaut.session:micronaut-session")
                 }
-            """)));
+                repositories {
+                    mavenCentral()
+                }
+                """
+            )
+          )
+        );
     }
 
     @Test
     void updateMavenDependencies() {
-        rewriteRun(mavenProject("project",
-          //language=xml
-          pomXml("""
+        rewriteRun(
+          mavenProject("project",
+            //language=xml
+            pomXml(
+              """
                 <project>
                     <groupId>com.mycompany.app</groupId>
                     <artifactId>my-app</artifactId>
@@ -69,7 +83,8 @@ class UpdateMicronautSessionTest extends Micronaut4RewriteTest {
                         </dependency>
                     </dependencies>
                 </project>
-            """.formatted(MicronautRewriteTestVersions.getLatestMN3Version()), """
+                """.formatted(MicronautRewriteTestVersions.getLatestMN3Version()),
+              """
                 <project>
                     <groupId>com.mycompany.app</groupId>
                     <artifactId>my-app</artifactId>
@@ -95,6 +110,9 @@ class UpdateMicronautSessionTest extends Micronaut4RewriteTest {
                         </dependency>
                     </dependencies>
                 </project>
-            """.formatted(latestMicronautVersion))));
+                """.formatted(latestMicronautVersion)
+            )
+          )
+        );
     }
 }
