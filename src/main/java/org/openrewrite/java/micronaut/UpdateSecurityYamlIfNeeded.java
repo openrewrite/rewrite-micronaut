@@ -60,7 +60,7 @@ public class UpdateSecurityYamlIfNeeded extends Recipe {
     }
 
     public UpdateSecurityYamlIfNeeded() {
-        this.recipeList.add(new MergeYaml("$.micronaut.security.token", newYamlKeysSnippet, Boolean.TRUE, null, null, null));
+        this.recipeList.add(new MergeYaml("$.micronaut.security.token", newYamlKeysSnippet, Boolean.TRUE, null, null, null, null));
         this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.generator.access-token.expiration", null, TOKEN_PATH + ".generator.access-token.expiration", null));
         this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.enabled", null, TOKEN_PATH + ".cookie.enabled", null));
         this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.cookie-max-age", null, TOKEN_PATH + ".cookie.cookie-max-age", null));
