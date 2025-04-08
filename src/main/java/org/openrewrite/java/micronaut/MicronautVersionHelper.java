@@ -76,7 +76,7 @@ public final class MicronautVersionHelper {
                 singletonList(new GradlePluginDescriptor("io.micronaut.gradle.MicronautApplicationPlugin", null)),
                 emptyMap(),
                 new GradleBuildscript(randomId(), singletonList(gradlePluginsRepo), emptyMap()));
-        return Optional.ofNullable(new DependencyVersionSelector(null, null, null, gradleSettings)
+        return Optional.ofNullable(new DependencyVersionSelector(null, null, gradleSettings)
                 .select(new GroupArtifactVersion(pluginId, pluginId + ".gradle.plugin", currentVersion),
                         "classpath",
                         versionPattern,
