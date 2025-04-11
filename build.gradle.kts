@@ -33,7 +33,6 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:latest.release")
 
     testImplementation("org.openrewrite:rewrite-test")
-    testImplementation("org.openrewrite:rewrite-java-tck")
     testImplementation("org.openrewrite.gradle.tooling:model:$rewriteVersion")
     testImplementation("org.assertj:assertj-core:latest.release")
     testRuntimeOnly(gradleApi())
