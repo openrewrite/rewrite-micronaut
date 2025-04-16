@@ -87,7 +87,8 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
                       return null;
                   }
               }
-              """, """
+              """,
+                """
               import io.micronaut.http.HttpRequest;
               import io.micronaut.security.authentication.AuthenticationProvider;
               import io.micronaut.security.authentication.AuthenticationRequest;
@@ -129,7 +130,8 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
                       return null;
                   }
               }
-              """, """
+              """,
+                """
               import io.micronaut.http.HttpRequest;
               import io.micronaut.security.authentication.AuthenticationProvider;
               import io.micronaut.security.authentication.AuthenticationRequest;
@@ -167,7 +169,8 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
                       return false;
                   }
               }
-              """, """
+              """,
+                """
               import io.micronaut.http.HttpRequest;
               import io.micronaut.security.token.Claims;
               import io.micronaut.security.token.jwt.validator.GenericJwtClaimsValidator;
@@ -199,7 +202,8 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
                       return false;
                   }
               }
-              """, """
+              """,
+                """
               import io.micronaut.http.HttpRequest;
               import io.micronaut.security.token.Claims;
               import io.micronaut.security.token.jwt.validator.JwtClaimsValidator;
@@ -232,7 +236,8 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
                       return null;
                   }
               }
-              """, """
+              """,
+                """
               import io.micronaut.http.HttpRequest;
               import io.micronaut.security.oauth2.endpoint.endsession.response.EndSessionCallbackUrlBuilder;
 
@@ -266,7 +271,8 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
                       return null;
                   }
               }
-              """, """
+              """,
+                """
               import io.micronaut.http.HttpRequest;
               import io.micronaut.security.oauth2.url.AbsoluteUrlBuilder;
 
@@ -322,7 +328,8 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
                       return null;
                   }
               }
-              """, """
+              """,
+                """
               import io.micronaut.http.HttpRequest;
               import io.micronaut.security.oauth2.url.OauthRouteUrlBuilder;
 
@@ -386,7 +393,8 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
                       return null;
                   }
               }
-              """, """
+              """,
+                """
               import io.micronaut.http.HttpRequest;
               import io.micronaut.security.authentication.Authentication;
               import io.micronaut.security.endpoints.introspection.IntrospectionProcessor;
@@ -428,7 +436,8 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
                       return null;
                   }
               }
-              """, """
+              """,
+                """
               import io.micronaut.http.HttpRequest;
               import io.micronaut.security.authentication.Authentication;
               import io.micronaut.security.filters.AuthenticationFetcher;
@@ -462,7 +471,8 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
                       return Optional.empty();
                   }
               }
-              """, """
+              """,
+                """
               import io.micronaut.http.HttpRequest;
               import io.micronaut.security.token.reader.TokenReader;
 
@@ -496,7 +506,8 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
                       return Optional.empty();
                   }
               }
-              """, """
+              """,
+                """
               import io.micronaut.http.HttpRequest;
               import io.micronaut.security.token.reader.TokenResolver;
 
@@ -530,7 +541,8 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
                       return null;
                   }
               }
-              """, """
+              """,
+                """
               import io.micronaut.http.HttpRequest;
               import io.micronaut.security.authentication.Authentication;
               import io.micronaut.security.token.validator.TokenValidator;

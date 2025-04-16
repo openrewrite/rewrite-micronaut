@@ -60,7 +60,8 @@ class UpdateBuildPluginsTest extends Micronaut4RewriteTest {
             repositories {
                 mavenCentral()
             }
-            """, """
+            """,
+                """
                 plugins {
                     id("com.github.johnrengelman.shadow") version "8.1.1"
                     id("io.micronaut.application") version "%s"

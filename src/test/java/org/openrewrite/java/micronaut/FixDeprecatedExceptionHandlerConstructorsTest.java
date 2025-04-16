@@ -69,7 +69,8 @@ class FixDeprecatedExceptionHandlerConstructorsTest implements RewriteTest {
                   }
                   private void someMethod(){}
               }
-              """)
+              """
+          )
         );
     }
 

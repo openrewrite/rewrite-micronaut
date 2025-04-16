@@ -227,12 +227,14 @@ class SubclassesReturnedFromFactoriesNotInjectableTest implements RewriteTest {
                       return false;
                   }
               }
-              """),
+              """
+          ),
           java(
             """
               package abc;
               public interface MyInterface {}
-              """),
+              """
+          ),
           java(
             """
               package abc;
@@ -245,7 +247,8 @@ class SubclassesReturnedFromFactoriesNotInjectableTest implements RewriteTest {
                       this.name = name;
                   }
               }
-              """),
+              """
+          ),
           java(
             """
               package abc;
@@ -258,7 +261,8 @@ class SubclassesReturnedFromFactoriesNotInjectableTest implements RewriteTest {
                       this.name = name;
                   }
               }
-              """),
+              """
+          ),
           java(
             """
               package abc;
@@ -297,7 +301,8 @@ class SubclassesReturnedFromFactoriesNotInjectableTest implements RewriteTest {
             """
               package abc;
               public interface Qi<T> {}
-              """),
+              """
+          ),
           java(
             """
               package abc;
