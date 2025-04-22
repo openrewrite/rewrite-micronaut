@@ -44,9 +44,6 @@ public final class MicronautVersionHelper {
     private static final String ARTIFACT_ID = "micronaut-parent";
     private static final LatestRelease LATEST_RELEASE = new LatestRelease(null);
 
-    public static final MavenRepository GRADLE_PLUGIN_REPO = new MavenRepository("gradle-plugins", "https://plugins.gradle.org/m2/", "true", "false", true, null, null, true);
-
-
     public static Optional<String> getNewerVersion(String versionPattern, String currentVersion, ExecutionContext ctx) throws MavenDownloadingException {
         VersionComparator versionComparator = Semver.validate(versionPattern, null).getValue();
         assert versionComparator != null;
@@ -69,7 +66,7 @@ public final class MicronautVersionHelper {
     }
 
     public static Optional<String> getNewerGradlePluginVersion(String pluginId, String versionPattern, String currentVersion, ExecutionContext ctx) throws MavenDownloadingException {
-        MavenRepository gradlePluginsRepo = new MavenRepository("gradle-plugins", "https://plugins.gradle.org/m2/", "true", "false", true, null, null, true);
+        MavenRepository gradlePluginsRepo = new MavenRepository("gradle-plugins", "https://plugins.gradle.org/m2/", "true", "false", true, null, null, null, true);
         GradleSettings gradleSettings = new GradleSettings(
                 randomId(),
                 singletonList(gradlePluginsRepo),
