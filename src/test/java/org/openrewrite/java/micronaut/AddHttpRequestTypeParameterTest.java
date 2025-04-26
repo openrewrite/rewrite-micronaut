@@ -40,32 +40,6 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
         spec.expectedCyclesThatMakeChanges(2);
     }
 
-    @Test
-    void authenticationProviderNoChangesNeeded() {
-        rewriteRun(
-          spec -> spec.expectedCyclesThatMakeChanges(0),
-          //language=java
-          java(
-            """
-              import io.micronaut.http.HttpRequest;
-              import io.micronaut.security.authentication.AuthenticationProvider;
-              import io.micronaut.security.authentication.AuthenticationRequest;
-              import io.micronaut.security.authentication.AuthenticationResponse;
-              import org.reactivestreams.Publisher;
-
-              public class AuthenticationProviderUserPassword implements AuthenticationProvider<HttpRequest<?>> {
-
-                  @Override
-                  public Publisher<AuthenticationResponse> authenticate(HttpRequest<?> httpRequest,
-                                                                        AuthenticationRequest<?, ?> authenticationRequest) {
-                      return null;
-                  }
-              }
-              """
-          )
-        );
-    }
-
     @DocumentExample
     @Test
     void authenticationProvider() {
@@ -89,6 +63,32 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
               }
               """,
                 """
+              import io.micronaut.http.HttpRequest;
+              import io.micronaut.security.authentication.AuthenticationProvider;
+              import io.micronaut.security.authentication.AuthenticationRequest;
+              import io.micronaut.security.authentication.AuthenticationResponse;
+              import org.reactivestreams.Publisher;
+
+              public class AuthenticationProviderUserPassword implements AuthenticationProvider<HttpRequest<?>> {
+
+                  @Override
+                  public Publisher<AuthenticationResponse> authenticate(HttpRequest<?> httpRequest,
+                                                                        AuthenticationRequest<?, ?> authenticationRequest) {
+                      return null;
+                  }
+              }
+              """
+          )
+        );
+    }
+
+    @Test
+    void authenticationProviderNoChangesNeeded() {
+        rewriteRun(
+          spec -> spec.expectedCyclesThatMakeChanges(0),
+          //language=java
+          java(
+            """
               import io.micronaut.http.HttpRequest;
               import io.micronaut.security.authentication.AuthenticationProvider;
               import io.micronaut.security.authentication.AuthenticationRequest;

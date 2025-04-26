@@ -32,6 +32,44 @@ class SubclassesReturnedFromFactoriesNotInjectableTest implements RewriteTest {
           .recipe(new SubclassesReturnedFromFactoriesNotInjectable());
     }
 
+    @DocumentExample
+    @Test
+    void addsTypeForInternalImplementation() {
+        rewriteRun(
+          java(
+            """
+              import java.util.concurrent.ForkJoinPool;
+              import java.util.concurrent.ExecutorService;
+              import javax.inject.Singleton;
+              import io.micronaut.context.annotation.Factory;
+              
+              @Factory
+              public class ExecutorFactory {
+                  
+                  @Singleton
+                  public ExecutorService executorService() {
+                      return ForkJoinPool.commonPool();
+                  }
+              }
+              """,
+            """
+              import java.util.concurrent.ForkJoinPool;
+              import javax.inject.Singleton;
+              import io.micronaut.context.annotation.Factory;
+              
+              @Factory
+              public class ExecutorFactory {
+              
+                  @Singleton
+                  public ForkJoinPool executorService() {
+                      return ForkJoinPool.commonPool();
+                  }
+              }
+              """
+          )
+        );
+    }
+
     @Test
     void beanTypeMatchesReturnType() {
         rewriteRun(
@@ -68,44 +106,6 @@ class SubclassesReturnedFromFactoriesNotInjectableTest implements RewriteTest {
                   
                   @Singleton
                   public ExecutorService executorService() {
-                      return ForkJoinPool.commonPool();
-                  }
-              }
-              """
-          )
-        );
-    }
-
-    @DocumentExample
-    @Test
-    void addsTypeForInternalImplementation() {
-        rewriteRun(
-          java(
-            """
-              import java.util.concurrent.ForkJoinPool;
-              import java.util.concurrent.ExecutorService;
-              import javax.inject.Singleton;
-              import io.micronaut.context.annotation.Factory;
-              
-              @Factory
-              public class ExecutorFactory {
-                  
-                  @Singleton
-                  public ExecutorService executorService() {
-                      return ForkJoinPool.commonPool();
-                  }
-              }
-              """,
-            """
-              import java.util.concurrent.ForkJoinPool;
-              import javax.inject.Singleton;
-              import io.micronaut.context.annotation.Factory;
-              
-              @Factory
-              public class ExecutorFactory {
-              
-                  @Singleton
-                  public ForkJoinPool executorService() {
                       return ForkJoinPool.commonPool();
                   }
               }

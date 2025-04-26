@@ -40,6 +40,75 @@ class CopyNonInheritedAnnotationsTest implements RewriteTest {
             """)).recipe(new CopyNonInheritedAnnotations());
     }
 
+    @DocumentExample
+    @Test
+    void refreshableFromGrandparent() {
+        //language=java
+        rewriteRun(
+          java(
+            """
+              package abc;
+              import io.micronaut.runtime.context.scope.Refreshable;
+              
+              @Refreshable
+              public abstract class BaseController {
+              }
+              
+              public abstract class MiddleController extends BaseController {
+              }
+              """,
+            """
+              package abc;
+              import io.micronaut.runtime.context.scope.Refreshable;
+              
+              @Refreshable
+              public abstract class BaseController {
+              }
+              
+              @Refreshable
+              public abstract class MiddleController extends BaseController {
+              }
+              """
+          ),
+          java(
+            """
+              package abc;
+              import io.micronaut.http.annotation.Controller;
+              import io.micronaut.http.annotation.Get;
+              
+              public class SuperClass {
+              
+                  @Controller
+                  public class MyController extends MiddleController {
+                      @Get
+                      public String info() {
+                          return "system info: ";
+                      }
+                  }
+              }
+              """,
+            """
+              package abc;
+              import io.micronaut.http.annotation.Controller;
+              import io.micronaut.http.annotation.Get;
+              import io.micronaut.runtime.context.scope.Refreshable;
+              
+              public class SuperClass {
+              
+                  @Controller
+                  @Refreshable
+                  public class MyController extends MiddleController {
+                      @Get
+                      public String info() {
+                          return "system info: ";
+                      }
+                  }
+              }
+              """
+          )
+        );
+    }
+
     @Test
     void refreshableControllerExtends() {
         //language=java
@@ -227,75 +296,6 @@ class CopyNonInheritedAnnotationsTest implements RewriteTest {
                   @Controller
                   @Refreshable
                   public class MyController extends BaseController {
-                      @Get
-                      public String info() {
-                          return "system info: ";
-                      }
-                  }
-              }
-              """
-          )
-        );
-    }
-
-    @DocumentExample
-    @Test
-    void refreshableFromGrandparent() {
-        //language=java
-        rewriteRun(
-          java(
-            """
-              package abc;
-              import io.micronaut.runtime.context.scope.Refreshable;
-              
-              @Refreshable
-              public abstract class BaseController {
-              }
-              
-              public abstract class MiddleController extends BaseController {
-              }
-              """,
-            """
-              package abc;
-              import io.micronaut.runtime.context.scope.Refreshable;
-              
-              @Refreshable
-              public abstract class BaseController {
-              }
-              
-              @Refreshable
-              public abstract class MiddleController extends BaseController {
-              }
-              """
-          ),
-          java(
-            """
-              package abc;
-              import io.micronaut.http.annotation.Controller;
-              import io.micronaut.http.annotation.Get;
-              
-              public class SuperClass {
-              
-                  @Controller
-                  public class MyController extends MiddleController {
-                      @Get
-                      public String info() {
-                          return "system info: ";
-                      }
-                  }
-              }
-              """,
-            """
-              package abc;
-              import io.micronaut.http.annotation.Controller;
-              import io.micronaut.http.annotation.Get;
-              import io.micronaut.runtime.context.scope.Refreshable;
-              
-              public class SuperClass {
-              
-                  @Controller
-                  @Refreshable
-                  public class MyController extends MiddleController {
                       @Get
                       public String info() {
                           return "system info: ";
