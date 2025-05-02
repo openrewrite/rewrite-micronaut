@@ -91,28 +91,6 @@ examples:
   sources:
   - before: |
       package abc;
-      import io.micronaut.runtime.context.scope.Refreshable;
-
-      @Refreshable
-      public abstract class BaseController {
-      }
-
-      public abstract class MiddleController extends BaseController {
-      }
-    after: |
-      package abc;
-      import io.micronaut.runtime.context.scope.Refreshable;
-
-      @Refreshable
-      public abstract class BaseController {
-      }
-
-      @Refreshable
-      public abstract class MiddleController extends BaseController {
-      }
-    language: java
-  - before: |
-      package abc;
       import io.micronaut.http.annotation.Controller;
       import io.micronaut.http.annotation.Get;
 
@@ -142,6 +120,28 @@ examples:
                   return "system info: ";
               }
           }
+      }
+    language: java
+  - before: |
+      package abc;
+      import io.micronaut.runtime.context.scope.Refreshable;
+
+      @Refreshable
+      public abstract class BaseController {
+      }
+
+      public abstract class MiddleController extends BaseController {
+      }
+    after: |
+      package abc;
+      import io.micronaut.runtime.context.scope.Refreshable;
+
+      @Refreshable
+      public abstract class BaseController {
+      }
+
+      @Refreshable
+      public abstract class MiddleController extends BaseController {
       }
     language: java
 ---
@@ -322,8 +322,6 @@ recipeName: org.openrewrite.java.micronaut.UpdateMicronautPlatformBom
 examples:
 - description: ''
   sources:
-  - before: micronautVersion=3.9.1
-    language: properties
   - before: |
       plugins {
           id("com.github.johnrengelman.shadow") version "7.1.2"
@@ -344,6 +342,8 @@ examples:
       }
     path: build.gradle
     language: groovy
+  - before: micronautVersion=3.9.1
+    language: properties
 ---
 type: specs.openrewrite.org/v1beta/example
 recipeName: org.openrewrite.java.micronaut.UpgradeMicronautGradlePropertiesVersion
