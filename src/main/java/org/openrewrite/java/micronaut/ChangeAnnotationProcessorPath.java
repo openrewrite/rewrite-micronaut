@@ -27,12 +27,10 @@ import org.openrewrite.internal.StringUtils;
 import org.openrewrite.maven.MavenVisitor;
 import org.openrewrite.semver.DependencyMatcher;
 import org.openrewrite.xml.AddOrUpdateChild;
-import org.openrewrite.xml.ChangeTagValueVisitor;
 import org.openrewrite.xml.tree.Xml;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.openrewrite.xml.FilterTagChildrenVisitor.filterTagChildren;
@@ -158,14 +156,6 @@ public class ChangeAnnotationProcessorPath extends Recipe {
             private boolean isPathMatch(Xml.Tag path) {
                 return this.depMatcher.matches(path.getChildValue("groupId").orElse(""),
                         path.getChildValue("artifactId").orElse(""));
-            }
-
-            private Xml.Tag changeChildTagValue(Xml.Tag tag, String childTagName, String newValue, ExecutionContext ctx) {
-                Optional<Xml.Tag> childTag = tag.getChild(childTagName);
-                if (childTag.isPresent() && !newValue.equals(childTag.get().getValue().orElse(null))) {
-                    tag = (Xml.Tag) new ChangeTagValueVisitor<>(childTag.get(), newValue).visitNonNull(tag, ctx);
-                }
-                return tag;
             }
         };
     }

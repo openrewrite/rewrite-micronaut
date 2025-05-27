@@ -87,7 +87,7 @@ class UpdateMavenAnnotationProcessorsTest extends Micronaut4RewriteTest {
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-compiler-plugin</artifactId>
                             <configuration>
-                                <annotationProcessorPaths combine.children="append"> 
+                                <annotationProcessorPaths combine.children="append">
                                     <path>
                                         <groupId>io.micronaut</groupId>
                                         <artifactId>micronaut-inject-java</artifactId>
@@ -127,7 +127,7 @@ class UpdateMavenAnnotationProcessorsTest extends Micronaut4RewriteTest {
                     <packaging>jar</packaging>
                     <jdk.version>11</jdk.version>
                     <release.version>11</release.version>
-                    <micronaut.version>3.9.2</micronaut.version>
+                    <micronaut.version>${micronaut.core.version}</micronaut.version>
                     <micronaut.test.resources.enabled>true</micronaut.test.resources.enabled>
                     <micronaut.data.version>3.10.0</micronaut.data.version>
                     <micronaut.runtime>netty</micronaut.runtime>
@@ -165,21 +165,21 @@ class UpdateMavenAnnotationProcessorsTest extends Micronaut4RewriteTest {
                             <groupId>org.apache.maven.plugins</groupId>
                             <artifactId>maven-compiler-plugin</artifactId>
                             <configuration>
-                                <annotationProcessorPaths combine.children="append">       
+                                <annotationProcessorPaths combine.children="append">
                                     <path>
                                         <groupId>io.micronaut</groupId>
                                         <artifactId>micronaut-inject-java</artifactId>
-                                        <version>${micronaut.core.version}</version>
+                                        <version>${micronaut.version}</version>
                                     </path>
                                     <path>
                                         <groupId>io.micronaut</groupId>
                                         <artifactId>micronaut-http-validation</artifactId>
-                                        <version>${micronaut.core.version}</version>
+                                        <version>${micronaut.version}</version>
                                     </path>
                                     <path>
                                         <groupId>io.micronaut</groupId>
                                         <artifactId>micronaut-graal</artifactId>
-                                        <version>${micronaut.core.version}</version>
+                                        <version>${micronaut.version}</version>
                                     </path>
                                 </annotationProcessorPaths>
                                 <compilerArgs>
@@ -328,17 +328,17 @@ class UpdateMavenAnnotationProcessorsTest extends Micronaut4RewriteTest {
                                     <path>
                                         <groupId>io.micronaut</groupId>
                                         <artifactId>micronaut-inject-java</artifactId>
-                                        <version>${micronaut.core.version}</version>
+                                        <version>${micronaut.version}</version>
                                     </path>
                                     <path>
                                         <groupId>io.micronaut</groupId>
                                         <artifactId>micronaut-http-validation</artifactId>
-                                        <version>${micronaut.core.version}</version>
+                                        <version>${micronaut.version}</version>
                                     </path>
                                     <path>
                                         <groupId>io.micronaut</groupId>
                                         <artifactId>micronaut-graal</artifactId>
-                                        <version>${micronaut.core.version}</version>
+                                        <version>${micronaut.version}</version>
                                     </path>
                                 </annotationProcessorPaths>
                                 <compilerArgs>
