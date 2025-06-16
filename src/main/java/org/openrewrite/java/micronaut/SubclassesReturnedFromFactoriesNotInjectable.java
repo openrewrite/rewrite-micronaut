@@ -91,8 +91,8 @@ public class SubclassesReturnedFromFactoriesNotInjectable extends Recipe {
             return rtn;
         }
 
-        @SuppressWarnings("ConstantConditions")
         @Override
+        @SuppressWarnings("ConstantConditions")
         public J.MethodDeclaration visitMethodDeclaration(J.MethodDeclaration method, ExecutionContext ctx) {
             J.MethodDeclaration md = super.visitMethodDeclaration(method, ctx);
             Set<JavaType> returnTypes = getCursor().pollMessage("return-types");

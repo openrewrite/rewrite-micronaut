@@ -24,8 +24,8 @@ import org.openrewrite.properties.PropertiesVisitor;
 import org.openrewrite.properties.tree.Properties;
 import org.openrewrite.semver.Semver;
 
-@Value
 @EqualsAndHashCode(callSuper = false)
+@Value
 public class UpgradeMicronautGradlePropertiesVersion extends Recipe {
 
     private static final String PROPERTY_KEY = "micronautVersion";

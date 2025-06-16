@@ -69,8 +69,8 @@ public class AddSnakeYamlDependencyIfNeeded extends ScanningRecipe<AddSnakeYamlD
                 null, null, null, "runtimeOnly", "runtime", null, null, null, null);
     }
 
-    @Data
     @AllArgsConstructor
+    @Data
     public static class Accumulator {
         boolean usesYamlConfig;
         AddDependency.Accumulator addDependencyAccumulator;

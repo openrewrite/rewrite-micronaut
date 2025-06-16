@@ -36,8 +36,8 @@ import java.util.stream.Collectors;
 import static org.openrewrite.xml.FilterTagChildrenVisitor.filterTagChildren;
 import static org.openrewrite.xml.MapTagChildrenVisitor.mapTagChildren;
 
-@Value
 @EqualsAndHashCode(callSuper = false)
+@Value
 public class ChangeAnnotationProcessorPath extends Recipe {
 
     @Option(displayName = "Old groupId",
