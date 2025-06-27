@@ -28,9 +28,9 @@ dependencies {
     runtimeOnly("org.openrewrite:rewrite-java-11")
     runtimeOnly("org.openrewrite:rewrite-java-17")
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:latest.release")
-    testImplementation("org.junit.jupiter:junit-jupiter-params:latest.release")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:latest.release")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.+")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.+")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.+")
 
     testImplementation("org.openrewrite:rewrite-test")
     testImplementation("org.openrewrite.gradle.tooling:model:$rewriteVersion")
