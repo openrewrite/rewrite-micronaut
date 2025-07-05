@@ -30,7 +30,7 @@ dependencies {
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.+")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.+")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.+")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.13.3")
 
     testImplementation("org.openrewrite:rewrite-test")
     testImplementation("org.openrewrite.gradle.tooling:model:$rewriteVersion")
