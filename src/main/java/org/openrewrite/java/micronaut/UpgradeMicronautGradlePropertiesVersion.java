@@ -71,7 +71,7 @@ public class UpgradeMicronautGradlePropertiesVersion extends Recipe {
 
         @Override
         public Properties visitEntry(Properties.Entry entry, ExecutionContext ctx) {
-            if (entry.getKey().equals(PROPERTY_KEY)) {
+            if (PROPERTY_KEY.equals(entry.getKey())) {
                 String currentVersion = entry.getValue().getText();
                 String latestVersion;
                 try {
