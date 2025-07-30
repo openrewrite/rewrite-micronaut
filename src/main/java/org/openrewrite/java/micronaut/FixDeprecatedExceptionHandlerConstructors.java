@@ -24,10 +24,15 @@ import org.openrewrite.java.search.UsesType;
 import org.openrewrite.java.tree.*;
 import org.openrewrite.marker.Markers;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
 
 public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
     private static final List<String> exception_handlers = Arrays.asList(
@@ -85,7 +90,7 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
                 J.ClassDeclaration cd = getCursor().firstEnclosing(J.ClassDeclaration.class);
                 if (cd != null && "super".equals(mi.getSimpleName()) && isClassExceptionHandler(cd)) {
                     if (mi.getArguments().stream().noneMatch(exp -> TypeUtils.isOfClassType(exp.getType(), errorResponseProcessorFqn))) {
-                        mi = mi.withArguments(Collections.singletonList(new J.Identifier(Tree.randomId(), Space.EMPTY, Markers.EMPTY, emptyList(), "errorResponseProcessor", JavaType.buildType(errorResponseProcessorFqn), null)));
+                        mi = mi.withArguments(singletonList(new J.Identifier(Tree.randomId(), Space.EMPTY, Markers.EMPTY, emptyList(), "errorResponseProcessor", JavaType.buildType(errorResponseProcessorFqn), null)));
                     }
                     if (mi.getArguments().stream().anyMatch(exp -> TypeUtils.isOfClassType(exp.getType(), errorResponseProcessorFqn))) {
                         getCursor().dropParentUntil(J.MethodDeclaration.class::isInstance).putMessage("super-invocation-exists", Boolean.TRUE);
@@ -108,9 +113,9 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
                         maybeAddImport("jakarta.inject.Inject");
 
                         if (md.getParameters().stream().noneMatch(this::isErrorProcessorParameter)) {
-                            List<Object> params = md.getParameters().stream().filter(j -> !(j instanceof J.Empty)).collect(Collectors.toList());
+                            List<Object> params = md.getParameters().stream().filter(j -> !(j instanceof J.Empty)).collect(toList());
                             params.add("ErrorResponseProcessor errorResponseProcessor");
-                            JavaTemplate paramsTemplate = JavaTemplate.builder(params.stream().map(p -> "#{}").collect(Collectors.joining(", ")))
+                            JavaTemplate paramsTemplate = JavaTemplate.builder(params.stream().map(p -> "#{}").collect(joining(", ")))
                                     .contextSensitive()
                                     .imports(errorResponseProcessorFqn)
                                     .javaParser(parser).build();

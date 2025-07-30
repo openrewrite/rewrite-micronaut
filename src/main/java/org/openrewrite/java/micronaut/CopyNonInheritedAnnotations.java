@@ -26,8 +26,9 @@ import org.openrewrite.java.tree.JavaType;
 import org.openrewrite.java.tree.TypeUtils;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toSet;
 
 public class CopyNonInheritedAnnotations extends ScanningRecipe<CopyNonInheritedAnnotations.Accumulator> {
 
@@ -93,7 +94,7 @@ public class CopyNonInheritedAnnotations extends ScanningRecipe<CopyNonInherited
             "io.micronaut.websocket.annotation.ClientWebSocket",
             "io.micronaut.websocket.annotation.ServerWebSocket",
             "io.micronaut.websocket.annotation.WebSocketComponent"
-    ).collect(Collectors.toSet());
+    ).collect(toSet());
 
     @Override
     public String getDisplayName() {

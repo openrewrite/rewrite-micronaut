@@ -31,8 +31,8 @@ import org.openrewrite.xml.tree.Xml;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
 import static org.openrewrite.xml.FilterTagChildrenVisitor.filterTagChildren;
 import static org.openrewrite.xml.MapTagChildrenVisitor.mapTagChildren;
 
@@ -136,7 +136,7 @@ public class ChangeAnnotationProcessorPath extends Recipe {
                         if (exclusions == null) {
                             path = filterTagChildren(path, child -> !"exclusions".equals(child.getName()));
                         } else {
-                            maybeAddExclusionsToPath(path, exclusions.stream().filter(s -> !StringUtils.isBlank(s)).collect(Collectors.toList()));
+                            maybeAddExclusionsToPath(path, exclusions.stream().filter(s -> !StringUtils.isBlank(s)).collect(toList()));
                         }
                         childTag = path;
                     }

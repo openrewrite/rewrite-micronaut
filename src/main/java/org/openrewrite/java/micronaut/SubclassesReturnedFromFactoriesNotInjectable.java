@@ -25,10 +25,10 @@ import org.openrewrite.marker.Markers;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
 
 public class SubclassesReturnedFromFactoriesNotInjectable extends Recipe {
     private static final AnnotationMatcher FACTORY_ANNOTATION_MATCHER = new AnnotationMatcher("@io.micronaut.context.annotation.Factory");
@@ -68,7 +68,7 @@ public class SubclassesReturnedFromFactoriesNotInjectable extends Recipe {
                                 .map(it -> new AnnotationMatcher("@" + it)),
                         Stream.of("@javax.inject", "@jakarta.inject")
                                 .map(it -> new AnnotationMatcher(it + ".Singleton")))
-                .map(AnnotationMatcher.class::cast).collect(Collectors.toList());
+                .map(AnnotationMatcher.class::cast).collect(toList());
 
         private static boolean isBeanAnnotation(J.Annotation annotation) {
             return BEAN_ANNOTATION_MATCHERS.stream().anyMatch(m -> m.matches(annotation));

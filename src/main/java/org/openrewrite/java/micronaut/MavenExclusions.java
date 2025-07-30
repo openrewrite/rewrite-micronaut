@@ -18,7 +18,8 @@ package org.openrewrite.java.micronaut;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.joining;
 
 public class MavenExclusions {
     static String buildContent(@Nullable List<String> exclusions) {
@@ -36,6 +37,6 @@ public class MavenExclusions {
                     .append("<artifactId>").append(exclusionParts[1]).append("</artifactId>\n")
                     .append("</exclusion>\n");
             return exclusionContent.toString();
-        }).collect(Collectors.joining());
+        }).collect(joining());
     }
 }

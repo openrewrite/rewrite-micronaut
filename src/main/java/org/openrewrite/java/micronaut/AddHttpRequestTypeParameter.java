@@ -25,10 +25,10 @@ import org.openrewrite.java.tree.*;
 import org.openrewrite.marker.Markers;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 
 public class AddHttpRequestTypeParameter extends Recipe {
 
@@ -69,10 +69,10 @@ public class AddHttpRequestTypeParameter extends Recipe {
                         JavaType httpRequestType = JavaType.buildType(IO_MICRONAUT_HTTP_HTTP_REQUEST);
                         J.Identifier httpRequestIdentifier = new J.Identifier(Tree.randomId(), Space.EMPTY, Markers.EMPTY, emptyList(), "HttpRequest", httpRequestType, null);
                         J.ParameterizedType httpRequestParameterized = new J.ParameterizedType(Tree.randomId(), Space.EMPTY, Markers.EMPTY, httpRequestIdentifier,
-                                JContainer.build(Collections.singletonList(JRightPadded.build(new J.Wildcard(Tree.randomId(), Space.EMPTY, Markers.EMPTY, null, null)))), httpRequestType);
+                                JContainer.build(singletonList(JRightPadded.build(new J.Wildcard(Tree.randomId(), Space.EMPTY, Markers.EMPTY, null, null)))), httpRequestType);
                         NameTree nameTree = new J.Identifier(Tree.randomId(), Space.EMPTY, Markers.EMPTY, emptyList(), fqInterfaceType.getClassName(), null, null);
                         return new J.ParameterizedType(Tree.randomId(), interfaceType.getPrefix(), Markers.EMPTY, nameTree,
-                                JContainer.build(Collections.singletonList(JRightPadded.build(httpRequestParameterized))), fqInterfaceType);
+                                JContainer.build(singletonList(JRightPadded.build(httpRequestParameterized))), fqInterfaceType);
                     }
                     return interfaceType;
                 });

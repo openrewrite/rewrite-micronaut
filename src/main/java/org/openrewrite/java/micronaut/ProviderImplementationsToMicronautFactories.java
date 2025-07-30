@@ -25,8 +25,9 @@ import org.openrewrite.java.tree.TypeUtils;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
 
 public class ProviderImplementationsToMicronautFactories extends Recipe {
 
@@ -41,7 +42,7 @@ public class ProviderImplementationsToMicronautFactories extends Recipe {
                     .map(it -> new AnnotationMatcher("@" + it)),
             Stream.of("@javax.inject", "@jakarta.inject")
                     .map(it -> new AnnotationMatcher(it + ".Singleton")))
-            .map(AnnotationMatcher.class::cast).collect(Collectors.toList());
+            .map(AnnotationMatcher.class::cast).collect(toList());
 
     @Override
     public String getDisplayName() {
@@ -85,7 +86,7 @@ public class ProviderImplementationsToMicronautFactories extends Recipe {
         public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext ctx) {
             List<J.Annotation> beanAnnotations = classDecl.getLeadingAnnotations().stream()
                     .filter(ProviderImplementationsToMicronautFactories::isBeanAnnotation)
-                    .collect(Collectors.toList());
+                    .collect(toList());
             if (classDecl.getType() == null || !isProvider(classDecl) || beanAnnotations.isEmpty()) {
                 return classDecl;
             }
@@ -118,7 +119,7 @@ public class ProviderImplementationsToMicronautFactories extends Recipe {
             MethodMatcher mm = classDeclCursor.getMessage("provider-get");
             List<J.Annotation> beanAnnotations = classDeclCursor.getMessage("class-bean-annotations");
             if (mm != null && mm.matches(md.getMethodType()) && beanAnnotations != null) {
-                List<J.Annotation> newBeanAnnotations = beanAnnotations.stream().filter(anno -> !annotationExists(method.getLeadingAnnotations(), anno)).collect(Collectors.toList());
+                List<J.Annotation> newBeanAnnotations = beanAnnotations.stream().filter(anno -> !annotationExists(method.getLeadingAnnotations(), anno)).collect(toList());
                 if (!newBeanAnnotations.isEmpty()) {
                     //noinspection ConstantConditions
                     md = maybeAutoFormat(md, md.withLeadingAnnotations(ListUtils.concatAll(md.getLeadingAnnotations(), newBeanAnnotations)), ctx, getCursor().getParent());
