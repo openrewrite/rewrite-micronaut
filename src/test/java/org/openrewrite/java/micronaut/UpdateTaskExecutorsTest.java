@@ -16,6 +16,7 @@
 package org.openrewrite.java.micronaut;
 
 import org.junit.jupiter.api.Test;
+import org.openrewrite.DocumentExample;
 import org.openrewrite.InMemoryExecutionContext;
 import org.openrewrite.config.Environment;
 import org.openrewrite.java.JavaParser;
@@ -37,6 +38,7 @@ class UpdateTaskExecutorsTest implements RewriteTest {
             .activateRecipes("org.openrewrite.java.micronaut.UpdateBlockingTaskExecutors"));
     }
 
+    @DocumentExample
     @Test
     void updateExecuteOnTaskExecutors() {
         rewriteRun(mavenProject("project",

@@ -18,6 +18,7 @@ package org.openrewrite.java.micronaut;
 
 import org.intellij.lang.annotations.Language;
 import org.junit.jupiter.api.Test;
+import org.openrewrite.DocumentExample;
 import org.openrewrite.InMemoryExecutionContext;
 import org.openrewrite.config.Environment;
 import org.openrewrite.java.JavaParser;
@@ -71,6 +72,54 @@ class UpdateMicronautDataTest extends Micronaut4RewriteTest {
 
       }
       """;
+
+    @DocumentExample
+    @Test
+    void updateSQLAnnotations() {
+        rewriteRun(mavenProject("project",
+          //language=java
+          srcMainJava(java("""
+            import io.micronaut.data.jdbc.annotation.ColumnTransformer;
+            import io.micronaut.data.jdbc.annotation.JoinColumn;
+            import io.micronaut.data.jdbc.annotation.JoinColumns;
+            import io.micronaut.data.jdbc.annotation.JoinTable;
+                      
+            public class MyEntity {
+                      
+                @JoinTable(
+                            name = "m2m_address_association",
+                            joinColumns = @JoinColumns({
+                                                  @JoinColumn(name="ADDR_ID", referencedColumnName="ID"),
+                                                  @JoinColumn(name="ADDR_ZIP", referencedColumnName="ZIP")
+                                              }))
+                List<String> addresses;
+                
+                @ColumnTransformer(read = "UPPER(org)")
+                private String name;
+                      
+            }
+            """, """
+            import io.micronaut.data.annotation.sql.ColumnTransformer;
+            import io.micronaut.data.annotation.sql.JoinColumn;
+            import io.micronaut.data.annotation.sql.JoinColumns;
+            import io.micronaut.data.annotation.sql.JoinTable;
+                      
+            public class MyEntity {
+                      
+                @JoinTable(
+                            name = "m2m_address_association",
+                            joinColumns = @JoinColumns({
+                                                  @JoinColumn(name="ADDR_ID", referencedColumnName="ID"),
+                                                  @JoinColumn(name="ADDR_ZIP", referencedColumnName="ZIP")
+                                              }))
+                List<String> addresses;
+                
+                @ColumnTransformer(read = "UPPER(org)")
+                private String name;
+                      
+            }
+            """))));
+    }
 
     @Test
     void updateJavaCodeAndUnmodifiedGradleDependencies() {
@@ -161,53 +210,6 @@ class UpdateMicronautDataTest extends Micronaut4RewriteTest {
                   </dependencies>
               </project>
               """.formatted(latestMicronautVersion))));
-    }
-
-    @Test
-    void updateSQLAnnotations() {
-        rewriteRun(mavenProject("project",
-          //language=java
-          srcMainJava(java("""
-            import io.micronaut.data.jdbc.annotation.ColumnTransformer;
-            import io.micronaut.data.jdbc.annotation.JoinColumn;
-            import io.micronaut.data.jdbc.annotation.JoinColumns;
-            import io.micronaut.data.jdbc.annotation.JoinTable;
-                      
-            public class MyEntity {
-                      
-                @JoinTable(
-                            name = "m2m_address_association",
-                            joinColumns = @JoinColumns({
-                                                  @JoinColumn(name="ADDR_ID", referencedColumnName="ID"),
-                                                  @JoinColumn(name="ADDR_ZIP", referencedColumnName="ZIP")
-                                              }))
-                List<String> addresses;
-                
-                @ColumnTransformer(read = "UPPER(org)")
-                private String name;
-                      
-            }
-            """, """
-            import io.micronaut.data.annotation.sql.ColumnTransformer;
-            import io.micronaut.data.annotation.sql.JoinColumn;
-            import io.micronaut.data.annotation.sql.JoinColumns;
-            import io.micronaut.data.annotation.sql.JoinTable;
-                      
-            public class MyEntity {
-                      
-                @JoinTable(
-                            name = "m2m_address_association",
-                            joinColumns = @JoinColumns({
-                                                  @JoinColumn(name="ADDR_ID", referencedColumnName="ID"),
-                                                  @JoinColumn(name="ADDR_ZIP", referencedColumnName="ZIP")
-                                              }))
-                List<String> addresses;
-                
-                @ColumnTransformer(read = "UPPER(org)")
-                private String name;
-                      
-            }
-            """))));
     }
 
     @Test
