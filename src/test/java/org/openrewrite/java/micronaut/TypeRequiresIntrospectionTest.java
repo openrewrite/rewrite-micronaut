@@ -17,6 +17,7 @@ package org.openrewrite.java.micronaut;
 
 import org.intellij.lang.annotations.Language;
 import org.junit.jupiter.api.Test;
+import org.openrewrite.DocumentExample;
 import org.openrewrite.InMemoryExecutionContext;
 import org.openrewrite.java.JavaParser;
 import org.openrewrite.test.RecipeSpec;
@@ -67,13 +68,23 @@ class TypeRequiresIntrospectionTest implements RewriteTest {
             }
         """;
 
+    @DocumentExample
     @Test
-    void hasIntrospectionAnnotation() {
+    void addsIntrospectionAnnotationFromParameter() {
         //language=java
         rewriteRun(
           java(controllerClass),
           java(pojoD),
           java(
+            """
+              package a.b;
+              
+              public class C {
+                  String name;
+                  String getName() { return name;}
+                  void setName(String name) {this.name = name;}
+              }
+              """,
             """
               package a.b;
               
@@ -91,21 +102,12 @@ class TypeRequiresIntrospectionTest implements RewriteTest {
     }
 
     @Test
-    void addsIntrospectionAnnotationFromParameter() {
+    void hasIntrospectionAnnotation() {
         //language=java
         rewriteRun(
           java(controllerClass),
           java(pojoD),
           java(
-            """
-              package a.b;
-              
-              public class C {
-                  String name;
-                  String getName() { return name;}
-                  void setName(String name) {this.name = name;}
-              }
-              """,
             """
               package a.b;
               

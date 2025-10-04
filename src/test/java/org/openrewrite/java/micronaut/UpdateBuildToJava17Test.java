@@ -16,6 +16,7 @@
 package org.openrewrite.java.micronaut;
 
 import org.junit.jupiter.api.Test;
+import org.openrewrite.DocumentExample;
 import org.openrewrite.test.RecipeSpec;
 import org.openrewrite.test.RewriteTest;
 
@@ -30,6 +31,7 @@ class UpdateBuildToJava17Test implements RewriteTest {
         spec.recipeFromResources("org.openrewrite.java.micronaut.Micronaut3to4Migration");
     }
 
+    @DocumentExample
     @Test
     void updateGradleJavaVersion() {
         rewriteRun(

@@ -15,7 +15,7 @@
 type: specs.openrewrite.org/v1beta/example
 recipeName: org.openrewrite.java.micronaut.AddHttpRequestTypeParameter
 examples:
-- description: ''
+- description: '`AddHttpRequestTypeParameterTest#authenticationProvider`'
   sources:
   - before: |
       import io.micronaut.http.HttpRequest;
@@ -52,7 +52,7 @@ examples:
 type: specs.openrewrite.org/v1beta/example
 recipeName: org.openrewrite.java.micronaut.BeanPropertyCapitalizationStrategy
 examples:
-- description: ''
+- description: '`BeanPropertyCapitalizationStrategyTest#deCapitalizeProperty`'
   sources:
   - before: |
       package a.b;
@@ -87,7 +87,7 @@ examples:
 type: specs.openrewrite.org/v1beta/example
 recipeName: org.openrewrite.java.micronaut.CopyNonInheritedAnnotations
 examples:
-- description: ''
+- description: '`CopyNonInheritedAnnotationsTest#refreshableFromGrandparent`'
   sources:
   - before: |
       package abc;
@@ -148,7 +148,7 @@ examples:
 type: specs.openrewrite.org/v1beta/example
 recipeName: org.openrewrite.java.micronaut.FixDeprecatedExceptionHandlerConstructors
 examples:
-- description: ''
+- description: '`FixDeprecatedExceptionHandlerConstructorsTest#addsErrorProcessorConstructor`'
   sources:
   - before: |
       package abc;
@@ -178,7 +178,7 @@ examples:
 type: specs.openrewrite.org/v1beta/example
 recipeName: org.openrewrite.java.micronaut.OncePerRequestHttpServerFilterToHttpServerFilter
 examples:
-- description: ''
+- description: '`OncePerRequestHttpServerFilterToHttpServerFilterTest#simpleConversion`'
   sources:
   - before: |
       package a.b;
@@ -237,7 +237,7 @@ examples:
 type: specs.openrewrite.org/v1beta/example
 recipeName: org.openrewrite.java.micronaut.ProviderImplementationsToMicronautFactories
 examples:
-- description: ''
+- description: '`ProviderImplementationsGenerateFactoriesTest#javaxProviderImplementation`'
   sources:
   - before: |
       package abc;
@@ -286,7 +286,7 @@ examples:
 type: specs.openrewrite.org/v1beta/example
 recipeName: org.openrewrite.java.micronaut.SubclassesReturnedFromFactoriesNotInjectable
 examples:
-- description: ''
+- description: '`SubclassesReturnedFromFactoriesNotInjectableTest#addsTypeForInternalImplementation`'
   sources:
   - before: |
       import java.util.concurrent.ForkJoinPool;
@@ -320,7 +320,7 @@ examples:
 type: specs.openrewrite.org/v1beta/example
 recipeName: org.openrewrite.java.micronaut.UpdateMicronautPlatformBom
 examples:
-- description: ''
+- description: '`UpdateBuildPluginsTest#updateGradleBuildPlugins`'
   sources:
   - before: |
       plugins {
@@ -343,22 +343,24 @@ examples:
     path: build.gradle
     language: groovy
   - before: micronautVersion=3.9.1
+    path: gradle.properties
     language: properties
 ---
 type: specs.openrewrite.org/v1beta/example
 recipeName: org.openrewrite.java.micronaut.UpgradeMicronautGradlePropertiesVersion
 examples:
-- description: ''
+- description: '`UpgradeMicronautGradlePropertiesVersionTest#upgradeMicronaut2`'
   parameters:
   - 2.x
   sources:
   - before: micronautVersion=2.0.3
+    path: gradle.properties
     language: properties
 ---
 type: specs.openrewrite.org/v1beta/example
 recipeName: org.openrewrite.java.micronaut.UpgradeMicronautMavenPropertyVersion
 examples:
-- description: ''
+- description: '`UpgradeMicronautMavenPropertyVersionTest#changeMavenMicronautVersion`'
   parameters:
   - 2.x
   sources:
