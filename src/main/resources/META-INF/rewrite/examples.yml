@@ -176,6 +176,30 @@ examples:
     language: java
 ---
 type: specs.openrewrite.org/v1beta/example
+recipeName: org.openrewrite.java.micronaut.Micronaut3to4Migration
+examples:
+- description: '`UpdateBuildToJava17Test#updateGradleJavaVersion`'
+  sources:
+  - before: |
+      version = "0.1.0-SNAPSHOT"
+      group = "com.example"
+      java {
+          sourceCompatibility = JavaVersion.toVersion("1.8")
+          targetCompatibility = JavaVersion.toVersion("1.8")
+      }
+    after: |
+      version = "0.1.0-SNAPSHOT"
+      group = "com.example"
+      java {
+          sourceCompatibility = JavaVersion.toVersion("17")
+          targetCompatibility = JavaVersion.toVersion("17")
+      }
+    path: build.gradle
+    language: groovy
+  - before: project
+    language: mavenProject
+---
+type: specs.openrewrite.org/v1beta/example
 recipeName: org.openrewrite.java.micronaut.OncePerRequestHttpServerFilterToHttpServerFilter
 examples:
 - description: '`OncePerRequestHttpServerFilterToHttpServerFilterTest#simpleConversion`'
@@ -284,6 +308,43 @@ examples:
     language: java
 ---
 type: specs.openrewrite.org/v1beta/example
+recipeName: org.openrewrite.java.micronaut.RemoveWithJansiLogbackConfiguration
+examples:
+- description: '`RemoveWithJansiLogbackConfigurationTest#removeWithJansi`'
+  sources:
+  - before: project
+    language: mavenProject
+  - before: |
+      <configuration>
+          <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+              <withJansi>true</withJansi>
+              <!-- encoders are assigned the type
+                   ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+              <encoder>
+                  <pattern>%cyan(%d{HH:mm:ss.SSS}) %gray([%thread]) %highlight(%-5level) %magenta(%logger{36}) - %msg%n</pattern>
+              </encoder>
+          </appender>
+          <root level="info">
+              <appender-ref ref="STDOUT" />
+          </root>
+      </configuration>
+    after: |
+      <configuration>
+          <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+              <!-- encoders are assigned the type
+                   ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+              <encoder>
+                  <pattern>%cyan(%d{HH:mm:ss.SSS}) %gray([%thread]) %highlight(%-5level) %magenta(%logger{36}) - %msg%n</pattern>
+              </encoder>
+          </appender>
+          <root level="info">
+              <appender-ref ref="STDOUT" />
+          </root>
+      </configuration>
+    path: logback.xml
+    language: xml
+---
+type: specs.openrewrite.org/v1beta/example
 recipeName: org.openrewrite.java.micronaut.SubclassesReturnedFromFactoriesNotInjectable
 examples:
 - description: '`SubclassesReturnedFromFactoriesNotInjectableTest#addsTypeForInternalImplementation`'
@@ -318,6 +379,69 @@ examples:
     language: java
 ---
 type: specs.openrewrite.org/v1beta/example
+recipeName: org.openrewrite.java.micronaut.TypeRequiresIntrospection
+examples:
+- description: '`TypeRequiresIntrospectionTest#addsIntrospectionAnnotationFromParameter`'
+  sources:
+  - before: |
+      package a.b;
+
+      public class C {
+          String name;
+          String getName() { return name;}
+          void setName(String name) {this.name = name;}
+      }
+    after: |
+      package a.b;
+
+      import io.micronaut.core.annotation.Introspected;
+
+      @Introspected
+      public class C {
+          String name;
+          String getName() { return name;}
+          void setName(String name) {this.name = name;}
+      }
+    language: java
+---
+type: specs.openrewrite.org/v1beta/example
+recipeName: org.openrewrite.java.micronaut.UpdateBlockingTaskExecutors
+examples:
+- description: '`UpdateTaskExecutorsTest#updateExecuteOnTaskExecutors`'
+  sources:
+  - before: |
+      import io.micronaut.scheduling.TaskExecutors;
+      import io.micronaut.scheduling.annotation.ExecuteOn;
+
+      import jakarta.inject.Singleton;
+
+      @Singleton
+      public class GenericService {
+
+          @ExecuteOn(TaskExecutors.IO)
+          public void doSomeBlockingIOTask() {
+
+          }
+      }
+    after: |
+      import io.micronaut.scheduling.TaskExecutors;
+      import io.micronaut.scheduling.annotation.ExecuteOn;
+
+      import jakarta.inject.Singleton;
+
+      @Singleton
+      public class GenericService {
+
+          @ExecuteOn(TaskExecutors.BLOCKING)
+          public void doSomeBlockingIOTask() {
+
+          }
+      }
+    language: java
+  - before: project
+    language: mavenProject
+---
+type: specs.openrewrite.org/v1beta/example
 recipeName: org.openrewrite.java.micronaut.UpdateMicronautPlatformBom
 examples:
 - description: '`UpdateBuildPluginsTest#updateGradleBuildPlugins`'
@@ -345,6 +469,77 @@ examples:
   - before: micronautVersion=3.9.1
     path: gradle.properties
     language: properties
+- description: '`UpdateMicronautDataTest#updateSQLAnnotations`'
+  sources:
+  - before: |
+      import io.micronaut.data.jdbc.annotation.ColumnTransformer;
+      import io.micronaut.data.jdbc.annotation.JoinColumn;
+      import io.micronaut.data.jdbc.annotation.JoinColumns;
+      import io.micronaut.data.jdbc.annotation.JoinTable;
+
+      public class MyEntity {
+
+          @JoinTable(
+                      name = "m2m_address_association",
+                      joinColumns = @JoinColumns({
+                                            @JoinColumn(name="ADDR_ID", referencedColumnName="ID"),
+                                            @JoinColumn(name="ADDR_ZIP", referencedColumnName="ZIP")
+                                        }))
+          List<String> addresses;
+
+          @ColumnTransformer(read = "UPPER(org)")
+          private String name;
+
+      }
+    after: |
+      import io.micronaut.data.annotation.sql.ColumnTransformer;
+      import io.micronaut.data.annotation.sql.JoinColumn;
+      import io.micronaut.data.annotation.sql.JoinColumns;
+      import io.micronaut.data.annotation.sql.JoinTable;
+
+      public class MyEntity {
+
+          @JoinTable(
+                      name = "m2m_address_association",
+                      joinColumns = @JoinColumns({
+                                            @JoinColumn(name="ADDR_ID", referencedColumnName="ID"),
+                                            @JoinColumn(name="ADDR_ZIP", referencedColumnName="ZIP")
+                                        }))
+          List<String> addresses;
+
+          @ColumnTransformer(read = "UPPER(org)")
+          private String name;
+
+      }
+    language: java
+  - before: project
+    language: mavenProject
+- description: '`UpdateMicronautSessionTest#updateGradleDependencies`'
+  sources:
+  - before: |
+      plugins {
+          id "java-library"
+      }
+      dependencies {
+          implementation("io.micronaut:micronaut-session")
+      }
+      repositories {
+          mavenCentral()
+      }
+    after: |
+      plugins {
+          id "java-library"
+      }
+      dependencies {
+          implementation("io.micronaut.session:micronaut-session")
+      }
+      repositories {
+          mavenCentral()
+      }
+    path: build.gradle
+    language: groovy
+  - before: project
+    language: mavenProject
 ---
 type: specs.openrewrite.org/v1beta/example
 recipeName: org.openrewrite.java.micronaut.UpgradeMicronautGradlePropertiesVersion
