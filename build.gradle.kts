@@ -25,8 +25,8 @@ dependencies {
     implementation("org.openrewrite.recipe:rewrite-java-dependencies:${rewriteVersion}")
 
     runtimeOnly("org.openrewrite:rewrite-java-8")
-    runtimeOnly("org.openrewrite:rewrite-java-11")
-    runtimeOnly("org.openrewrite:rewrite-java-17")
+    runtimeOnly("org.openrewrite:rewrite-java-21")
+    runtimeOnly("org.openrewrite:rewrite-java-21")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.+")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.+")
