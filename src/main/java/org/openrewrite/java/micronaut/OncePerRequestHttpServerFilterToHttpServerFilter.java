@@ -66,8 +66,8 @@ public class OncePerRequestHttpServerFilterToHttpServerFilter extends Recipe {
                             cd.getType().getFullyQualifiedName() + " doFilterOnce(io.micronaut.http.HttpRequest, io.micronaut.http.filter.ServerFilterChain)",
                             "doFilter", true, false).getVisitor());
                 }
-                maybeAddImport("io.micronaut.http.filter.HttpServerFilter");
                 maybeRemoveImport(oncePerRequestHttpServerFilterFqn);
+                maybeAddImport("io.micronaut.http.filter.HttpServerFilter");
             }
             return cd;
         }
