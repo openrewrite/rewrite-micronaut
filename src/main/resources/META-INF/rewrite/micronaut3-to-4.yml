@@ -175,7 +175,7 @@ recipeList:
 type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.AddMicronautWebsocketDependencyIfNeeded
 displayName: Update the Micronaut Websocket support
-description: This recipe will add the explicit Micronaut Websocket dependency if needed
+description: This recipe will add the explicit Micronaut Websocket dependency if needed.
 recipeList:
   - org.openrewrite.java.dependencies.AddDependency:
       groupId: io.micronaut
@@ -187,7 +187,7 @@ recipeList:
 type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.UpdateMicronautSession
 displayName: Update the Micronaut Session support
-description: This recipe will update the Micronaut Session dependency if needed
+description: This recipe will update the Micronaut Session dependency if needed.
 recipeList:
   - org.openrewrite.gradle.ChangeDependencyGroupId:
       groupId: io.micronaut
@@ -203,7 +203,7 @@ recipeList:
 type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.AddMicronautRetryDependencyIfNeeded
 displayName: Update the Micronaut Retry support
-description: This recipe will add the explicit Micronaut Retry dependency if needed
+description: This recipe will add the explicit Micronaut Retry dependency if needed.
 recipeList:
   - org.openrewrite.java.dependencies.AddDependency:
       groupId: io.micronaut
