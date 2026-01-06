@@ -444,32 +444,6 @@ examples:
 type: specs.openrewrite.org/v1beta/example
 recipeName: org.openrewrite.java.micronaut.UpdateMicronautPlatformBom
 examples:
-- description: '`UpdateMicronautSessionTest#updateGradleDependencies`'
-  sources:
-  - before: |
-      plugins {
-          id "java-library"
-      }
-      dependencies {
-          implementation("io.micronaut:micronaut-session")
-      }
-      repositories {
-          mavenCentral()
-      }
-    after: |
-      plugins {
-          id "java-library"
-      }
-      dependencies {
-          implementation("io.micronaut.session:micronaut-session")
-      }
-      repositories {
-          mavenCentral()
-      }
-    path: build.gradle
-    language: groovy
-  - before: project
-    language: mavenProject
 - description: '`UpdateBuildPluginsTest#updateGradleBuildPlugins`'
   sources:
   - before: |
@@ -538,6 +512,32 @@ examples:
 
       }
     language: java
+  - before: project
+    language: mavenProject
+- description: '`UpdateMicronautSessionTest#updateGradleDependencies`'
+  sources:
+  - before: |
+      plugins {
+          id "java-library"
+      }
+      dependencies {
+          implementation("io.micronaut:micronaut-session")
+      }
+      repositories {
+          mavenCentral()
+      }
+    after: |
+      plugins {
+          id "java-library"
+      }
+      dependencies {
+          implementation("io.micronaut.session:micronaut-session")
+      }
+      repositories {
+          mavenCentral()
+      }
+    path: build.gradle
+    language: groovy
   - before: project
     language: mavenProject
 ---
