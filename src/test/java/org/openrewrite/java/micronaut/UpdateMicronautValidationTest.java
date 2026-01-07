@@ -37,20 +37,17 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
               "validation-api-2.*",
               "jakarta.validation-api-3.*",
               "jakarta.inject-api-2.*"))
-          .recipes(Environment.builder()
-            .scanRuntimeClasspath("org.openrewrite.java.micronaut")
-            .build()
-            .activateRecipes(
+          .recipeFromResources(
               "org.openrewrite.java.micronaut.UpdateMicronautPlatformBom",
               "org.openrewrite.java.micronaut.UpdateBuildPlugins",
-              "org.openrewrite.java.micronaut.UpdateMicronautValidation"));
+              "org.openrewrite.java.micronaut.UpdateMicronautValidation");
     }
 
     @Language("java")
     private final String annotatedJavaxClass = """
       import jakarta.inject.Singleton;
       import javax.validation.constraints.NotBlank;
-                
+
       @Singleton
       public class PersonService {
           public void sayHello(@NotBlank String name) {
@@ -63,7 +60,7 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
     private final String annotatedJakartaClass = """
       import jakarta.inject.Singleton;
       import jakarta.validation.constraints.NotBlank;
-                
+
       @Singleton
       public class PersonService {
           public void sayHello(@NotBlank String name) {
@@ -81,11 +78,11 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
             plugins {
                 id("io.micronaut.application") version "3.7.10"
             }
-            
+
             repositories {
                 mavenCentral()
             }
-            
+
             dependencies {
                 annotationProcessor("io.micronaut:micronaut-http-validation")
                 implementation("io.micronaut:micronaut-http-client")
@@ -97,11 +94,11 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
             plugins {
                 id("io.micronaut.application") version "%s"
             }
-            
+
             repositories {
                 mavenCentral()
             }
-            
+
             dependencies {
                 annotationProcessor("io.micronaut:micronaut-http-validation")
                 annotationProcessor "io.micronaut.validation:micronaut-validation-processor"
@@ -122,11 +119,11 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
             plugins {
                 id("io.micronaut.application") version "3.7.10"
             }
-            
+
             repositories {
                 mavenCentral()
             }
-            
+
             dependencies {
                 annotationProcessor("io.micronaut:micronaut-http-validation")
                 implementation("io.micronaut:micronaut-http-client")
@@ -137,11 +134,11 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
             plugins {
                 id("io.micronaut.application") version "%s"
             }
-            
+
             repositories {
                 mavenCentral()
             }
-            
+
             dependencies {
                 annotationProcessor("io.micronaut:micronaut-http-validation")
                 annotationProcessor "io.micronaut.validation:micronaut-validation-processor"
