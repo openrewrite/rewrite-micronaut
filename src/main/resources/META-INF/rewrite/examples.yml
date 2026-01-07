@@ -442,7 +442,7 @@ examples:
     language: mavenProject
 ---
 type: specs.openrewrite.org/v1beta/example
-recipeName: org.openrewrite.java.micronaut.UpdateMicronautPlatformBom
+recipeName: org.openrewrite.java.micronaut.UpdateBuildPlugins
 examples:
 - description: '`UpdateBuildPluginsTest#updateGradleBuildPlugins`'
   sources:
@@ -469,6 +469,10 @@ examples:
   - before: micronautVersion=3.9.1
     path: gradle.properties
     language: properties
+---
+type: specs.openrewrite.org/v1beta/example
+recipeName: org.openrewrite.java.micronaut.UpdateMicronautData
+examples:
 - description: '`UpdateMicronautDataTest#updateSQLAnnotations`'
   sources:
   - before: |
@@ -514,6 +518,10 @@ examples:
     language: java
   - before: project
     language: mavenProject
+---
+type: specs.openrewrite.org/v1beta/example
+recipeName: org.openrewrite.java.micronaut.UpdateMicronautSession
+examples:
 - description: '`UpdateMicronautSessionTest#updateGradleDependencies`'
   sources:
   - before: |
