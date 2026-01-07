@@ -17,7 +17,6 @@ package org.openrewrite.java.micronaut;
 
 import org.junit.jupiter.api.Test;
 import org.openrewrite.DocumentExample;
-import org.openrewrite.config.Environment;
 import org.openrewrite.test.RecipeSpec;
 
 import static org.openrewrite.gradle.Assertions.buildGradle;
@@ -29,10 +28,9 @@ class UpdateMicronautSessionTest extends Micronaut4RewriteTest {
 
     @Override
     public void defaults(RecipeSpec spec) {
-        spec.recipes(Environment.builder()
-          .scanRuntimeClasspath("org.openrewrite.java.micronaut")
-          .build()
-          .activateRecipes("org.openrewrite.java.micronaut.UpdateMicronautPlatformBom", "org.openrewrite.java.micronaut.UpdateMicronautSession"));
+        spec.recipeFromResources(
+          "org.openrewrite.java.micronaut.UpdateMicronautPlatformBom",
+          "org.openrewrite.java.micronaut.UpdateMicronautSession");
     }
 
     @DocumentExample

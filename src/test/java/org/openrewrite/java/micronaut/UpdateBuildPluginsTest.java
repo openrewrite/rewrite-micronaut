@@ -30,10 +30,9 @@ class UpdateBuildPluginsTest extends Micronaut4RewriteTest {
 
     @Override
     public void defaults(RecipeSpec spec) {
-        spec.recipes(Environment.builder()
-          .scanRuntimeClasspath("org.openrewrite.java.micronaut")
-          .build()
-          .activateRecipes("org.openrewrite.java.micronaut.UpdateMicronautPlatformBom", "org.openrewrite.java.micronaut.UpdateBuildPlugins"));
+        spec.recipeFromResources(
+          "org.openrewrite.java.micronaut.UpdateMicronautPlatformBom",
+          "org.openrewrite.java.micronaut.UpdateBuildPlugins");
     }
 
     @DocumentExample
@@ -56,7 +55,7 @@ class UpdateBuildPluginsTest extends Micronaut4RewriteTest {
                 id("io.micronaut.minimal.library") version "3.7.9"
                 id("io.micronaut.test-resources") version "3.5.1"
             }
-            
+
             repositories {
                 mavenCentral()
             }
@@ -75,7 +74,7 @@ class UpdateBuildPluginsTest extends Micronaut4RewriteTest {
                     id("io.micronaut.minimal.library") version "%s"
                     id("io.micronaut.test-resources") version "%s"
                 }
-                
+
                 repositories {
                     mavenCentral()
                 }
@@ -104,7 +103,7 @@ class UpdateBuildPluginsTest extends Micronaut4RewriteTest {
                           </plugin>
                       </plugins>
                     </build>
-                </project>    
+                </project>
             """, """
                 <project>
                     <groupId>com.mycompany.app</groupId>

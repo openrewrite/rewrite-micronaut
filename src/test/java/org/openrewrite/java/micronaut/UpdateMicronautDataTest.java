@@ -20,7 +20,6 @@ import org.intellij.lang.annotations.Language;
 import org.junit.jupiter.api.Test;
 import org.openrewrite.DocumentExample;
 import org.openrewrite.InMemoryExecutionContext;
-import org.openrewrite.config.Environment;
 import org.openrewrite.java.JavaParser;
 import org.openrewrite.test.RecipeSpec;
 
@@ -32,7 +31,18 @@ class UpdateMicronautDataTest extends Micronaut4RewriteTest {
 
     @Override
     public void defaults(RecipeSpec spec) {
-        spec.parser(JavaParser.fromJavaVersion().classpathFromResources(new InMemoryExecutionContext(), "javax.transaction-api-1.*", "jakarta.transaction-api-2.*", "micronaut-data-jdbc-3.*", "micronaut-data-jdbc-4.*", "micronaut-data-model-4.*", "micronaut-data-tx-3.*", "micronaut-data-tx-4.*")).recipes(Environment.builder().scanRuntimeClasspath("org.openrewrite.java.micronaut").build().activateRecipes("org.openrewrite.java.micronaut.UpdateMicronautPlatformBom", "org.openrewrite.java.micronaut.UpdateMicronautData"));
+        spec
+          .parser(JavaParser.fromJavaVersion().classpathFromResources(new InMemoryExecutionContext(),
+            "javax.transaction-api-1.*",
+            "jakarta.transaction-api-2.*",
+            "micronaut-data-jdbc-3.*",
+            "micronaut-data-jdbc-4.*",
+            "micronaut-data-model-4.*",
+            "micronaut-data-tx-3.*",
+            "micronaut-data-tx-4.*"))
+          .recipeFromResources(
+            "org.openrewrite.java.micronaut.UpdateMicronautPlatformBom",
+            "org.openrewrite.java.micronaut.UpdateMicronautData");
     }
 
     @Language("java")
@@ -40,14 +50,14 @@ class UpdateMicronautDataTest extends Micronaut4RewriteTest {
       import io.micronaut.data.jdbc.annotation.JdbcRepository;
       import io.micronaut.data.model.query.builder.sql.Dialect;
       import io.micronaut.data.repository.PageableRepository;
-            
+
       import java.util.Map;
-            
+
       import javax.transaction.Transactional;
-            
+
       @JdbcRepository(dialect = Dialect.MYSQL)
       public interface GenreRepository extends PageableRepository<Map<String, Object>, Long> {
-            
+
           @Transactional
           Map<String, Object> save(String name);
 
@@ -59,14 +69,14 @@ class UpdateMicronautDataTest extends Micronaut4RewriteTest {
       import io.micronaut.data.jdbc.annotation.JdbcRepository;
       import io.micronaut.data.model.query.builder.sql.Dialect;
       import io.micronaut.data.repository.PageableRepository;
-            
+
       import java.util.Map;
-            
+
       import jakarta.transaction.Transactional;
-            
+
       @JdbcRepository(dialect = Dialect.MYSQL)
       public interface GenreRepository extends PageableRepository<Map<String, Object>, Long> {
-            
+
           @Transactional
           Map<String, Object> save(String name);
 
@@ -83,9 +93,9 @@ class UpdateMicronautDataTest extends Micronaut4RewriteTest {
             import io.micronaut.data.jdbc.annotation.JoinColumn;
             import io.micronaut.data.jdbc.annotation.JoinColumns;
             import io.micronaut.data.jdbc.annotation.JoinTable;
-                      
+
             public class MyEntity {
-                      
+
                 @JoinTable(
                             name = "m2m_address_association",
                             joinColumns = @JoinColumns({
@@ -93,19 +103,19 @@ class UpdateMicronautDataTest extends Micronaut4RewriteTest {
                                                   @JoinColumn(name="ADDR_ZIP", referencedColumnName="ZIP")
                                               }))
                 List<String> addresses;
-                
+
                 @ColumnTransformer(read = "UPPER(org)")
                 private String name;
-                      
+
             }
             """, """
             import io.micronaut.data.annotation.sql.ColumnTransformer;
             import io.micronaut.data.annotation.sql.JoinColumn;
             import io.micronaut.data.annotation.sql.JoinColumns;
             import io.micronaut.data.annotation.sql.JoinTable;
-                      
+
             public class MyEntity {
-                      
+
                 @JoinTable(
                             name = "m2m_address_association",
                             joinColumns = @JoinColumns({
@@ -113,10 +123,10 @@ class UpdateMicronautDataTest extends Micronaut4RewriteTest {
                                                   @JoinColumn(name="ADDR_ZIP", referencedColumnName="ZIP")
                                               }))
                 List<String> addresses;
-                
+
                 @ColumnTransformer(read = "UPPER(org)")
                 private String name;
-                      
+
             }
             """))));
     }
@@ -218,22 +228,22 @@ class UpdateMicronautDataTest extends Micronaut4RewriteTest {
           //language=java
           srcMainJava(java("""
             import io.micronaut.transaction.annotation.TransactionalAdvice;
-                        
+
             public class MyTxService {
-                
+
                 @TransactionalAdvice
                 public void doSomethingTransactional() {
-                
+
                 }
             }
             """, """
             import io.micronaut.transaction.annotation.Transactional;
-                        
+
             public class MyTxService {
-                
+
                 @Transactional
                 public void doSomethingTransactional() {
-                
+
                 }
             }
             """))));
