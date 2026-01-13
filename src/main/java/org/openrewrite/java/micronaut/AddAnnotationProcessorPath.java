@@ -62,15 +62,9 @@ public class AddAnnotationProcessorPath extends ScanningRecipe<AddAnnotationProc
     @Nullable
     List<String> exclusions;
 
-    @Override
-    public String getDisplayName() {
-        return "Add Maven annotation processor path";
-    }
+    String displayName = "Add Maven annotation processor path";
 
-    @Override
-    public String getDescription() {
-        return "Add the groupId, artifactId, version, and exclusions of a Maven annotation processor path.";
-    }
+    String description = "Add the groupId, artifactId, version, and exclusions of a Maven annotation processor path.";
 
     public static class Scanned {
         boolean usingType;

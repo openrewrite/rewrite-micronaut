@@ -46,15 +46,9 @@ public class UpgradeMicronautGradlePropertiesVersion extends Recipe {
         return validated;
     }
 
-    @Override
-    public String getDisplayName() {
-        return "Upgrade gradle.properties Micronaut version";
-    }
+    String displayName = "Upgrade gradle.properties Micronaut version";
 
-    @Override
-    public String getDescription() {
-        return "Set the gradle.properties version number according to a node-style semver selector or to a specific version number.";
-    }
+    String description = "Set the gradle.properties version number according to a node-style semver selector or to a specific version number.";
 
     @Override
     public TreeVisitor<?, ExecutionContext> getVisitor() {

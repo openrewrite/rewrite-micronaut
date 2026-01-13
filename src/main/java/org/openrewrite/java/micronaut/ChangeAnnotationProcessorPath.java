@@ -78,15 +78,9 @@ public class ChangeAnnotationProcessorPath extends Recipe {
     @Nullable
     List<String> exclusions;
 
-    @Override
-    public String getDisplayName() {
-        return "Change Maven annotation processor path";
-    }
+    String displayName = "Change Maven annotation processor path";
 
-    @Override
-    public String getDescription() {
-        return "Change the groupId, artifactId, and version of a Maven annotation processor path.";
-    }
+    String description = "Change the groupId, artifactId, and version of a Maven annotation processor path.";
 
     @Override
     public TreeVisitor<?, ExecutionContext> getVisitor() {

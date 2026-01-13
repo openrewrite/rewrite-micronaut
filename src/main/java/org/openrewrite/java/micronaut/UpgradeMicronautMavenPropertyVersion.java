@@ -44,15 +44,9 @@ public class UpgradeMicronautMavenPropertyVersion extends Recipe {
         return validated;
     }
 
-    @Override
-    public String getDisplayName() {
-        return "Upgrade `micronaut.version` Maven property";
-    }
+    String displayName = "Upgrade `micronaut.version` Maven property";
 
-    @Override
-    public String getDescription() {
-        return "Set the maven micronaut.version property according to a node-style semver selector or to a specific version number.";
-    }
+    String description = "Set the maven micronaut.version property according to a node-style semver selector or to a specific version number.";
 
     @Override
     public TreeVisitor<?, ExecutionContext> getVisitor() {

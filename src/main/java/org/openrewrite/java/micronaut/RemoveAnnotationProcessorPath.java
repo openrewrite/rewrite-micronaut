@@ -41,15 +41,9 @@ public class RemoveAnnotationProcessorPath extends Recipe {
             example = "my-new-annotation-processor")
     String artifactId;
 
-    @Override
-    public String getDisplayName() {
-        return "Remove Maven annotation processor path";
-    }
+    String displayName = "Remove Maven annotation processor path";
 
-    @Override
-    public String getDescription() {
-        return "Remove the Maven annotation processor path that matches the given groupId and artifactId.";
-    }
+    String description = "Remove the Maven annotation processor path that matches the given groupId and artifactId.";
 
     @Override
     public TreeVisitor<?, ExecutionContext> getVisitor() {
