@@ -15,6 +15,7 @@
  */
 package org.openrewrite.java.micronaut;
 
+import lombok.Getter;
 import org.openrewrite.*;
 import org.openrewrite.java.AnnotationMatcher;
 import org.openrewrite.java.JavaIsoVisitor;
@@ -55,15 +56,11 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
     private static final AnnotationMatcher javax_matcher = new AnnotationMatcher("@javax.inject.Inject");
     private static final AnnotationMatcher jakarta_matcher = new AnnotationMatcher("@jakarta.inject.Inject");
 
-    @Override
-    public String getDisplayName() {
-        return "Fix deprecated no-arg `ExceptionHandler` constructors";
-    }
+    @Getter
+    final String displayName = "Fix deprecated no-arg `ExceptionHandler` constructors";
 
-    @Override
-    public String getDescription() {
-        return "Adds `ErrorResponseProcessor` argument to deprecated no-arg `ExceptionHandler` constructors.";
-    }
+    @Getter
+    final String description = "Adds `ErrorResponseProcessor` argument to deprecated no-arg `ExceptionHandler` constructors.";
 
     @Override
     public TreeVisitor<?, ExecutionContext> getVisitor() {

@@ -16,6 +16,7 @@
 package org.openrewrite.java.micronaut;
 
 import lombok.Data;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
 import org.openrewrite.ExecutionContext;
@@ -33,15 +34,11 @@ import java.util.*;
 public class TypeRequiresIntrospection extends ScanningRecipe<TypeRequiresIntrospection.Accumulator> {
     private static final Collection<String> typesRequiringIntrospection = Arrays.asList("io.micronaut.http.annotation.Controller", "io.micronaut.http.client.annotation.Client");
 
-    @Override
-    public String getDisplayName() {
-        return "Add `@Introspected` to classes requiring a map representation";
-    }
+    @Getter
+    final String displayName = "Add `@Introspected` to classes requiring a map representation";
 
-    @Override
-    public String getDescription() {
-        return "In Micronaut 2.x a reflection-based strategy was used to retrieve that information if the class was not annotated with `@Introspected`. As of Micronaut 3.x it is required to annotate classes with `@Introspected` that are used in this way.";
-    }
+    @Getter
+    final String description = "In Micronaut 2.x a reflection-based strategy was used to retrieve that information if the class was not annotated with `@Introspected`. As of Micronaut 3.x it is required to annotate classes with `@Introspected` that are used in this way.";
 
     private static boolean parentRequiresIntrospection(JavaType.@Nullable FullyQualified type) {
         if (type == null) {

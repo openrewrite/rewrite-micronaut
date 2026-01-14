@@ -15,6 +15,7 @@
  */
 package org.openrewrite.java.micronaut;
 
+import lombok.Getter;
 import org.jspecify.annotations.Nullable;
 import org.openrewrite.*;
 import org.openrewrite.properties.ChangePropertyKey;
@@ -26,15 +27,11 @@ public class UpdateSecurityPropertiesIfNeeded extends Recipe {
 
     private final List<Recipe> recipeList = new ArrayList<>();
 
-    @Override
-    public String getDisplayName() {
-        return "Update relocated Micronaut Security config properties";
-    }
+    @Getter
+    final String displayName = "Update relocated Micronaut Security config properties";
 
-    @Override
-    public String getDescription() {
-        return "This recipe will update relocated security config keys in Micronaut configuration property files.";
-    }
+    @Getter
+    final String description = "This recipe will update relocated security config keys in Micronaut configuration property files.";
 
     @Override
     public List<Recipe> getRecipeList() {

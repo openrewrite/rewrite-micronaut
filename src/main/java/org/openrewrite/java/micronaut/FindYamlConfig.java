@@ -15,6 +15,7 @@
  */
 package org.openrewrite.java.micronaut;
 
+import lombok.Getter;
 import org.openrewrite.ExecutionContext;
 import org.openrewrite.FindSourceFiles;
 import org.openrewrite.Recipe;
@@ -22,15 +23,11 @@ import org.openrewrite.TreeVisitor;
 
 public class FindYamlConfig extends Recipe {
 
-    @Override
-    public String getDisplayName() {
-        return "Find Micronaut yaml config";
-    }
+    @Getter
+    final String displayName = "Find Micronaut yaml config";
 
-    @Override
-    public String getDescription() {
-        return "Find Micronaut yaml configuration files.";
-    }
+    @Getter
+    final String description = "Find Micronaut yaml configuration files.";
 
     @Override
     public TreeVisitor<?, ExecutionContext> getVisitor() {

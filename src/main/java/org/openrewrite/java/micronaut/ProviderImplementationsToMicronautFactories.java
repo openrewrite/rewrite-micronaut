@@ -15,6 +15,7 @@
  */
 package org.openrewrite.java.micronaut;
 
+import lombok.Getter;
 import org.openrewrite.*;
 import org.openrewrite.internal.ListUtils;
 import org.openrewrite.java.*;
@@ -44,15 +45,11 @@ public class ProviderImplementationsToMicronautFactories extends Recipe {
                     .map(it -> new AnnotationMatcher(it + ".Singleton")))
             .map(AnnotationMatcher.class::cast).collect(toList());
 
-    @Override
-    public String getDisplayName() {
-        return "`Provider` implementation beans to Micronaut `@Factory`";
-    }
+    @Getter
+    final String displayName = "`Provider` implementation beans to Micronaut `@Factory`";
 
-    @Override
-    public String getDescription() {
-        return "As of Micronaut 3.x the `@Factory` annotation is required for creating beans from `javax.inject.Provider get()` implementations.";
-    }
+    @Getter
+    final String description = "As of Micronaut 3.x the `@Factory` annotation is required for creating beans from `javax.inject.Provider get()` implementations.";
 
     @Override
     public TreeVisitor<?, ExecutionContext> getVisitor() {

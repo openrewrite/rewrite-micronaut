@@ -15,6 +15,7 @@
  */
 package org.openrewrite.java.micronaut;
 
+import lombok.Getter;
 import org.openrewrite.ExecutionContext;
 import org.openrewrite.FindSourceFiles;
 import org.openrewrite.Recipe;
@@ -22,15 +23,11 @@ import org.openrewrite.TreeVisitor;
 
 public class FindPropertiesConfig extends Recipe {
 
-    @Override
-    public String getDisplayName() {
-        return "Find Micronaut properties config";
-    }
+    @Getter
+    final String displayName = "Find Micronaut properties config";
 
-    @Override
-    public String getDescription() {
-        return "Find Micronaut properties configuration files.";
-    }
+    @Getter
+    final String description = "Find Micronaut properties configuration files.";
 
     @Override
     public TreeVisitor<?, ExecutionContext> getVisitor() {

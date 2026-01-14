@@ -16,6 +16,7 @@
 package org.openrewrite.java.micronaut;
 
 
+import lombok.Getter;
 import org.openrewrite.ExecutionContext;
 import org.openrewrite.Preconditions;
 import org.openrewrite.Recipe;
@@ -30,15 +31,11 @@ import java.util.Optional;
 
 public class AddTestResourcesClientDependencyIfNeeded extends Recipe {
 
-    @Override
-    public String getDisplayName() {
-        return "Add `micronaut-test-resources-client` if needed";
-    }
+    @Getter
+    final String displayName = "Add `micronaut-test-resources-client` if needed";
 
-    @Override
-    public String getDescription() {
-        return "Add the `micronaut-test-resources-client` dependency to pom.xml if `test.resources.client.enabled property=true`.";
-    }
+    @Getter
+    final String description = "Add the `micronaut-test-resources-client` dependency to pom.xml if `test.resources.client.enabled property=true`.";
 
     @Override
     public TreeVisitor<?, ExecutionContext> getVisitor() {

@@ -17,21 +17,18 @@ package org.openrewrite.java.micronaut;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import org.jspecify.annotations.Nullable;
 import org.openrewrite.*;
 import org.openrewrite.java.dependencies.AddDependency;
 
 public class AddSnakeYamlDependencyIfNeeded extends ScanningRecipe<AddSnakeYamlDependencyIfNeeded.Accumulator> {
 
-    @Override
-    public String getDisplayName() {
-        return "Add `snakeyaml` dependency if needed";
-    }
+    @Getter
+    final String displayName = "Add `snakeyaml` dependency if needed";
 
-    @Override
-    public String getDescription() {
-        return "This recipe will add the `snakeyaml` dependency to a Micronaut 4 application that uses yaml configuration.";
-    }
+    @Getter
+    final String description = "This recipe will add the `snakeyaml` dependency to a Micronaut 4 application that uses yaml configuration.";
 
     @Override
     public AddSnakeYamlDependencyIfNeeded.Accumulator getInitialValue(ExecutionContext ctx) {

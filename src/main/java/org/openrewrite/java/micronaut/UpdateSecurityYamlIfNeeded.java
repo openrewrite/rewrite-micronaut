@@ -15,6 +15,7 @@
  */
 package org.openrewrite.java.micronaut;
 
+import lombok.Getter;
 import org.jspecify.annotations.Nullable;
 import org.openrewrite.*;
 import org.openrewrite.yaml.CopyValue;
@@ -44,15 +45,11 @@ public class UpdateSecurityYamlIfNeeded extends Recipe {
 
     private static final String TOKEN_PATH = "$.micronaut.security.token";
 
-    @Override
-    public String getDisplayName() {
-        return "Update relocated Micronaut Security config yaml keys";
-    }
+    @Getter
+    final String displayName = "Update relocated Micronaut Security config yaml keys";
 
-    @Override
-    public String getDescription() {
-        return "This recipe will update relocated security config keys in Micronaut configuration yaml files.";
-    }
+    @Getter
+    final String description = "This recipe will update relocated security config keys in Micronaut configuration yaml files.";
 
     @Override
     public List<Recipe> getRecipeList() {

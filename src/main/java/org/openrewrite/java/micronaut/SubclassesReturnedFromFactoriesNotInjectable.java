@@ -15,6 +15,7 @@
  */
 package org.openrewrite.java.micronaut;
 
+import lombok.Getter;
 import org.openrewrite.*;
 import org.openrewrite.java.AnnotationMatcher;
 import org.openrewrite.java.JavaIsoVisitor;
@@ -33,15 +34,11 @@ import static java.util.stream.Collectors.toList;
 public class SubclassesReturnedFromFactoriesNotInjectable extends Recipe {
     private static final AnnotationMatcher FACTORY_ANNOTATION_MATCHER = new AnnotationMatcher("@io.micronaut.context.annotation.Factory");
 
-    @Override
-    public String getDisplayName() {
-        return "Change factory method return types to reflect their resolved return type";
-    }
+    @Getter
+    final String displayName = "Change factory method return types to reflect their resolved return type";
 
-    @Override
-    public String getDescription() {
-        return "As of Micronaut 3.x It is no longer possible to inject the internal implementation type from beans produced via factories. Factory method return types are changed to reflect the resolved return type if the method returns a single non-null type that does not match the method declaration return type.";
-    }
+    @Getter
+    final String description = "As of Micronaut 3.x It is no longer possible to inject the internal implementation type from beans produced via factories. Factory method return types are changed to reflect the resolved return type if the method returns a single non-null type that does not match the method declaration return type.";
 
     @Override
     public TreeVisitor<?, ExecutionContext> getVisitor() {

@@ -15,6 +15,7 @@
  */
 package org.openrewrite.java.micronaut;
 
+import lombok.Getter;
 import org.openrewrite.*;
 import org.openrewrite.internal.ListUtils;
 import org.openrewrite.java.ChangeMethodName;
@@ -29,15 +30,11 @@ import static java.util.Collections.emptyList;
 public class OncePerRequestHttpServerFilterToHttpServerFilter extends Recipe {
     private static final String oncePerRequestHttpServerFilterFqn = "io.micronaut.http.filter.OncePerRequestHttpServerFilter";
 
-    @Override
-    public String getDisplayName() {
-        return "Convert `OncePerRequestServerFilter` extensions to `HttpServerFilter`";
-    }
+    @Getter
+    final String displayName = "Convert `OncePerRequestServerFilter` extensions to `HttpServerFilter`";
 
-    @Override
-    public String getDescription() {
-        return "Starting in Micronaut 3.0 all filters are executed once per request. Directly implement `HttpServerFilter` instead of extending `OncePerRequestHttpServerFilter` and replace any usages of `micronaut.once` attributes with a custom attribute name.";
-    }
+    @Getter
+    final String description = "Starting in Micronaut 3.0 all filters are executed once per request. Directly implement `HttpServerFilter` instead of extending `OncePerRequestHttpServerFilter` and replace any usages of `micronaut.once` attributes with a custom attribute name.";
 
     @Override
     public TreeVisitor<?, ExecutionContext> getVisitor() {

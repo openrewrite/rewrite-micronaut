@@ -15,6 +15,7 @@
  */
 package org.openrewrite.java.micronaut;
 
+import lombok.Getter;
 import org.openrewrite.ExecutionContext;
 import org.openrewrite.Preconditions;
 import org.openrewrite.Recipe;
@@ -27,15 +28,11 @@ import org.openrewrite.java.tree.J;
 
 public class BeanPropertyCapitalizationStrategy extends Recipe {
 
-    @Override
-    public String getDisplayName() {
-        return "De-capitalize `BeanIntrospection` `getProperty(..)` and `getRequiredProperty(..)` name arguments";
-    }
+    @Getter
+    final String displayName = "De-capitalize `BeanIntrospection` `getProperty(..)` and `getRequiredProperty(..)` name arguments";
 
-    @Override
-    public String getDescription() {
-        return "As of Micronaut 3.x property names for getters like `getXForwarded()` are de-capitalized from `XForwarded` to `xForwarded`.";
-    }
+    @Getter
+    final String description = "As of Micronaut 3.x property names for getters like `getXForwarded()` are de-capitalized from `XForwarded` to `xForwarded`.";
 
     @Override
     public TreeVisitor<?, ExecutionContext> getVisitor() {

@@ -16,6 +16,7 @@
 package org.openrewrite.java.micronaut;
 
 import lombok.Data;
+import lombok.Getter;
 import org.openrewrite.ExecutionContext;
 import org.openrewrite.ScanningRecipe;
 import org.openrewrite.TreeVisitor;
@@ -96,15 +97,11 @@ public class CopyNonInheritedAnnotations extends ScanningRecipe<CopyNonInherited
             "io.micronaut.websocket.annotation.WebSocketComponent"
     ).collect(toSet());
 
-    @Override
-    public String getDisplayName() {
-        return "Copy non-inherited annotations from super class";
-    }
+    @Getter
+    final String displayName = "Copy non-inherited annotations from super class";
 
-    @Override
-    public String getDescription() {
-        return "As of Micronaut 3.x only [annotations](https://github.com/micronaut-projects/micronaut-core/blob/3.0.x/src/main/docs/guide/appendix/breaks.adoc#annotation-inheritance) that are explicitly meta-annotated with `@Inherited` are inherited from parent classes and interfaces.";
-    }
+    @Getter
+    final String description = "As of Micronaut 3.x only [annotations](https://github.com/micronaut-projects/micronaut-core/blob/3.0.x/src/main/docs/guide/appendix/breaks.adoc#annotation-inheritance) that are explicitly meta-annotated with `@Inherited` are inherited from parent classes and interfaces.";
 
     @Override
     public Accumulator getInitialValue(ExecutionContext ctx) {

@@ -15,6 +15,7 @@
  */
 package org.openrewrite.java.micronaut;
 
+import lombok.Getter;
 import org.openrewrite.ExecutionContext;
 import org.openrewrite.Recipe;
 import org.openrewrite.Tree;
@@ -46,16 +47,12 @@ public class AddHttpRequestTypeParameter extends Recipe {
             "io.micronaut.security.token.reader.TokenResolver",
             "io.micronaut.security.token.validator.TokenValidator");
 
-    @Override
-    public String getDisplayName() {
-        return "Add `HttpRequest` type parameter for implemented interfaces";
-    }
+    @Getter
+    final String displayName = "Add `HttpRequest` type parameter for implemented interfaces";
 
-    @Override
-    public String getDescription() {
-        return "Add an `HttpRequest` type parameter to a class `implements` statement for interfaces that have been " +
-               "generically parameterized where they previously specified `HttpRequest` explicitly.";
-    }
+    @Getter
+    final String description = "Add an `HttpRequest` type parameter to a class `implements` statement for interfaces that have been " +
+            "generically parameterized where they previously specified `HttpRequest` explicitly.";
 
     @Override
     public TreeVisitor<?, ExecutionContext> getVisitor() {
