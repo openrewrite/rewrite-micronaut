@@ -19,6 +19,8 @@ type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.Micronaut3to4Migration
 displayName: Migrate from Micronaut 3.x to 4.x
 description: This recipe will apply changes required for migrating from Micronaut 3 to Micronaut 4.
+preconditions:
+  - org.openrewrite.Singleton
 recipeList:
   - org.openrewrite.java.migrate.UpgradeJavaVersion:
       version: 17
@@ -48,6 +50,8 @@ type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.UpdateBuildToMicronaut4Version
 displayName: Update the Micronaut version to 4.x
 description: This recipe will update the Micronaut version to 4.x for a Gradle or Maven build.
+preconditions:
+  - org.openrewrite.Singleton
 recipeList:
   - org.openrewrite.java.micronaut.UpgradeMicronautMavenPropertyVersion:
       newVersion: 4.x
@@ -58,6 +62,8 @@ type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.UpdateBuildPlugins
 displayName: Add Micronaut build plugins to 4.x
 description: This recipe will update the shadow jar plugin to 8.x and the Micronaut build plugins to 4.x for a Gradle build.
+preconditions:
+  - org.openrewrite.Singleton
 recipeList:
   - org.openrewrite.gradle.plugins.UpgradePluginVersion:
       pluginIdPattern: com.github.johnrengelman.shadow
@@ -107,6 +113,8 @@ type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.UpdateMicronautPlatformBom
 displayName: Update to Micronaut 4.x platform BOM
 description: This recipe will update a Gradle or Maven build to reference the Micronaut 4 platform BOM.
+preconditions:
+  - org.openrewrite.Singleton
 recipeList:
   - org.openrewrite.maven.ChangeParentPom:
       oldGroupId: io.micronaut
@@ -118,6 +126,8 @@ type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.UpdateJakartaAnnotations
 displayName: Update jakarta annotations dependency
 description: This recipe will remove jakarta annotations dependency as it is a transitive dependency of micronaut-inject, and migrate from javax.annotation if needed.
+preconditions:
+  - org.openrewrite.Singleton
 recipeList:
   - org.openrewrite.java.migrate.jakarta.JavaxAnnotationMigrationToJakartaAnnotation
   - org.openrewrite.java.dependencies.RemoveDependency:
@@ -128,6 +138,8 @@ type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.UpdateMicronautValidation
 displayName: Update to Micronaut Validation 4.x
 description: This recipe will add jakarta validation dependency if needed, migrate from javax.validation if needed, and update micronaut validation dependencies.
+preconditions:
+  - org.openrewrite.Singleton
 recipeList:
   - org.openrewrite.java.ChangePackage:
       oldPackageName: javax.validation
@@ -162,6 +174,8 @@ type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.UpdateMicronautEmail
 displayName: Update to Micronaut Email 2.x
 description: This recipe will migrate from javax.validation if needed, and update packages in for the Postmark integration if needed.
+preconditions:
+  - org.openrewrite.Singleton
 recipeList:
   - org.openrewrite.java.ChangePackage:
       oldPackageName: javax.mail
@@ -176,6 +190,8 @@ type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.AddMicronautWebsocketDependencyIfNeeded
 displayName: Update the Micronaut Websocket support
 description: This recipe will add the explicit Micronaut Websocket dependency if needed.
+preconditions:
+  - org.openrewrite.Singleton
 recipeList:
   - org.openrewrite.java.dependencies.AddDependency:
       groupId: io.micronaut
@@ -188,6 +204,8 @@ type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.UpdateMicronautSession
 displayName: Update the Micronaut Session support
 description: This recipe will update the Micronaut Session dependency if needed.
+preconditions:
+  - org.openrewrite.Singleton
 recipeList:
   - org.openrewrite.gradle.ChangeDependencyGroupId:
       groupId: io.micronaut
@@ -204,6 +222,8 @@ type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.AddMicronautRetryDependencyIfNeeded
 displayName: Update the Micronaut Retry support
 description: This recipe will add the explicit Micronaut Retry dependency if needed.
+preconditions:
+  - org.openrewrite.Singleton
 recipeList:
   - org.openrewrite.java.dependencies.AddDependency:
       groupId: io.micronaut
@@ -216,6 +236,8 @@ type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.UpdateMicronautSecurity
 displayName: Update the Micronaut Security library
 description: This recipe will update imports for relocated classes and update configuration files with renamed keys.
+preconditions:
+  - org.openrewrite.Singleton
 recipeList:
   - org.openrewrite.java.ChangeType:
       oldFullyQualifiedTypeName: io.micronaut.security.token.jwt.endpoints.TokenRefreshRequest
@@ -323,6 +345,8 @@ type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.UpdateMicronautData
 displayName: Update the Micronaut Data library
 description: This recipe will make the necessary updates for using Micronaut Data with Micronaut Framework 4.
+preconditions:
+  - org.openrewrite.Singleton
 recipeList:
   - org.openrewrite.xml.RemoveXmlTag:
       xPath: /project/properties/micronaut.data.version
@@ -351,6 +375,8 @@ type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.UpdateBlockingTaskExecutors
 displayName: Migrate the use of TaskExecutors with blocking IO
 description: This recipe will any usage of TaskExecutors.IO to TaskExecutors.BLOCKING in order to be compatible with virtual threads.
+preconditions:
+  - org.openrewrite.Singleton
 recipeList:
   - org.openrewrite.java.ReplaceConstantWithAnotherConstant:
       existingFullyQualifiedConstantName: io.micronaut.scheduling.TaskExecutors.IO
@@ -360,6 +386,8 @@ type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.RemoveWithJansiLogbackConfiguration
 displayName: Remove withJansi Logback configuration
 description: This recipe will remove the withJansi configuration tag from logback.xml.
+preconditions:
+  - org.openrewrite.Singleton
 recipeList:
   - org.openrewrite.xml.RemoveXmlTag:
       xPath: /configuration/appender/withJansi
@@ -369,6 +397,8 @@ type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.RemoveUnnecessaryDependencies
 displayName: Remove unnecessary dependencies
 description: This recipe will remove dependencies that are no longer explicitly needed.
+preconditions:
+  - org.openrewrite.Singleton
 recipeList:
   - org.openrewrite.java.dependencies.RemoveDependency:
       groupId: io.micronaut
@@ -378,6 +408,8 @@ type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.UpdateMavenAnnotationProcessors
 displayName: Update the version of core annotation processors
 description: This recipe will update the version of Maven-configured annotation processors from Micronaut Core.
+preconditions:
+  - org.openrewrite.Singleton
 recipeList:
   - org.openrewrite.java.micronaut.ChangeAnnotationProcessorPath:
       oldGroupId: io.micronaut
