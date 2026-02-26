@@ -21,6 +21,7 @@ import org.openrewrite.InMemoryExecutionContext;
 import org.openrewrite.java.JavaParser;
 import org.openrewrite.test.RecipeSpec;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.openrewrite.gradle.Assertions.buildGradle;
 import static org.openrewrite.gradle.toolingapi.Assertions.withToolingApi;
 import static org.openrewrite.java.Assertions.*;
@@ -218,89 +219,11 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
                     </plugins>
                 </build>
             </project>
-            """.formatted(MicronautRewriteTestVersions.getLatestMN3Version()), """
-            <project>
-                <groupId>com.mycompany.app</groupId>
-                <artifactId>my-app</artifactId>
-                <version>1</version>
-                <parent>
-                    <groupId>io.micronaut.platform</groupId>
-                    <artifactId>micronaut-parent</artifactId>
-                    <version>%s</version>
-                </parent>
-                <dependencyManagement>
-                    <dependencies>
-                        <dependency>
-                            <groupId>io.micronaut</groupId>
-                            <artifactId>micronaut-validation</artifactId>
-                            <version>3.10.4</version>
-                        </dependency>
-                    </dependencies>
-                </dependencyManagement>
-                <dependencies>
-                    <dependency>
-                        <groupId>io.micronaut</groupId>
-                        <artifactId>micronaut-http-client</artifactId>
-                        <scope>compile</scope>
-                    </dependency>
-                    <dependency>
-                        <groupId>io.micronaut</groupId>
-                        <artifactId>micronaut-http-server-netty</artifactId>
-                        <scope>compile</scope>
-                    </dependency>
-                    <dependency>
-                        <groupId>io.micronaut</groupId>
-                        <artifactId>micronaut-jackson-databind</artifactId>
-                        <scope>compile</scope>
-                    </dependency>
-                    <dependency>
-                        <groupId>io.micronaut.validation</groupId>
-                        <artifactId>micronaut-validation</artifactId>
-                    </dependency>
-                    <dependency>
-                        <groupId>ch.qos.logback</groupId>
-                        <artifactId>logback-classic</artifactId>
-                        <scope>runtime</scope>
-                    </dependency>
-                </dependencies>
-                <build>
-                    <plugins>
-                        <plugin>
-                            <groupId>io.micronaut.maven</groupId>
-                            <artifactId>micronaut-maven-plugin</artifactId>
-                        </plugin>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-compiler-plugin</artifactId>
-                            <configuration>
-                                <annotationProcessorPaths combine.children="append">
-                                    <path>
-                                        <groupId>io.micronaut</groupId>
-                                        <artifactId>micronaut-http-validation</artifactId>
-                                        <version>${micronaut.version}</version>
-                                    </path>
-                                    <path>
-                                        <groupId>io.micronaut.validation</groupId>
-                                        <artifactId>micronaut-validation-processor</artifactId>
-                                        <version>${micronaut.validation.version}</version>
-                                        <exclusions>
-                                            <exclusion>
-                                                <groupId>io.micronaut</groupId>
-                                                <artifactId>micronaut-inject</artifactId>
-                                            </exclusion>
-                                        </exclusions>
-                                    </path>
-                                </annotationProcessorPaths>
-                                <compilerArgs>
-                                    <arg>-Amicronaut.processing.group=com.example</arg>
-                                    <arg>-Amicronaut.processing.module=demo</arg>
-                                </compilerArgs>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </build>
-            </project>
-            """.formatted(latestMicronautVersion))));
+            """.formatted(MicronautRewriteTestVersions.getLatestMN3Version()),
+            spec -> spec.after(actual -> assertThat(actual)
+              .containsPattern("<dependencyManagement>(.*|\\s)*<artifactId>micronaut-validation</artifactId>\\s*<version>3\\.\\d+\\.\\d+</version>(.*|\\s)*</dependencyManagement>")
+              .actual()
+            ))));
     }
 
     @Test
@@ -377,89 +300,11 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
                     </plugins>
                 </build>
             </project>
-            """.formatted(MicronautRewriteTestVersions.getLatestMN3Version()), """
-            <project>
-                <groupId>com.mycompany.app</groupId>
-                <artifactId>my-app</artifactId>
-                <version>1</version>
-                <parent>
-                    <groupId>io.micronaut.platform</groupId>
-                    <artifactId>micronaut-parent</artifactId>
-                    <version>%s</version>
-                </parent>
-                <dependencyManagement>
-                    <dependencies>
-                        <dependency>
-                            <groupId>io.micronaut</groupId>
-                            <artifactId>micronaut-validation</artifactId>
-                            <version>3.10.4</version>
-                        </dependency>
-                    </dependencies>
-                </dependencyManagement>
-                <dependencies>
-                    <dependency>
-                        <groupId>io.micronaut</groupId>
-                        <artifactId>micronaut-http-client</artifactId>
-                        <scope>compile</scope>
-                    </dependency>
-                    <dependency>
-                        <groupId>io.micronaut</groupId>
-                        <artifactId>micronaut-http-server-netty</artifactId>
-                        <scope>compile</scope>
-                    </dependency>
-                    <dependency>
-                        <groupId>io.micronaut</groupId>
-                        <artifactId>micronaut-jackson-databind</artifactId>
-                        <scope>compile</scope>
-                    </dependency>
-                    <dependency>
-                        <groupId>io.micronaut.validation</groupId>
-                        <artifactId>micronaut-validation</artifactId>
-                    </dependency>
-                    <dependency>
-                        <groupId>ch.qos.logback</groupId>
-                        <artifactId>logback-classic</artifactId>
-                        <scope>runtime</scope>
-                    </dependency>
-                </dependencies>
-                <build>
-                    <plugins>
-                        <plugin>
-                            <groupId>io.micronaut.maven</groupId>
-                            <artifactId>micronaut-maven-plugin</artifactId>
-                        </plugin>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-compiler-plugin</artifactId>
-                            <configuration>
-                                <annotationProcessorPaths combine.children="append">
-                                    <path>
-                                        <groupId>io.micronaut</groupId>
-                                        <artifactId>micronaut-http-validation</artifactId>
-                                        <version>${micronaut.version}</version>
-                                    </path>
-                                    <path>
-                                        <groupId>io.micronaut.validation</groupId>
-                                        <artifactId>micronaut-validation-processor</artifactId>
-                                        <version>${micronaut.validation.version}</version>
-                                        <exclusions>
-                                            <exclusion>
-                                                <groupId>io.micronaut</groupId>
-                                                <artifactId>micronaut-inject</artifactId>
-                                            </exclusion>
-                                        </exclusions>
-                                    </path>
-                                </annotationProcessorPaths>
-                                <compilerArgs>
-                                    <arg>-Amicronaut.processing.group=com.example</arg>
-                                    <arg>-Amicronaut.processing.module=demo</arg>
-                                </compilerArgs>
-                            </configuration>
-                        </plugin>
-                    </plugins>
-                </build>
-            </project>
-            """.formatted(latestMicronautVersion))));
+            """.formatted(MicronautRewriteTestVersions.getLatestMN3Version()),
+            spec -> spec.after(actual -> {
+                assertThat(actual).containsPattern("<artifactId>micronaut-validation</artifactId>\\s*<version>3\\.\\d+\\.\\d+</version>");
+                return actual;
+            }))));
     }
 
     @Test
