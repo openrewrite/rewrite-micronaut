@@ -28,6 +28,7 @@ import java.util.List;
 
 public class UpdateSecurityYamlIfNeeded extends Recipe {
 
+    @Getter
     private final List<Recipe> recipeList = new ArrayList<>();
 
     private final String newYamlKeysSnippet =
@@ -50,11 +51,6 @@ public class UpdateSecurityYamlIfNeeded extends Recipe {
 
     @Getter
     final String description = "This recipe will update relocated security config keys in Micronaut configuration yaml files.";
-
-    @Override
-    public List<Recipe> getRecipeList() {
-        return this.recipeList;
-    }
 
     public UpdateSecurityYamlIfNeeded() {
         this.recipeList.add(new MergeYaml("$.micronaut.security.token", newYamlKeysSnippet, Boolean.TRUE, null, null, null, null, null));

@@ -15,9 +15,12 @@
  */
 package org.openrewrite.java.micronaut;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.openrewrite.InMemoryExecutionContext;
 import org.openrewrite.maven.MavenDownloadingException;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MicronautRewriteTestVersions {
     private static final String MN_2_VERSION;
     private static final String MN_3_VERSION;
@@ -66,8 +69,5 @@ public final class MicronautRewriteTestVersions {
         } catch (MavenDownloadingException e) {
             throw new IllegalStateException("Failed to resolve plugin version for " + pluginId, e);
         }
-    }
-
-    private MicronautRewriteTestVersions() {
     }
 }

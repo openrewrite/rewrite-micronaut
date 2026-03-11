@@ -15,6 +15,8 @@
  */
 package org.openrewrite.java.micronaut;
 
+import lombok.AccessLevel;
+import lombok.Getter;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.openrewrite.test.RewriteTest;
@@ -25,6 +27,7 @@ import static org.openrewrite.properties.Assertions.properties;
 public abstract class Micronaut4RewriteTest implements RewriteTest {
     protected static String latestApplicationPluginVersion;
     protected static String latestMicronautVersion;
+    @Getter(AccessLevel.PROTECTED)
     private SourceSpecs gradleProperties;
 
     @BeforeAll
@@ -36,9 +39,5 @@ public abstract class Micronaut4RewriteTest implements RewriteTest {
     @BeforeEach
     void initGradleProperties() {
        gradleProperties = properties("micronautVersion=" + latestMicronautVersion, s -> s.path("gradle.properties"));
-    }
-
-    protected SourceSpecs getGradleProperties() {
-        return gradleProperties;
     }
 }

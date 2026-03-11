@@ -15,8 +15,10 @@
  */
 package org.openrewrite.java.micronaut;
 
+import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.openrewrite.ExecutionContext;
 import org.openrewrite.ScanningRecipe;
 import org.openrewrite.TreeVisitor;
@@ -137,12 +139,9 @@ public class CopyNonInheritedAnnotations extends ScanningRecipe<CopyNonInherited
         return new CopyAnnoVisitor(acc.getParentAnnotationsByType());
     }
 
+    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     private static final class CopyAnnoVisitor extends JavaIsoVisitor<ExecutionContext> {
         private final Map<String, List<J.Annotation>> parentAnnotationsByType;
-
-        private CopyAnnoVisitor(Map<String, List<J.Annotation>> parentAnnotationsByType) {
-            this.parentAnnotationsByType = parentAnnotationsByType;
-        }
 
         @Override
         public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext ctx) {

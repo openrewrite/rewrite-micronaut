@@ -25,6 +25,7 @@ import java.util.List;
 
 public class UpdateSecurityPropertiesIfNeeded extends Recipe {
 
+    @Getter
     private final List<Recipe> recipeList = new ArrayList<>();
 
     @Getter
@@ -32,11 +33,6 @@ public class UpdateSecurityPropertiesIfNeeded extends Recipe {
 
     @Getter
     final String description = "This recipe will update relocated security config keys in Micronaut configuration property files.";
-
-    @Override
-    public List<Recipe> getRecipeList() {
-        return this.recipeList;
-    }
 
     public UpdateSecurityPropertiesIfNeeded() {
         this.recipeList.add(new ChangePropertyKey("micronaut.security.token.jwt.generator.access-token.expiration", "micronaut.security.token.generator.access-token.expiration", null, null));

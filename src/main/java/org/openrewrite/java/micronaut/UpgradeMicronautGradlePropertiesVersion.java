@@ -16,6 +16,7 @@
 package org.openrewrite.java.micronaut;
 
 import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import org.openrewrite.*;
 import org.openrewrite.marker.Markup;
@@ -55,13 +56,10 @@ public class UpgradeMicronautGradlePropertiesVersion extends Recipe {
         return Preconditions.check(new FindSourceFiles(FILE_MATCHER), new ChangePropertyValueVisitor(newVersion));
     }
 
+    @RequiredArgsConstructor
     private static class ChangePropertyValueVisitor extends PropertiesVisitor<ExecutionContext> {
 
         private final String newVersion;
-
-        public ChangePropertyValueVisitor(String newVersion) {
-            this.newVersion = newVersion;
-        }
 
         @Override
         public Properties visitEntry(Properties.Entry entry, ExecutionContext ctx) {

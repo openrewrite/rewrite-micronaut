@@ -15,6 +15,8 @@
  */
 package org.openrewrite.java.micronaut;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.openrewrite.ExecutionContext;
 import org.openrewrite.gradle.DependencyVersionSelector;
 import org.openrewrite.gradle.marker.GradleBuildscript;
@@ -37,6 +39,7 @@ import java.util.Optional;
 import static java.util.Collections.*;
 import static org.openrewrite.Tree.randomId;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MicronautVersionHelper {
 
     private static final String GROUP_ID = "io.micronaut";
@@ -79,8 +82,5 @@ public final class MicronautVersionHelper {
                         versionPattern,
                         (String) null,
                         ctx));
-    }
-
-    private MicronautVersionHelper() {
     }
 }
