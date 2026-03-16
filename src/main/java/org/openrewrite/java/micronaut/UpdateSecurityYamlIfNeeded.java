@@ -16,8 +16,9 @@
 package org.openrewrite.java.micronaut;
 
 import lombok.Getter;
-import org.jspecify.annotations.Nullable;
-import org.openrewrite.*;
+import org.openrewrite.ExecutionContext;
+import org.openrewrite.Recipe;
+import org.openrewrite.TreeVisitor;
 import org.openrewrite.yaml.CopyValue;
 import org.openrewrite.yaml.DeleteKey;
 import org.openrewrite.yaml.MergeYaml;
@@ -27,6 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UpdateSecurityYamlIfNeeded extends Recipe {
+
+    private static final String FILE_MATCHER = "**/{application,application-*,bootstrap,bootstrap-*}.{yml,yaml}";
 
     @Getter
     private final List<Recipe> recipeList = new ArrayList<>();
@@ -53,30 +56,17 @@ public class UpdateSecurityYamlIfNeeded extends Recipe {
     final String description = "This recipe will update relocated security config keys in Micronaut configuration yaml files.";
 
     public UpdateSecurityYamlIfNeeded() {
-        this.recipeList.add(new MergeYaml("$.micronaut.security.token", newYamlKeysSnippet, Boolean.TRUE, null, null, null, null, null));
-        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.generator.access-token.expiration", null, TOKEN_PATH + ".generator.access-token.expiration", null));
-        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.enabled", null, TOKEN_PATH + ".cookie.enabled", null));
-        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.cookie-max-age", null, TOKEN_PATH + ".cookie.cookie-max-age", null));
-        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.cookie-path", null, TOKEN_PATH + ".cookie.cookie-path", null));
-        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.cookie-domain", null, TOKEN_PATH + ".cookie.cookie-domain", null));
-        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.cookie-same-site", null, TOKEN_PATH + ".cookie.cookie-same-site", null));
-        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.bearer.enabled", null, TOKEN_PATH + ".bearer.enabled", null));
-        this.recipeList.add(new DeleteKey(TOKEN_PATH + ".jwt.generator", null));
-        this.recipeList.add(new DeleteKey(TOKEN_PATH + ".jwt.cookie", null));
-        this.recipeList.add(new DeleteKey(TOKEN_PATH + ".jwt.bearer", null));
+        this.recipeList.add(new MergeYaml("$.micronaut.security.token", newYamlKeysSnippet, Boolean.TRUE, null, FILE_MATCHER, null, null, null));
+        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.generator.access-token.expiration", FILE_MATCHER, TOKEN_PATH + ".generator.access-token.expiration", FILE_MATCHER));
+        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.enabled", FILE_MATCHER, TOKEN_PATH + ".cookie.enabled", FILE_MATCHER));
+        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.cookie-max-age", FILE_MATCHER, TOKEN_PATH + ".cookie.cookie-max-age", FILE_MATCHER));
+        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.cookie-path", FILE_MATCHER, TOKEN_PATH + ".cookie.cookie-path", FILE_MATCHER));
+        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.cookie-domain", FILE_MATCHER, TOKEN_PATH + ".cookie.cookie-domain", FILE_MATCHER));
+        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.cookie-same-site", FILE_MATCHER, TOKEN_PATH + ".cookie.cookie-same-site", FILE_MATCHER));
+        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.bearer.enabled", FILE_MATCHER, TOKEN_PATH + ".bearer.enabled", FILE_MATCHER));
+        this.recipeList.add(new DeleteKey(TOKEN_PATH + ".jwt.generator", FILE_MATCHER));
+        this.recipeList.add(new DeleteKey(TOKEN_PATH + ".jwt.cookie", FILE_MATCHER));
+        this.recipeList.add(new DeleteKey(TOKEN_PATH + ".jwt.bearer", FILE_MATCHER));
         this.recipeList.add(new RemoveUnused());
-    }
-
-    @Override
-    public TreeVisitor<?, ExecutionContext> getVisitor() {
-        return Preconditions.check(Preconditions.not(new FindYamlConfig().getVisitor()), new TreeVisitor<Tree, ExecutionContext>() {
-            @Override
-            public @Nullable Tree visit(@Nullable Tree tree, ExecutionContext ctx) {
-                if (!recipeList.isEmpty()) {
-                    recipeList.clear();
-                }
-                return super.visit(tree, ctx);
-            }
-        });
     }
 }
