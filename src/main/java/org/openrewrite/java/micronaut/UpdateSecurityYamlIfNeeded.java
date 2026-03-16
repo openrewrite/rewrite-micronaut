@@ -22,7 +22,6 @@ import org.openrewrite.TreeVisitor;
 import org.openrewrite.yaml.CopyValue;
 import org.openrewrite.yaml.DeleteKey;
 import org.openrewrite.yaml.MergeYaml;
-import org.openrewrite.yaml.cleanup.RemoveUnused;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,6 +66,6 @@ public class UpdateSecurityYamlIfNeeded extends Recipe {
         this.recipeList.add(new DeleteKey(TOKEN_PATH + ".jwt.generator", FILE_MATCHER));
         this.recipeList.add(new DeleteKey(TOKEN_PATH + ".jwt.cookie", FILE_MATCHER));
         this.recipeList.add(new DeleteKey(TOKEN_PATH + ".jwt.bearer", FILE_MATCHER));
-        this.recipeList.add(new RemoveUnused());
+        this.recipeList.add(new RemoveUnusedInConfigFiles());
     }
 }
