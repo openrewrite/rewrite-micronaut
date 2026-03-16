@@ -20,13 +20,22 @@ import org.jspecify.annotations.Nullable;
 import org.openrewrite.*;
 import org.openrewrite.properties.ChangePropertyKey;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class UpdateSecurityPropertiesIfNeeded extends Recipe {
 
-    @Getter
-    private final List<Recipe> recipeList = new ArrayList<>();
+    private static final String FILE_MATCHER = "**/{application,application-*,bootstrap,bootstrap-*}.properties";
+
+    private static final List<String[]> KEY_MAPPINGS = Arrays.asList(
+            new String[]{"micronaut.security.token.jwt.generator.access-token.expiration", "micronaut.security.token.generator.access-token.expiration"},
+            new String[]{"micronaut.security.token.jwt.cookie.enabled", "micronaut.security.token.cookie.enabled"},
+            new String[]{"micronaut.security.token.jwt.cookie.cookie-max-age", "micronaut.security.token.cookie.cookie-max-age"},
+            new String[]{"micronaut.security.token.jwt.cookie.cookie-path", "micronaut.security.token.cookie.cookie-path"},
+            new String[]{"micronaut.security.token.jwt.cookie.cookie-domain", "micronaut.security.token.cookie.cookie-domain"},
+            new String[]{"micronaut.security.token.jwt.cookie.cookie-same-site", "micronaut.security.token.cookie.cookie-same-site"},
+            new String[]{"micronaut.security.token.jwt.bearer.enabled", "micronaut.security.token.bearer.enabled"}
+    );
 
     @Getter
     final String displayName = "Update relocated Micronaut Security config properties";
@@ -34,25 +43,15 @@ public class UpdateSecurityPropertiesIfNeeded extends Recipe {
     @Getter
     final String description = "This recipe will update relocated security config keys in Micronaut configuration property files.";
 
-    public UpdateSecurityPropertiesIfNeeded() {
-        this.recipeList.add(new ChangePropertyKey("micronaut.security.token.jwt.generator.access-token.expiration", "micronaut.security.token.generator.access-token.expiration", null, null));
-        this.recipeList.add(new ChangePropertyKey("micronaut.security.token.jwt.cookie.enabled", "micronaut.security.token.cookie.enabled", null, null));
-        this.recipeList.add(new ChangePropertyKey("micronaut.security.token.jwt.cookie.cookie-max-age", "micronaut.security.token.cookie.cookie-max-age", null, null));
-        this.recipeList.add(new ChangePropertyKey("micronaut.security.token.jwt.cookie.cookie-path", "micronaut.security.token.cookie.cookie-path", null, null));
-        this.recipeList.add(new ChangePropertyKey("micronaut.security.token.jwt.cookie.cookie-domain", "micronaut.security.token.cookie.cookie-domain", null, null));
-        this.recipeList.add(new ChangePropertyKey("micronaut.security.token.jwt.cookie.cookie-same-site", "micronaut.security.token.cookie.cookie-same-site", null, null));
-        this.recipeList.add(new ChangePropertyKey("micronaut.security.token.jwt.bearer.enabled", "micronaut.security.token.bearer.enabled", null, null));
-    }
-
     @Override
     public TreeVisitor<?, ExecutionContext> getVisitor() {
-        return Preconditions.check(Preconditions.not(new FindPropertiesConfig().getVisitor()), new TreeVisitor<Tree, ExecutionContext>() {
+        return Preconditions.check(new FindSourceFiles(FILE_MATCHER).getVisitor(), new TreeVisitor<Tree, ExecutionContext>() {
             @Override
             public @Nullable Tree visit(@Nullable Tree tree, ExecutionContext ctx) {
-                if (!recipeList.isEmpty()) {
-                    recipeList.clear();
+                for (String[] mapping : KEY_MAPPINGS) {
+                    tree = new ChangePropertyKey(mapping[0], mapping[1], null, null).getVisitor().visit(tree, ctx);
                 }
-                return super.visit(tree, ctx);
+                return tree;
             }
         });
     }
