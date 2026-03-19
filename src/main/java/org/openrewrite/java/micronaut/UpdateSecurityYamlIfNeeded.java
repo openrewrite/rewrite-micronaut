@@ -16,9 +16,7 @@
 package org.openrewrite.java.micronaut;
 
 import lombok.Getter;
-import org.openrewrite.ExecutionContext;
 import org.openrewrite.Recipe;
-import org.openrewrite.TreeVisitor;
 import org.openrewrite.yaml.CopyValue;
 import org.openrewrite.yaml.DeleteKey;
 import org.openrewrite.yaml.MergeYaml;
