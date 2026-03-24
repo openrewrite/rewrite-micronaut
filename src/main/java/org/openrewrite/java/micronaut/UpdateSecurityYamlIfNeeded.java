@@ -16,35 +16,20 @@
 package org.openrewrite.java.micronaut;
 
 import lombok.Getter;
-import org.openrewrite.Recipe;
-import org.openrewrite.yaml.CopyValue;
-import org.openrewrite.yaml.DeleteKey;
-import org.openrewrite.yaml.MergeYaml;
+import org.openrewrite.*;
+import org.openrewrite.yaml.JsonPathMatcher;
+import org.openrewrite.yaml.ShiftFormatLeftVisitor;
+import org.openrewrite.yaml.YamlIsoVisitor;
+import org.openrewrite.yaml.tree.Yaml;
 
-import java.util.ArrayList;
+import org.openrewrite.internal.ListUtils;
+
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class UpdateSecurityYamlIfNeeded extends Recipe {
 
     private static final String FILE_MATCHER = "**/{application,application-*,bootstrap,bootstrap-*}.{yml,yaml}";
-
-    @Getter
-    private final List<Recipe> recipeList = new ArrayList<>();
-
-    private final String newYamlKeysSnippet =
-            "generator:\n" +
-            "  access-token:\n" +
-            "    expiration:\n" +
-            "cookie:\n" +
-            "  enabled:\n" +
-            "  cookie-max-age:\n" +
-            "  cookie-path:\n" +
-            "  cookie-domain:\n" +
-            "  cookie-same-site:\n" +
-            "bearer:\n" +
-            "  enabled:";
-
-    private static final String TOKEN_PATH = "$.micronaut.security.token";
 
     @Getter
     final String displayName = "Update relocated Micronaut Security config yaml keys";
@@ -52,18 +37,51 @@ public class UpdateSecurityYamlIfNeeded extends Recipe {
     @Getter
     final String description = "This recipe will update relocated security config keys in Micronaut configuration yaml files.";
 
-    public UpdateSecurityYamlIfNeeded() {
-        this.recipeList.add(new MergeYaml("$.micronaut.security.token", newYamlKeysSnippet, Boolean.TRUE, null, FILE_MATCHER, null, null, null));
-        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.generator.access-token.expiration", FILE_MATCHER, TOKEN_PATH + ".generator.access-token.expiration", FILE_MATCHER));
-        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.enabled", FILE_MATCHER, TOKEN_PATH + ".cookie.enabled", FILE_MATCHER));
-        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.cookie-max-age", FILE_MATCHER, TOKEN_PATH + ".cookie.cookie-max-age", FILE_MATCHER));
-        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.cookie-path", FILE_MATCHER, TOKEN_PATH + ".cookie.cookie-path", FILE_MATCHER));
-        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.cookie-domain", FILE_MATCHER, TOKEN_PATH + ".cookie.cookie-domain", FILE_MATCHER));
-        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.cookie-same-site", FILE_MATCHER, TOKEN_PATH + ".cookie.cookie-same-site", FILE_MATCHER));
-        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.bearer.enabled", FILE_MATCHER, TOKEN_PATH + ".bearer.enabled", FILE_MATCHER));
-        this.recipeList.add(new DeleteKey(TOKEN_PATH + ".jwt.generator", FILE_MATCHER));
-        this.recipeList.add(new DeleteKey(TOKEN_PATH + ".jwt.cookie", FILE_MATCHER));
-        this.recipeList.add(new DeleteKey(TOKEN_PATH + ".jwt.bearer", FILE_MATCHER));
-        this.recipeList.add(new RemoveUnusedInConfigFiles());
+    @Override
+    public TreeVisitor<?, ExecutionContext> getVisitor() {
+        JsonPathMatcher jwtMatcher = new JsonPathMatcher("$.micronaut.security.token.jwt");
+        return Preconditions.check(new FindSourceFiles(FILE_MATCHER).getVisitor(),
+                new YamlIsoVisitor<ExecutionContext>() {
+                    @Override
+                    public Yaml.Mapping visitMapping(Yaml.Mapping mapping, ExecutionContext ctx) {
+                        Yaml.Mapping m = super.visitMapping(mapping, ctx);
+                        Yaml.Mapping.Entry jwtEntry = null;
+                        for (Yaml.Mapping.Entry entry : m.getEntries()) {
+                            if (entry.getValue() instanceof Yaml.Mapping &&
+                                    jwtMatcher.matches(new Cursor(getCursor(), entry))) {
+                                jwtEntry = entry;
+                                break;
+                            }
+                        }
+                        if (jwtEntry == null) {
+                            return m;
+                        }
+                        Yaml.Mapping jwtMapping = (Yaml.Mapping) jwtEntry.getValue();
+                        // Calculate indent shift: difference between jwt child indent and jwt indent
+                        int jwtIndent = indentOf(jwtEntry.getPrefix());
+                        int childIndent = jwtMapping.getEntries().isEmpty() ? jwtIndent :
+                                indentOf(jwtMapping.getEntries().get(0).getPrefix());
+                        int shift = childIndent - jwtIndent;
+
+                        Yaml.Mapping.Entry finalJwtEntry = jwtEntry;
+                        int finalShift = shift;
+                        List<Yaml.Mapping.Entry> promoted = jwtMapping.getEntries().stream()
+                                .map(child -> {
+                                    Yaml.Mapping.Entry p = child.withPrefix(finalJwtEntry.getPrefix());
+                                    if (finalShift > 0 && p.getValue() instanceof Yaml.Mapping) {
+                                        doAfterVisit(new ShiftFormatLeftVisitor<>(p.getValue(), finalShift));
+                                    }
+                                    return p;
+                                })
+                                .collect(Collectors.toList());
+                        return m.withEntries(ListUtils.flatMap(m.getEntries(), entry ->
+                                entry.getKey().getValue().equals(finalJwtEntry.getKey().getValue()) ? promoted : entry));
+                    }
+
+                    private int indentOf(String prefix) {
+                        int lastNewline = prefix.lastIndexOf('\n');
+                        return lastNewline >= 0 ? prefix.length() - lastNewline - 1 : prefix.length();
+                    }
+                });
     }
 }
