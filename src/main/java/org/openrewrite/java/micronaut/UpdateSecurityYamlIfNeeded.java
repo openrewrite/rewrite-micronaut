@@ -22,8 +22,10 @@ import org.openrewrite.yaml.ShiftFormatLeftVisitor;
 import org.openrewrite.yaml.YamlIsoVisitor;
 import org.openrewrite.yaml.tree.Yaml;
 
-import java.util.ArrayList;
+import org.openrewrite.internal.ListUtils;
+
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class UpdateSecurityYamlIfNeeded extends Recipe {
 
@@ -61,21 +63,19 @@ public class UpdateSecurityYamlIfNeeded extends Recipe {
                                 indentOf(jwtMapping.getEntries().get(0).getPrefix());
                         int shift = childIndent - jwtIndent;
 
-                        List<Yaml.Mapping.Entry> newEntries = new ArrayList<>();
-                        for (Yaml.Mapping.Entry entry : m.getEntries()) {
-                            if (entry.getKey().getValue().equals(jwtEntry.getKey().getValue())) {
-                                for (Yaml.Mapping.Entry child : jwtMapping.getEntries()) {
-                                    Yaml.Mapping.Entry promoted = child.withPrefix(jwtEntry.getPrefix());
-                                    if (shift > 0 && promoted.getValue() instanceof Yaml.Mapping) {
-                                        doAfterVisit(new ShiftFormatLeftVisitor<>(promoted.getValue(), shift));
+                        Yaml.Mapping.Entry finalJwtEntry = jwtEntry;
+                        int finalShift = shift;
+                        List<Yaml.Mapping.Entry> promoted = jwtMapping.getEntries().stream()
+                                .map(child -> {
+                                    Yaml.Mapping.Entry p = child.withPrefix(finalJwtEntry.getPrefix());
+                                    if (finalShift > 0 && p.getValue() instanceof Yaml.Mapping) {
+                                        doAfterVisit(new ShiftFormatLeftVisitor<>(p.getValue(), finalShift));
                                     }
-                                    newEntries.add(promoted);
-                                }
-                            } else {
-                                newEntries.add(entry);
-                            }
-                        }
-                        return m.withEntries(newEntries);
+                                    return p;
+                                })
+                                .collect(Collectors.toList());
+                        return m.withEntries(ListUtils.flatMap(m.getEntries(), entry ->
+                                entry.getKey().getValue().equals(finalJwtEntry.getKey().getValue()) ? promoted : entry));
                     }
 
                     private int indentOf(String prefix) {
