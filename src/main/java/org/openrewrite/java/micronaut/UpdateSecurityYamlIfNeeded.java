@@ -16,9 +16,10 @@
 package org.openrewrite.java.micronaut;
 
 import lombok.Getter;
-import org.openrewrite.Recipe;
-import org.openrewrite.yaml.CopyValue;
-import org.openrewrite.yaml.DeleteKey;
+import org.openrewrite.*;
+import org.openrewrite.yaml.ShiftFormatLeftVisitor;
+import org.openrewrite.yaml.YamlIsoVisitor;
+import org.openrewrite.yaml.tree.Yaml;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,27 +29,78 @@ public class UpdateSecurityYamlIfNeeded extends Recipe {
     private static final String FILE_MATCHER = "**/{application,application-*,bootstrap,bootstrap-*}.{yml,yaml}";
 
     @Getter
-    private final List<Recipe> recipeList = new ArrayList<>();
-
-    private static final String TOKEN_PATH = "$.micronaut.security.token";
-
-    @Getter
     final String displayName = "Update relocated Micronaut Security config yaml keys";
 
     @Getter
     final String description = "This recipe will update relocated security config keys in Micronaut configuration yaml files.";
 
-    public UpdateSecurityYamlIfNeeded() {
-        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.generator.access-token.expiration", FILE_MATCHER, TOKEN_PATH + ".generator.access-token.expiration", FILE_MATCHER, Boolean.TRUE));
-        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.enabled", FILE_MATCHER, TOKEN_PATH + ".cookie.enabled", FILE_MATCHER, Boolean.TRUE));
-        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.cookie-max-age", FILE_MATCHER, TOKEN_PATH + ".cookie.cookie-max-age", FILE_MATCHER, Boolean.TRUE));
-        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.cookie-path", FILE_MATCHER, TOKEN_PATH + ".cookie.cookie-path", FILE_MATCHER, Boolean.TRUE));
-        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.cookie-domain", FILE_MATCHER, TOKEN_PATH + ".cookie.cookie-domain", FILE_MATCHER, Boolean.TRUE));
-        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.cookie-same-site", FILE_MATCHER, TOKEN_PATH + ".cookie.cookie-same-site", FILE_MATCHER, Boolean.TRUE));
-        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.bearer.enabled", FILE_MATCHER, TOKEN_PATH + ".bearer.enabled", FILE_MATCHER, Boolean.TRUE));
-        this.recipeList.add(new DeleteKey(TOKEN_PATH + ".jwt.generator", FILE_MATCHER));
-        this.recipeList.add(new DeleteKey(TOKEN_PATH + ".jwt.cookie", FILE_MATCHER));
-        this.recipeList.add(new DeleteKey(TOKEN_PATH + ".jwt.bearer", FILE_MATCHER));
-        this.recipeList.add(new RemoveUnusedInConfigFiles());
+    @Override
+    public TreeVisitor<?, ExecutionContext> getVisitor() {
+        return Preconditions.check(new FindSourceFiles(FILE_MATCHER).getVisitor(),
+                new YamlIsoVisitor<ExecutionContext>() {
+                    @Override
+                    public Yaml.Mapping visitMapping(Yaml.Mapping mapping, ExecutionContext ctx) {
+                        Yaml.Mapping m = super.visitMapping(mapping, ctx);
+                        if (!isTokenMapping()) {
+                            return m;
+                        }
+                        Yaml.Mapping.Entry jwtEntry = null;
+                        for (Yaml.Mapping.Entry entry : m.getEntries()) {
+                            if ("jwt".equals(entry.getKey().getValue()) && entry.getValue() instanceof Yaml.Mapping) {
+                                jwtEntry = entry;
+                                break;
+                            }
+                        }
+                        if (jwtEntry == null) {
+                            return m;
+                        }
+                        Yaml.Mapping jwtMapping = (Yaml.Mapping) jwtEntry.getValue();
+                        // Calculate indent shift: difference between jwt child indent and jwt indent
+                        int jwtIndent = indentOf(jwtEntry.getPrefix());
+                        int childIndent = jwtMapping.getEntries().isEmpty() ? jwtIndent :
+                                indentOf(jwtMapping.getEntries().get(0).getPrefix());
+                        int shift = childIndent - jwtIndent;
+
+                        List<Yaml.Mapping.Entry> newEntries = new ArrayList<>();
+                        for (Yaml.Mapping.Entry entry : m.getEntries()) {
+                            if (entry.getKey().getValue().equals(jwtEntry.getKey().getValue())) {
+                                for (Yaml.Mapping.Entry child : jwtMapping.getEntries()) {
+                                    Yaml.Mapping.Entry promoted = child.withPrefix(jwtEntry.getPrefix());
+                                    if (shift > 0 && promoted.getValue() instanceof Yaml.Mapping) {
+                                        doAfterVisit(new ShiftFormatLeftVisitor<>(promoted.getValue(), shift));
+                                    }
+                                    newEntries.add(promoted);
+                                }
+                            } else {
+                                newEntries.add(entry);
+                            }
+                        }
+                        return m.withEntries(newEntries);
+                    }
+
+                    private int indentOf(String prefix) {
+                        int lastNewline = prefix.lastIndexOf('\n');
+                        return lastNewline >= 0 ? prefix.length() - lastNewline - 1 : prefix.length();
+                    }
+
+                    private boolean isTokenMapping() {
+                        String[] expectedKeys = {"token", "security", "micronaut"};
+                        int keyIndex = 0;
+                        Cursor c = getCursor();
+                        while (c != null && keyIndex < expectedKeys.length) {
+                            Object value = c.getValue();
+                            if (value instanceof Yaml.Mapping.Entry) {
+                                String key = ((Yaml.Mapping.Entry) value).getKey().getValue();
+                                if (key.equals(expectedKeys[keyIndex])) {
+                                    keyIndex++;
+                                } else {
+                                    return false;
+                                }
+                            }
+                            c = c.getParent();
+                        }
+                        return keyIndex == expectedKeys.length;
+                    }
+                });
     }
 }
