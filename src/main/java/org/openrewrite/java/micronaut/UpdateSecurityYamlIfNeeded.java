@@ -19,7 +19,6 @@ import lombok.Getter;
 import org.openrewrite.Recipe;
 import org.openrewrite.yaml.CopyValue;
 import org.openrewrite.yaml.DeleteKey;
-import org.openrewrite.yaml.MergeYaml;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,19 +30,6 @@ public class UpdateSecurityYamlIfNeeded extends Recipe {
     @Getter
     private final List<Recipe> recipeList = new ArrayList<>();
 
-    private final String newYamlKeysSnippet =
-            "generator:\n" +
-            "  access-token:\n" +
-            "    expiration:\n" +
-            "cookie:\n" +
-            "  enabled:\n" +
-            "  cookie-max-age:\n" +
-            "  cookie-path:\n" +
-            "  cookie-domain:\n" +
-            "  cookie-same-site:\n" +
-            "bearer:\n" +
-            "  enabled:";
-
     private static final String TOKEN_PATH = "$.micronaut.security.token";
 
     @Getter
@@ -53,14 +39,13 @@ public class UpdateSecurityYamlIfNeeded extends Recipe {
     final String description = "This recipe will update relocated security config keys in Micronaut configuration yaml files.";
 
     public UpdateSecurityYamlIfNeeded() {
-        this.recipeList.add(new MergeYaml("$.micronaut.security.token", newYamlKeysSnippet, Boolean.TRUE, null, FILE_MATCHER, null, null, null));
-        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.generator.access-token.expiration", FILE_MATCHER, TOKEN_PATH + ".generator.access-token.expiration", FILE_MATCHER));
-        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.enabled", FILE_MATCHER, TOKEN_PATH + ".cookie.enabled", FILE_MATCHER));
-        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.cookie-max-age", FILE_MATCHER, TOKEN_PATH + ".cookie.cookie-max-age", FILE_MATCHER));
-        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.cookie-path", FILE_MATCHER, TOKEN_PATH + ".cookie.cookie-path", FILE_MATCHER));
-        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.cookie-domain", FILE_MATCHER, TOKEN_PATH + ".cookie.cookie-domain", FILE_MATCHER));
-        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.cookie-same-site", FILE_MATCHER, TOKEN_PATH + ".cookie.cookie-same-site", FILE_MATCHER));
-        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.bearer.enabled", FILE_MATCHER, TOKEN_PATH + ".bearer.enabled", FILE_MATCHER));
+        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.generator.access-token.expiration", FILE_MATCHER, TOKEN_PATH + ".generator.access-token.expiration", FILE_MATCHER, Boolean.TRUE));
+        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.enabled", FILE_MATCHER, TOKEN_PATH + ".cookie.enabled", FILE_MATCHER, Boolean.TRUE));
+        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.cookie-max-age", FILE_MATCHER, TOKEN_PATH + ".cookie.cookie-max-age", FILE_MATCHER, Boolean.TRUE));
+        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.cookie-path", FILE_MATCHER, TOKEN_PATH + ".cookie.cookie-path", FILE_MATCHER, Boolean.TRUE));
+        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.cookie-domain", FILE_MATCHER, TOKEN_PATH + ".cookie.cookie-domain", FILE_MATCHER, Boolean.TRUE));
+        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.cookie.cookie-same-site", FILE_MATCHER, TOKEN_PATH + ".cookie.cookie-same-site", FILE_MATCHER, Boolean.TRUE));
+        this.recipeList.add(new CopyValue(TOKEN_PATH + ".jwt.bearer.enabled", FILE_MATCHER, TOKEN_PATH + ".bearer.enabled", FILE_MATCHER, Boolean.TRUE));
         this.recipeList.add(new DeleteKey(TOKEN_PATH + ".jwt.generator", FILE_MATCHER));
         this.recipeList.add(new DeleteKey(TOKEN_PATH + ".jwt.cookie", FILE_MATCHER));
         this.recipeList.add(new DeleteKey(TOKEN_PATH + ".jwt.bearer", FILE_MATCHER));
