@@ -17,6 +17,7 @@ package org.openrewrite.java.micronaut;
 
 import lombok.Getter;
 import org.openrewrite.*;
+import org.openrewrite.yaml.JsonPathMatcher;
 import org.openrewrite.yaml.ShiftFormatLeftVisitor;
 import org.openrewrite.yaml.YamlIsoVisitor;
 import org.openrewrite.yaml.tree.Yaml;
@@ -36,17 +37,16 @@ public class UpdateSecurityYamlIfNeeded extends Recipe {
 
     @Override
     public TreeVisitor<?, ExecutionContext> getVisitor() {
+        JsonPathMatcher jwtMatcher = new JsonPathMatcher("$.micronaut.security.token.jwt");
         return Preconditions.check(new FindSourceFiles(FILE_MATCHER).getVisitor(),
                 new YamlIsoVisitor<ExecutionContext>() {
                     @Override
                     public Yaml.Mapping visitMapping(Yaml.Mapping mapping, ExecutionContext ctx) {
                         Yaml.Mapping m = super.visitMapping(mapping, ctx);
-                        if (!isTokenMapping()) {
-                            return m;
-                        }
                         Yaml.Mapping.Entry jwtEntry = null;
                         for (Yaml.Mapping.Entry entry : m.getEntries()) {
-                            if ("jwt".equals(entry.getKey().getValue()) && entry.getValue() instanceof Yaml.Mapping) {
+                            if (entry.getValue() instanceof Yaml.Mapping &&
+                                    jwtMatcher.matches(new Cursor(getCursor(), entry))) {
                                 jwtEntry = entry;
                                 break;
                             }
@@ -81,25 +81,6 @@ public class UpdateSecurityYamlIfNeeded extends Recipe {
                     private int indentOf(String prefix) {
                         int lastNewline = prefix.lastIndexOf('\n');
                         return lastNewline >= 0 ? prefix.length() - lastNewline - 1 : prefix.length();
-                    }
-
-                    private boolean isTokenMapping() {
-                        String[] expectedKeys = {"token", "security", "micronaut"};
-                        int keyIndex = 0;
-                        Cursor c = getCursor();
-                        while (c != null && keyIndex < expectedKeys.length) {
-                            Object value = c.getValue();
-                            if (value instanceof Yaml.Mapping.Entry) {
-                                String key = ((Yaml.Mapping.Entry) value).getKey().getValue();
-                                if (key.equals(expectedKeys[keyIndex])) {
-                                    keyIndex++;
-                                } else {
-                                    return false;
-                                }
-                            }
-                            c = c.getParent();
-                        }
-                        return keyIndex == expectedKeys.length;
                     }
                 });
     }
