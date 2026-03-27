@@ -17,15 +17,15 @@ package org.openrewrite.java.micronaut;
 
 import lombok.Getter;
 import org.openrewrite.*;
+import org.openrewrite.internal.ListUtils;
 import org.openrewrite.yaml.JsonPathMatcher;
 import org.openrewrite.yaml.ShiftFormatLeftVisitor;
 import org.openrewrite.yaml.YamlIsoVisitor;
 import org.openrewrite.yaml.tree.Yaml;
 
-import org.openrewrite.internal.ListUtils;
-
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 public class UpdateSecurityYamlIfNeeded extends Recipe {
 
@@ -73,7 +73,7 @@ public class UpdateSecurityYamlIfNeeded extends Recipe {
                                     }
                                     return p;
                                 })
-                                .collect(Collectors.toList());
+                                .collect(toList());
                         return m.withEntries(ListUtils.flatMap(m.getEntries(), entry ->
                                 entry.getKey().getValue().equals(finalJwtEntry.getKey().getValue()) ? promoted : entry));
                     }
