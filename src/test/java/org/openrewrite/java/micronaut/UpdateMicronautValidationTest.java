@@ -302,8 +302,7 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
             </project>
             """.formatted(MicronautRewriteTestVersions.getLatestMN3Version()),
             spec -> spec.after(actual -> {
-                assertThat(actual).containsPattern("<artifactId>micronaut-validation</artifactId>\\s*<version>3\\.\\d+\\.\\d+</version>");
-                return actual;
+                return assertThat(actual).containsPattern("<artifactId>micronaut-validation</artifactId>\\s*<version>3\\.\\d+\\.\\d+</version>").actual();
             }))));
     }
 
