@@ -43,7 +43,7 @@ public class AddSnakeYamlDependencyIfNeeded extends ScanningRecipe<AddSnakeYamlD
             public @Nullable Tree visit(@Nullable Tree tree, ExecutionContext ctx) {
                 if (tree instanceof SourceFile) {
                     if (!acc.usesYamlConfig) {
-                        acc.usesYamlConfig = (tree != new FindYamlConfig().getVisitor().visit(tree, ctx));
+                        acc.usesYamlConfig = tree != new FindYamlConfig().getVisitor().visit(tree, ctx);
                     }
                     TreeVisitor<?, ExecutionContext> addDependencyScanner = addDependencyRecipe.getScanner(acc.getAddDependencyAccumulator());
                     if (addDependencyScanner.isAcceptable((SourceFile) tree, ctx)) {
