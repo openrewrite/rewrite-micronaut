@@ -66,6 +66,8 @@ recipeList:
       oldGroupId: io.micronaut.testresources
       oldArtifactId: junit-jupiter
       newArtifactId: testcontainers-junit-jupiter
+  - org.openrewrite.java.jackson.UpgradeJackson_2_3
+  - org.openrewrite.java.jspecify.MigrateToJSpecify
 ---
 type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.UpdateBuildPlugins5
