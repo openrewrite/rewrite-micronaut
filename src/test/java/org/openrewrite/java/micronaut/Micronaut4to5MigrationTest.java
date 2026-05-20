@@ -17,53 +17,44 @@ package org.openrewrite.java.micronaut;
 
 import org.junit.jupiter.api.Test;
 import org.openrewrite.DocumentExample;
+import org.openrewrite.InMemoryExecutionContext;
+import org.openrewrite.java.JavaParser;
 import org.openrewrite.test.RecipeSpec;
 import org.openrewrite.test.RewriteTest;
 
-import static org.openrewrite.java.Assertions.mavenProject;
-import static org.openrewrite.maven.Assertions.pomXml;
+import static org.openrewrite.java.Assertions.java;
 
 class Micronaut4to5MigrationTest implements RewriteTest {
 
     @Override
     public void defaults(RecipeSpec spec) {
+        spec.parser(JavaParser.fromJavaVersion().classpathFromResources(new InMemoryExecutionContext(), "micronaut-core-2.*"));
         spec.recipeFromResources("org.openrewrite.java.micronaut.Micronaut4to5Migration");
     }
 
     @DocumentExample
     @Test
-    void bumpsJavaVersionTo25() {
+    void migratesMicronautNullableAnnotationToJSpecify() {
         rewriteRun(
-          mavenProject("project",
-            //language=xml
-            pomXml(
+          //language=java
+          java(
+            """
+              import io.micronaut.core.annotation.Nullable;
+
+              class Service {
+                  @Nullable
+                  String name;
+              }
+              """,
+            """
+              import org.jspecify.annotations.Nullable;
+
+              class Service {
+                  @Nullable
+                  String name;
+              }
               """
-                <project>
-                    <modelVersion>4.0.0</modelVersion>
-                    <groupId>com.mycompany.app</groupId>
-                    <artifactId>my-app</artifactId>
-                    <version>1</version>
-                    <properties>
-                        <jdk.version>17</jdk.version>
-                        <release.version>17</release.version>
-                    </properties>
-                </project>
-                """,
-              """
-                <project>
-                    <modelVersion>4.0.0</modelVersion>
-                    <groupId>com.mycompany.app</groupId>
-                    <artifactId>my-app</artifactId>
-                    <version>1</version>
-                    <properties>
-                        <jdk.version>25</jdk.version>
-                        <release.version>25</release.version>
-                    </properties>
-                </project>
-                """
-            )
           )
         );
     }
-
 }
