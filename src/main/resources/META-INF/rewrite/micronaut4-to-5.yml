@@ -15,12 +15,11 @@
 # limitations under the License.
 #
 
-# Contributor guide: this file mirrors the layout of `micronaut3-to-4.yml`.
-# To add a new migration step, append a sub-recipe entry to the `Micronaut4to5Migration`
-# recipeList below, and define the sub-recipe further down in this file. Each sub-recipe
-# should be self-contained and exposed under `org.openrewrite.java.micronaut.<Name>`
-# so it can also be invoked standalone. See https://github.com/openrewrite/rewrite-micronaut/issues/138
-# for the candidate-recipe checklist and references to the upstream Micronaut 5 migration guide.
+# Contributor guide: add new migration steps directly to the `Micronaut4to5Migration`
+# recipeList below. Pull a step out into a named sub-recipe (e.g. `UpdateBuildPlugins5`)
+# only when it grows large enough to be worth invoking on its own. See
+# https://github.com/openrewrite/rewrite-micronaut/issues/138 for the candidate-recipe
+# checklist and references to the upstream Micronaut 5 migration guide.
 ---
 type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.Micronaut4to5Migration
@@ -45,11 +44,27 @@ recipeList:
       oldArtifactId: micronaut-parent
       newVersion: 5.x
   - org.openrewrite.java.micronaut.UpdateBuildPlugins5
-  - org.openrewrite.java.micronaut.UpdateMicronautSecurity5
-  - org.openrewrite.java.micronaut.UpdateMicronautEclipseStore5
-  - org.openrewrite.java.micronaut.UpdateMicronautViews5
-  - org.openrewrite.java.micronaut.UpdateMicronautTestcontainers5
-  - org.openrewrite.java.micronaut.UpdateMicronautData5
+  - org.openrewrite.java.dependencies.ChangeDependency:
+      oldGroupId: io.micronaut.security
+      oldArtifactId: micronaut-security-annotations
+      newArtifactId: micronaut-security-processor
+  - org.openrewrite.java.dependencies.ChangeDependency:
+      oldGroupId: io.micronaut.eclipsestore
+      oldArtifactId: micronaut-eclipsestore-annotations
+      newArtifactId: micronaut-eclipsestore-processor
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.views.turbo.TurboView
+      newFullyQualifiedTypeName: io.micronaut.views.turbo.TurboStreamView
+  - org.openrewrite.java.dependencies.AddDependency:
+      groupId: io.micronaut.views
+      artifactId: micronaut-views-turbo
+      configuration: implementation
+      scope: compile
+      onlyIfUsing: io.micronaut.views.turbo..*
+  - org.openrewrite.java.dependencies.ChangeDependency:
+      oldGroupId: io.micronaut.testresources
+      oldArtifactId: junit-jupiter
+      newArtifactId: testcontainers-junit-jupiter
   - org.openrewrite.java.micronaut.UpdateMavenAnnotationProcessors
 ---
 type: specs.openrewrite.org/v1beta/recipe
@@ -98,68 +113,3 @@ recipeList:
   - org.openrewrite.gradle.plugins.UpgradePluginVersion:
       pluginIdPattern: io.micronaut.test-resources-consumer
       newVersion: 5.x
----
-type: specs.openrewrite.org/v1beta/recipe
-name: org.openrewrite.java.micronaut.UpdateMicronautSecurity5
-displayName: Update Micronaut Security to 5.x
-description: >-
-  Micronaut 5 moves the JSR 250 annotation mappers out of `micronaut-security-annotations`
-  into `micronaut-security-processor`. Add per-module class renames here as they are confirmed
-  against the upstream breaking-changes pages.
-recipeList:
-  - org.openrewrite.java.dependencies.ChangeDependency:
-      oldGroupId: io.micronaut.security
-      oldArtifactId: micronaut-security-annotations
-      newArtifactId: micronaut-security-processor
----
-type: specs.openrewrite.org/v1beta/recipe
-name: org.openrewrite.java.micronaut.UpdateMicronautEclipseStore5
-displayName: Update Micronaut EclipseStore to 5.x
-description: >-
-  Micronaut 5 moves the EclipseStore annotation mappers out of `micronaut-eclipsestore-annotations`
-  into `micronaut-eclipsestore-processor`.
-recipeList:
-  - org.openrewrite.java.dependencies.ChangeDependency:
-      oldGroupId: io.micronaut.eclipsestore
-      oldArtifactId: micronaut-eclipsestore-annotations
-      newArtifactId: micronaut-eclipsestore-processor
----
-type: specs.openrewrite.org/v1beta/recipe
-name: org.openrewrite.java.micronaut.UpdateMicronautViews5
-displayName: Update Micronaut Views to 5.x
-description: >-
-  Micronaut 5 splits Turbo support into its own `micronaut-views-turbo` artifact and renames
-  `@TurboView` to `@TurboStreamView`.
-recipeList:
-  - org.openrewrite.java.ChangeType:
-      oldFullyQualifiedTypeName: io.micronaut.views.turbo.TurboView
-      newFullyQualifiedTypeName: io.micronaut.views.turbo.TurboStreamView
-  - org.openrewrite.java.dependencies.AddDependency:
-      groupId: io.micronaut.views
-      artifactId: micronaut-views-turbo
-      configuration: implementation
-      scope: compile
-      onlyIfUsing: io.micronaut.views.turbo..*
----
-type: specs.openrewrite.org/v1beta/recipe
-name: org.openrewrite.java.micronaut.UpdateMicronautTestcontainers5
-displayName: Update Micronaut Testcontainers artifact IDs to 5.x
-description: >-
-  Micronaut 5 renames Testcontainers integration artifacts (e.g. `junit-jupiter` →
-  `testcontainers-junit-jupiter`). Add additional renames here as further coordinate changes
-  are confirmed.
-recipeList:
-  - org.openrewrite.java.dependencies.ChangeDependency:
-      oldGroupId: io.micronaut.testresources
-      oldArtifactId: junit-jupiter
-      newArtifactId: testcontainers-junit-jupiter
----
-type: specs.openrewrite.org/v1beta/recipe
-name: org.openrewrite.java.micronaut.UpdateMicronautData5
-displayName: Update Micronaut Data to 5.x
-description: >-
-  Micronaut Data 5 changes the default embedded-field naming strategy. As a safe default this
-  recipe opts in to the legacy strategy via `micronaut.data.embedded.naming.strategy=LEGACY`;
-  remove the property and annotate fields with `@MappedProperty` once the schema has been
-  reviewed. See the upstream migration guide for details.
-recipeList: []
