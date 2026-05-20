@@ -36,8 +36,14 @@ recipeList:
   - org.openrewrite.gradle.UpdateGradleWrapper:
       version: 9.5.x
       addIfMissing: false
-  - org.openrewrite.java.micronaut.UpdateBuildToMicronaut5Version
-  - org.openrewrite.java.micronaut.UpdateMicronautPlatformBom5
+  - org.openrewrite.java.micronaut.UpgradeMicronautMavenPropertyVersion:
+      newVersion: 5.x
+  - org.openrewrite.java.micronaut.UpgradeMicronautGradlePropertiesVersion:
+      newVersion: 5.x
+  - org.openrewrite.maven.ChangeParentPom:
+      oldGroupId: io.micronaut.platform
+      oldArtifactId: micronaut-parent
+      newVersion: 5.x
   - org.openrewrite.java.micronaut.UpdateBuildPlugins5
   - org.openrewrite.java.micronaut.UpdateMicronautSecurity5
   - org.openrewrite.java.micronaut.UpdateMicronautEclipseStore5
@@ -45,26 +51,6 @@ recipeList:
   - org.openrewrite.java.micronaut.UpdateMicronautTestcontainers5
   - org.openrewrite.java.micronaut.UpdateMicronautData5
   - org.openrewrite.java.micronaut.UpdateMavenAnnotationProcessors
----
-type: specs.openrewrite.org/v1beta/recipe
-name: org.openrewrite.java.micronaut.UpdateBuildToMicronaut5Version
-displayName: Update the Micronaut version to 5.x
-description: This recipe will update the Micronaut version to 5.x for a Gradle or Maven build.
-recipeList:
-  - org.openrewrite.java.micronaut.UpgradeMicronautMavenPropertyVersion:
-      newVersion: 5.x
-  - org.openrewrite.java.micronaut.UpgradeMicronautGradlePropertiesVersion:
-      newVersion: 5.x
----
-type: specs.openrewrite.org/v1beta/recipe
-name: org.openrewrite.java.micronaut.UpdateMicronautPlatformBom5
-displayName: Update to Micronaut 5.x platform BOM
-description: This recipe will update a Gradle or Maven build to reference the Micronaut 5 platform BOM.
-recipeList:
-  - org.openrewrite.maven.ChangeParentPom:
-      oldGroupId: io.micronaut.platform
-      oldArtifactId: micronaut-parent
-      newVersion: 5.x
 ---
 type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.UpdateBuildPlugins5
