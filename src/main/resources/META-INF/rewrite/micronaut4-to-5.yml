@@ -1,0 +1,117 @@
+#
+# Copyright 2026 the original author or authors.
+# <p>
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# <p>
+# https://www.apache.org/licenses/LICENSE-2.0
+# <p>
+# <p>
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+# Contributor guide: add new migration steps directly to the `Micronaut4to5Migration`
+# recipeList below. Pull a step out into a named sub-recipe (e.g. `UpdateBuildPlugins5`)
+# only when it grows large enough to be worth invoking on its own. See
+# https://github.com/openrewrite/rewrite-micronaut/issues/138 for the candidate-recipe
+# checklist and references to the upstream Micronaut 5 migration guide.
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: org.openrewrite.java.micronaut.Micronaut4to5Migration
+displayName: Migrate from Micronaut 4.x to 5.x
+description: >-
+  This recipe will apply changes required for migrating from Micronaut 4 to Micronaut 5.
+  Micronaut 5 raises the Java baseline to 25 and ships a number of artifact/plugin renames;
+  see the [upstream migration guide](https://github.com/micronaut-projects/micronaut-core/wiki/Update-to-Micronaut-5)
+  for the full list of breaking changes.
+recipeList:
+  - org.openrewrite.java.micronaut.Micronaut3to4Migration
+  - org.openrewrite.java.migrate.UpgradeJavaVersion:
+      version: 25
+  - org.openrewrite.gradle.UpdateGradleWrapper:
+      version: 9.5.x
+      addIfMissing: false
+  - org.openrewrite.java.micronaut.UpgradeMicronautMavenPropertyVersion:
+      newVersion: 5.x
+  - org.openrewrite.java.micronaut.UpgradeMicronautGradlePropertiesVersion:
+      newVersion: 5.x
+  - org.openrewrite.maven.ChangeParentPom:
+      oldGroupId: io.micronaut.platform
+      oldArtifactId: micronaut-parent
+      newVersion: 5.x
+  - org.openrewrite.java.micronaut.UpdateBuildPlugins5
+  - org.openrewrite.java.dependencies.ChangeDependency:
+      oldGroupId: io.micronaut.security
+      oldArtifactId: micronaut-security-annotations
+      newArtifactId: micronaut-security-processor
+  - org.openrewrite.java.dependencies.ChangeDependency:
+      oldGroupId: io.micronaut.eclipsestore
+      oldArtifactId: micronaut-eclipsestore-annotations
+      newArtifactId: micronaut-eclipsestore-processor
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: io.micronaut.views.turbo.TurboView
+      newFullyQualifiedTypeName: io.micronaut.views.turbo.TurboStreamView
+  - org.openrewrite.java.dependencies.AddDependency:
+      groupId: io.micronaut.views
+      artifactId: micronaut-views-turbo
+      configuration: implementation
+      scope: compile
+      onlyIfUsing: io.micronaut.views.turbo..*
+  - org.openrewrite.java.dependencies.ChangeDependency:
+      oldGroupId: io.micronaut.testresources
+      oldArtifactId: junit-jupiter
+      newArtifactId: testcontainers-junit-jupiter
+  - org.openrewrite.java.jackson.UpgradeJackson_2_3
+  - org.openrewrite.java.jspecify.MigrateToJSpecify
+---
+type: specs.openrewrite.org/v1beta/recipe
+name: org.openrewrite.java.micronaut.UpdateBuildPlugins5
+displayName: Update Micronaut Gradle build plugins to 5.x
+description: >-
+  This recipe will update the Micronaut Gradle build plugins to 5.x and migrate the Shadow plugin
+  from `com.github.johnrengelman.shadow` to `com.gradleup.shadow` 9.x.
+recipeList:
+  - org.openrewrite.gradle.plugins.UpgradePluginVersion:
+      pluginIdPattern: com.gradleup.shadow
+      newVersion: 9.x
+  - org.openrewrite.gradle.plugins.UpgradePluginVersion:
+      pluginIdPattern: io.micronaut.aot
+      newVersion: 5.x
+  - org.openrewrite.gradle.plugins.UpgradePluginVersion:
+      pluginIdPattern: io.micronaut.application
+      newVersion: 5.x
+  - org.openrewrite.gradle.plugins.UpgradePluginVersion:
+      pluginIdPattern: io.micronaut.component
+      newVersion: 5.x
+  - org.openrewrite.gradle.plugins.UpgradePluginVersion:
+      pluginIdPattern: io.micronaut.crac
+      newVersion: 5.x
+  - org.openrewrite.gradle.plugins.UpgradePluginVersion:
+      pluginIdPattern: io.micronaut.docker
+      newVersion: 5.x
+  - org.openrewrite.gradle.plugins.UpgradePluginVersion:
+      pluginIdPattern: io.micronaut.graalvm
+      newVersion: 5.x
+  - org.openrewrite.gradle.plugins.UpgradePluginVersion:
+      pluginIdPattern: io.micronaut.library
+      newVersion: 5.x
+  - org.openrewrite.gradle.plugins.UpgradePluginVersion:
+      pluginIdPattern: io.micronaut.minimal.application
+      newVersion: 5.x
+  - org.openrewrite.gradle.plugins.UpgradePluginVersion:
+      pluginIdPattern: io.micronaut.minimal.library
+      newVersion: 5.x
+  - org.openrewrite.gradle.plugins.UpgradePluginVersion:
+      pluginIdPattern: io.micronaut.openapi
+      newVersion: 5.x
+  - org.openrewrite.gradle.plugins.UpgradePluginVersion:
+      pluginIdPattern: io.micronaut.test-resources
+      newVersion: 5.x
+  - org.openrewrite.gradle.plugins.UpgradePluginVersion:
+      pluginIdPattern: io.micronaut.test-resources-consumer
+      newVersion: 5.x
