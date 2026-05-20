@@ -30,6 +30,7 @@ description: >-
   see the [upstream migration guide](https://github.com/micronaut-projects/micronaut-core/wiki/Update-to-Micronaut-5)
   for the full list of breaking changes.
 recipeList:
+  - org.openrewrite.java.micronaut.Micronaut3to4Migration
   - org.openrewrite.java.migrate.UpgradeJavaVersion:
       version: 25
   - org.openrewrite.gradle.UpdateGradleWrapper:
