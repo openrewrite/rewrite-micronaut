@@ -200,6 +200,27 @@ examples:
     language: mavenProject
 ---
 type: specs.openrewrite.org/v1beta/example
+recipeName: org.openrewrite.java.micronaut.Micronaut4to5Migration
+examples:
+- description: '`Micronaut4to5MigrationTest#migratesMicronautNullableAnnotationToJSpecify`'
+  sources:
+  - before: |
+      import io.micronaut.core.annotation.Nullable;
+
+      class Service {
+          @Nullable
+          String name;
+      }
+    after: |
+      import org.jspecify.annotations.Nullable;
+
+      class Service {
+          @Nullable
+          String name;
+      }
+    language: java
+---
+type: specs.openrewrite.org/v1beta/example
 recipeName: org.openrewrite.java.micronaut.OncePerRequestHttpServerFilterToHttpServerFilter
 examples:
 - description: '`OncePerRequestHttpServerFilterToHttpServerFilterTest#simpleConversion`'
