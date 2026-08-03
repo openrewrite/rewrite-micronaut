@@ -28,7 +28,11 @@ import static org.openrewrite.java.Assertions.java;
 class CopyNonInheritedAnnotationsTest implements RewriteTest {
     @Override
     public void defaults(RecipeSpec spec) {
-        spec.parser(JavaParser.fromJavaVersion().classpathFromResources(new InMemoryExecutionContext(), "micronaut-core-2.5.13", "micronaut-context-2.5.13", "micronaut-http-2.5.13", "micronaut-http-client-core-2.5.13")
+        spec.parser(JavaParser.fromJavaVersion().classpathFromResources(new InMemoryExecutionContext(),
+                "micronaut-core-2.5.13",
+                "micronaut-context-2.5.13",
+                "micronaut-http-2.5.13",
+                "micronaut-http-client-core-2.5.13")
           //language=java
           .dependsOn("""
                 package a.b;

@@ -31,7 +31,10 @@ class UpdateJakartaAnnotationsTest extends Micronaut4RewriteTest {
 
     @Override
     public void defaults(RecipeSpec spec) {
-        spec.parser(JavaParser.fromJavaVersion().classpathFromResources(new InMemoryExecutionContext(), "jakarta.inject-api-2.*", "jakarta.annotation-api-2.*", "javax.annotation-api-1.3.2"));
+        spec.parser(JavaParser.fromJavaVersion().classpathFromResources(new InMemoryExecutionContext(),
+                "jakarta.inject-api-2.*",
+                "jakarta.annotation-api-2.*",
+                "javax.annotation-api-1.3.2"));
         spec.recipe(Environment.builder().scanRuntimeClasspath("org.openrewrite.java.micronaut").build().activateRecipes("org.openrewrite.java.micronaut.UpdateJakartaAnnotations"));
     }
 

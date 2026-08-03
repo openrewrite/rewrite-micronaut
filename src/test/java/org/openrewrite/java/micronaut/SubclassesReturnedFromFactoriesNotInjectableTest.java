@@ -28,7 +28,10 @@ class SubclassesReturnedFromFactoriesNotInjectableTest implements RewriteTest {
     @Override
     public void defaults(RecipeSpec spec) {
         spec.parser(JavaParser.fromJavaVersion().classpathFromResources(new InMemoryExecutionContext(),
-            "micronaut-core-2.5.13", "micronaut-inject-2.5.13", "javax.inject-1", "jakarta.inject-api-2.*"))
+            "micronaut-core-2.5.13",
+            "micronaut-inject-2.5.13",
+            "javax.inject-1",
+            "jakarta.inject-api-2.*"))
           .recipe(new SubclassesReturnedFromFactoriesNotInjectable());
     }
 
