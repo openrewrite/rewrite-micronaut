@@ -17,9 +17,8 @@ package org.openrewrite.java.micronaut;
 
 import lombok.Getter;
 import org.openrewrite.*;
-import org.openrewrite.internal.ListUtils;
-import org.openrewrite.yaml.JsonPathMatcher;
-import org.openrewrite.yaml.ShiftFormatLeftVisitor;
+import org.openrewrite.yaml.ChangePropertyKey;
+import org.openrewrite.yaml.UnfoldProperties;
 import org.openrewrite.yaml.YamlIsoVisitor;
 import org.openrewrite.yaml.tree.Yaml;
 
@@ -31,6 +30,10 @@ public class UpdateSecurityYamlIfNeeded extends Recipe {
 
     private static final String FILE_MATCHER = "**/{application,application-*,bootstrap,bootstrap-*}.{yml,yaml}";
 
+    private static final List<String> RELOCATED_KEY_PATHS = SecurityKeyRelocations.KEY_MAPPINGS.stream()
+            .map(mapping -> "$." + mapping[1])
+            .collect(toList());
+
     @Getter
     final String displayName = "Update relocated Micronaut Security config yaml keys";
 
@@ -39,49 +42,19 @@ public class UpdateSecurityYamlIfNeeded extends Recipe {
 
     @Override
     public TreeVisitor<?, ExecutionContext> getVisitor() {
-        JsonPathMatcher jwtMatcher = new JsonPathMatcher("$.micronaut.security.token.jwt");
-        return Preconditions.check(new FindSourceFiles(FILE_MATCHER).getVisitor(),
-                new YamlIsoVisitor<ExecutionContext>() {
-                    @Override
-                    public Yaml.Mapping visitMapping(Yaml.Mapping mapping, ExecutionContext ctx) {
-                        Yaml.Mapping m = super.visitMapping(mapping, ctx);
-                        Yaml.Mapping.Entry jwtEntry = null;
-                        for (Yaml.Mapping.Entry entry : m.getEntries()) {
-                            if (entry.getValue() instanceof Yaml.Mapping &&
-                                    jwtMatcher.matches(new Cursor(getCursor(), entry))) {
-                                jwtEntry = entry;
-                                break;
-                            }
-                        }
-                        if (jwtEntry == null) {
-                            return m;
-                        }
-                        Yaml.Mapping jwtMapping = (Yaml.Mapping) jwtEntry.getValue();
-                        // Calculate indent shift: difference between jwt child indent and jwt indent
-                        int jwtIndent = indentOf(jwtEntry.getPrefix());
-                        int childIndent = jwtMapping.getEntries().isEmpty() ? jwtIndent :
-                                indentOf(jwtMapping.getEntries().get(0).getPrefix());
-                        int shift = childIndent - jwtIndent;
-
-                        Yaml.Mapping.Entry finalJwtEntry = jwtEntry;
-                        int finalShift = shift;
-                        List<Yaml.Mapping.Entry> promoted = jwtMapping.getEntries().stream()
-                                .map(child -> {
-                                    Yaml.Mapping.Entry p = child.withPrefix(finalJwtEntry.getPrefix());
-                                    if (finalShift > 0 && p.getValue() instanceof Yaml.Mapping) {
-                                        doAfterVisit(new ShiftFormatLeftVisitor<>(p.getValue(), finalShift));
-                                    }
-                                    return p;
-                                })
-                                .collect(toList());
-                        return m.withEntries(ListUtils.flatMap(m.getEntries(), entry ->
-                                entry.getKey().getValue().equals(finalJwtEntry.getKey().getValue()) ? promoted : entry));
-                    }
-
-                    private int indentOf(String prefix) {
-                        int lastNewline = prefix.lastIndexOf('\n');
-                        return lastNewline >= 0 ? prefix.length() - lastNewline - 1 : prefix.length();
-                    }
-                });
+        return Preconditions.check(new FindSourceFiles(FILE_MATCHER).getVisitor(), new YamlIsoVisitor<ExecutionContext>() {
+            @Override
+            public Yaml.Documents visitDocuments(Yaml.Documents documents, ExecutionContext ctx) {
+                Yaml.Documents docs = documents;
+                for (String[] mapping : SecurityKeyRelocations.KEY_MAPPINGS) {
+                    docs = (Yaml.Documents) new ChangePropertyKey(mapping[0], mapping[1], null, null, null)
+                            .getVisitor().visitNonNull(docs, ctx);
+                    // Unfold eagerly so that the next relocated key nests into the mapping created here
+                    docs = (Yaml.Documents) new UnfoldProperties(null, RELOCATED_KEY_PATHS)
+                            .getVisitor().visitNonNull(docs, ctx);
+                }
+                return docs;
+            }
+        });
     }
 }

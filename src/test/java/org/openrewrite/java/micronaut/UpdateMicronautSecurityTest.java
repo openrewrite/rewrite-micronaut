@@ -17,6 +17,7 @@ package org.openrewrite.java.micronaut;
 
 import org.intellij.lang.annotations.Language;
 import org.junit.jupiter.api.Test;
+import org.openrewrite.Issue;
 import org.openrewrite.config.Environment;
 import org.openrewrite.test.RecipeSpec;
 import org.openrewrite.test.RewriteTest;
@@ -149,6 +150,57 @@ class UpdateMicronautSecurityTest implements RewriteTest {
     @Test
     void noJwtConfig() {
         rewriteRun(mavenProject("project", srcMainResources(yaml(noJwtConfig, s -> s.path("application.yml")))));
+    }
+
+    @Issue("https://github.com/openrewrite/rewrite-micronaut/issues/145")
+    @Test
+    void retainJwtKeysThatWereNotRelocated() {
+        rewriteRun(mavenProject("project", srcMainResources(yaml(
+          """
+            micronaut:
+              security:
+                token:
+                  jwt:
+                    signatures:
+                      jwks:
+                        azure:
+                          url: "https://login.microsoftonline.com/example-tennant-id/discovery/v2.0/keys"
+                    claims-validators:
+                      audience: "example-audience"
+                      issuer: "https://login.microsoftonline.com/example-tennant-id/v2.0"
+            """,
+          s -> s.path("application.yml")))));
+    }
+
+    @Issue("https://github.com/openrewrite/rewrite-micronaut/issues/145")
+    @Test
+    void relocateOnlyChangedKeys() {
+        rewriteRun(mavenProject("project", srcMainResources(yaml(
+          """
+            micronaut:
+              security:
+                token:
+                  jwt:
+                    signatures:
+                      secret:
+                        generator:
+                          secret: pleaseChangeThisSecretForANewOne
+                    bearer:
+                      enabled: true
+            """,
+          """
+            micronaut:
+              security:
+                token:
+                  jwt:
+                    signatures:
+                      secret:
+                        generator:
+                          secret: pleaseChangeThisSecretForANewOne
+                  bearer:
+                    enabled: true
+            """,
+          s -> s.path("application.yml")))));
     }
 
     @Test
