@@ -46,6 +46,7 @@ recipeList:
   - org.openrewrite.java.ChangePackage:
       oldPackageName: io.micronaut.configuration.security.ldap
       newPackageName: io.micronaut.security.ldap
+      recursive: true
   - org.openrewrite.java.ChangeMethodName:
       methodPattern: io.micronaut.context.ApplicationContext build(..)
       newMethodName: builder
