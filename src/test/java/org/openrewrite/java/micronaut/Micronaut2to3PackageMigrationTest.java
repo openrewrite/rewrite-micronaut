@@ -16,6 +16,7 @@
 package org.openrewrite.java.micronaut;
 
 import org.junit.jupiter.api.Test;
+import org.openrewrite.DocumentExample;
 import org.openrewrite.java.JavaParser;
 import org.openrewrite.test.RecipeSpec;
 import org.openrewrite.test.RewriteTest;
@@ -39,6 +40,7 @@ class Micronaut2to3PackageMigrationTest implements RewriteTest {
           ));
     }
 
+    @DocumentExample
     @Test
     void migrateLdapType() {
         rewriteRun(
