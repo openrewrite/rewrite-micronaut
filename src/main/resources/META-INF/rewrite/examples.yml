@@ -176,6 +176,25 @@ examples:
     language: java
 ---
 type: specs.openrewrite.org/v1beta/example
+recipeName: org.openrewrite.java.micronaut.Micronaut2to3Migration
+examples:
+- description: '`Micronaut2to3PackageMigrationTest#migrateLdapType`'
+  sources:
+  - before: |
+      import io.micronaut.configuration.security.ldap.LdapAuthenticationProvider;
+
+      class A {
+          LdapAuthenticationProvider provider;
+      }
+    after: |
+      import io.micronaut.security.ldap.LdapAuthenticationProvider;
+
+      class A {
+          LdapAuthenticationProvider provider;
+      }
+    language: java
+---
+type: specs.openrewrite.org/v1beta/example
 recipeName: org.openrewrite.java.micronaut.Micronaut3to4Migration
 examples:
 - description: '`UpdateBuildToJava17Test#updateGradleJavaVersion`'
