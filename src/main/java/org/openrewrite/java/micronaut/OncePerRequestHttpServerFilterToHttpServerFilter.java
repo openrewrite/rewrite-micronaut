@@ -30,6 +30,9 @@ import static java.util.Collections.emptyList;
 public class OncePerRequestHttpServerFilterToHttpServerFilter extends Recipe {
     private static final String oncePerRequestHttpServerFilterFqn = "io.micronaut.http.filter.OncePerRequestHttpServerFilter";
 
+    private static final MethodMatcher keyMethodMatcher = new MethodMatcher(oncePerRequestHttpServerFilterFqn + " getKey(Class)");
+    private static final MethodMatcher doFilterOnceMethodMatcher = new MethodMatcher("* doFilterOnce(io.micronaut.http.HttpRequest, io.micronaut.http.filter.ServerFilterChain)");
+
     @Getter
     final String displayName = "Convert `OncePerRequestServerFilter` extensions to `HttpServerFilter`";
 
@@ -38,59 +41,53 @@ public class OncePerRequestHttpServerFilterToHttpServerFilter extends Recipe {
 
     @Override
     public TreeVisitor<?, ExecutionContext> getVisitor() {
-        return Preconditions.check(new UsesType<>(oncePerRequestHttpServerFilterFqn, false), new OncePerRequestHttpServerFilterToHttpServerFilterVisitor());
-    }
-
-    private static class OncePerRequestHttpServerFilterToHttpServerFilterVisitor extends JavaIsoVisitor<ExecutionContext> {
-
-        private static final MethodMatcher keyMethodMatcher = new MethodMatcher(oncePerRequestHttpServerFilterFqn + " getKey(Class)");
-        private static final MethodMatcher doFilterOnceMethodMatcher = new MethodMatcher("* doFilterOnce(io.micronaut.http.HttpRequest, io.micronaut.http.filter.ServerFilterChain)");
-
-        @Override
-        public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext ctx) {
-            J.ClassDeclaration cd = super.visitClassDeclaration(classDecl, ctx);
-            if (cd.getExtends() != null && cd.getExtends().getType() != null &&
-                    TypeUtils.isOfClassType(cd.getExtends().getType(), oncePerRequestHttpServerFilterFqn)) {
-                cd = cd.withExtends(null);
-                J.Identifier newImplementsIdentifier = new J.Identifier(Tree.randomId(), Space.format(" "), Markers.EMPTY,
-                        emptyList(), "HttpServerFilter", JavaType.buildType("io.micronaut.http.filter.HttpServerFilter"), null);
-                J.Block body = cd.getBody();
-                //noinspection ConstantConditions
-                cd = maybeAutoFormat(cd, cd.withBody(null).withImplements(ListUtils.concat(cd.getImplements(), newImplementsIdentifier)), ctx, getCursor().getParent());
-                cd = cd.withBody(body);
-                if (cd.getType() != null) {
-                    doAfterVisit(new ChangeMethodName(
-                            cd.getType().getFullyQualifiedName() + " doFilterOnce(io.micronaut.http.HttpRequest, io.micronaut.http.filter.ServerFilterChain)",
-                            "doFilter", true, false).getVisitor());
+        return Preconditions.check(new UsesType<>(oncePerRequestHttpServerFilterFqn, false), new JavaIsoVisitor<ExecutionContext>() {
+            @Override
+            public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext ctx) {
+                J.ClassDeclaration cd = super.visitClassDeclaration(classDecl, ctx);
+                if (cd.getExtends() != null && cd.getExtends().getType() != null &&
+                        TypeUtils.isOfClassType(cd.getExtends().getType(), oncePerRequestHttpServerFilterFqn)) {
+                    cd = cd.withExtends(null);
+                    J.Identifier newImplementsIdentifier = new J.Identifier(Tree.randomId(), Space.format(" "), Markers.EMPTY,
+                            emptyList(), "HttpServerFilter", JavaType.buildType("io.micronaut.http.filter.HttpServerFilter"), null);
+                    J.Block body = cd.getBody();
+                    //noinspection ConstantConditions
+                    cd = maybeAutoFormat(cd, cd.withBody(null).withImplements(ListUtils.concat(cd.getImplements(), newImplementsIdentifier)), ctx, getCursor().getParent());
+                    cd = cd.withBody(body);
+                    if (cd.getType() != null) {
+                        doAfterVisit(new ChangeMethodName(
+                                cd.getType().getFullyQualifiedName() + " doFilterOnce(io.micronaut.http.HttpRequest, io.micronaut.http.filter.ServerFilterChain)",
+                                "doFilter", true, false).getVisitor());
+                    }
+                    maybeRemoveImport(oncePerRequestHttpServerFilterFqn);
+                    maybeAddImport("io.micronaut.http.filter.HttpServerFilter");
                 }
-                maybeRemoveImport(oncePerRequestHttpServerFilterFqn);
-                maybeAddImport("io.micronaut.http.filter.HttpServerFilter");
+                return cd;
             }
-            return cd;
-        }
 
-        @Override
-        public J.MethodDeclaration visitMethodDeclaration(J.MethodDeclaration method, ExecutionContext ctx) {
-            J.MethodDeclaration methodDeclaration = super.visitMethodDeclaration(method, ctx);
-            J.ClassDeclaration classDeclaration = getCursor().firstEnclosing(J.ClassDeclaration.class);
-            if (classDeclaration != null && doFilterOnceMethodMatcher.matches(methodDeclaration, classDeclaration)) {
-                methodDeclaration = methodDeclaration.withModifiers(
-                        ListUtils.map(methodDeclaration.getModifiers(), mod -> mod.getType() == J.Modifier.Type.Private ||
-                                mod.getType() == J.Modifier.Type.Protected ?
-                                mod.withType(J.Modifier.Type.Public) : mod)
-                );
+            @Override
+            public J.MethodDeclaration visitMethodDeclaration(J.MethodDeclaration method, ExecutionContext ctx) {
+                J.MethodDeclaration methodDeclaration = super.visitMethodDeclaration(method, ctx);
+                J.ClassDeclaration classDeclaration = getCursor().firstEnclosing(J.ClassDeclaration.class);
+                if (classDeclaration != null && doFilterOnceMethodMatcher.matches(methodDeclaration, classDeclaration)) {
+                    methodDeclaration = methodDeclaration.withModifiers(
+                            ListUtils.map(methodDeclaration.getModifiers(), mod -> mod.getType() == J.Modifier.Type.Private ||
+                                    mod.getType() == J.Modifier.Type.Protected ?
+                                    mod.withType(J.Modifier.Type.Public) : mod)
+                    );
+                }
+                return methodDeclaration;
             }
-            return methodDeclaration;
-        }
 
-        @Override
-        public J.MethodInvocation visitMethodInvocation(J.MethodInvocation method, ExecutionContext ctx) {
-            J.MethodInvocation mi = super.visitMethodInvocation(method, ctx);
-            String todoCommentText = "TODO: See `Server Filter Behavior` in https://docs.micronaut.io/3.0.x/guide/#breaks for details";
-            if (keyMethodMatcher.matches(mi) && mi.getComments().stream().noneMatch(c -> c instanceof TextComment && ((TextComment) c).getText().equals(todoCommentText))) {
-                mi = mi.withComments(ListUtils.concat(mi.getComments(), new TextComment(true, todoCommentText, " ", Markers.EMPTY)));
+            @Override
+            public J.MethodInvocation visitMethodInvocation(J.MethodInvocation method, ExecutionContext ctx) {
+                J.MethodInvocation mi = super.visitMethodInvocation(method, ctx);
+                String todoCommentText = "TODO: See `Server Filter Behavior` in https://docs.micronaut.io/3.0.x/guide/#breaks for details";
+                if (keyMethodMatcher.matches(mi) && mi.getComments().stream().noneMatch(c -> c instanceof TextComment && ((TextComment) c).getText().equals(todoCommentText))) {
+                    mi = mi.withComments(ListUtils.concat(mi.getComments(), new TextComment(true, todoCommentText, " ", Markers.EMPTY)));
+                }
+                return mi;
             }
-            return mi;
-        }
+        });
     }
 }
