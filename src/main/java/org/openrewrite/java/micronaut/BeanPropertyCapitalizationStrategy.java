@@ -28,6 +28,9 @@ import org.openrewrite.java.tree.J;
 
 public class BeanPropertyCapitalizationStrategy extends Recipe {
 
+    private static final MethodMatcher BEAN_PROPERTY_METHOD = new MethodMatcher("io.micronaut.core.beans.BeanIntrospection getProperty(..)");
+    private static final MethodMatcher REQUIRED_BEAN_PROPERTY_METHOD = new MethodMatcher("io.micronaut.core.beans.BeanIntrospection getRequiredProperty(..)");
+
     @Getter
     final String displayName = "De-capitalize `BeanIntrospection` `getProperty(..)` and `getRequiredProperty(..)` name arguments";
 
@@ -36,25 +39,20 @@ public class BeanPropertyCapitalizationStrategy extends Recipe {
 
     @Override
     public TreeVisitor<?, ExecutionContext> getVisitor() {
-        return Preconditions.check(new UsesType<>("io.micronaut.core.beans.BeanIntrospection", false), new BeanPropertyCapitalizationStrategyVisitor());
-    }
-
-    private static class BeanPropertyCapitalizationStrategyVisitor extends JavaIsoVisitor<ExecutionContext> {
-        private static final MethodMatcher BEAN_PROPERTY_METHOD = new MethodMatcher("io.micronaut.core.beans.BeanIntrospection getProperty(..)");
-        private static final MethodMatcher REQUIRED_BEAN_PROPERTY_METHOD = new MethodMatcher("io.micronaut.core.beans.BeanIntrospection getRequiredProperty(..)");
-
-        @Override
-        public J.MethodInvocation visitMethodInvocation(J.MethodInvocation method, ExecutionContext ctx) {
-            J.MethodInvocation mi = super.visitMethodInvocation(method, ctx);
-            if ((BEAN_PROPERTY_METHOD.matches(mi) || REQUIRED_BEAN_PROPERTY_METHOD.matches(mi)) && mi.getArguments().get(0) instanceof J.Literal) {
-                J.Literal propertyNameArg = (J.Literal) mi.getArguments().get(0);
-                String sVal = String.valueOf(propertyNameArg.getValue());
-                final String newValue = sVal.substring(0, 1).toLowerCase() + sVal.substring(1);
-                if (!sVal.equals(newValue)) {
-                    doAfterVisit(new ChangeLiteral<>(propertyNameArg, p -> newValue));
+        return Preconditions.check(new UsesType<>("io.micronaut.core.beans.BeanIntrospection", false), new JavaIsoVisitor<ExecutionContext>() {
+            @Override
+            public J.MethodInvocation visitMethodInvocation(J.MethodInvocation method, ExecutionContext ctx) {
+                J.MethodInvocation mi = super.visitMethodInvocation(method, ctx);
+                if ((BEAN_PROPERTY_METHOD.matches(mi) || REQUIRED_BEAN_PROPERTY_METHOD.matches(mi)) && mi.getArguments().get(0) instanceof J.Literal) {
+                    J.Literal propertyNameArg = (J.Literal) mi.getArguments().get(0);
+                    String sVal = String.valueOf(propertyNameArg.getValue());
+                    final String newValue = sVal.substring(0, 1).toLowerCase() + sVal.substring(1);
+                    if (!sVal.equals(newValue)) {
+                        doAfterVisit(new ChangeLiteral<>(propertyNameArg, p -> newValue));
+                    }
                 }
+                return mi;
             }
-            return mi;
-        }
+        });
     }
 }
