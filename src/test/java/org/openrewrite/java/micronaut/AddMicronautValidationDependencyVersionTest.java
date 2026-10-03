@@ -16,6 +16,7 @@
 package org.openrewrite.java.micronaut;
 
 import org.junit.jupiter.api.Test;
+import org.openrewrite.gradle.AddDependency;
 import org.openrewrite.test.RecipeSpec;
 import org.openrewrite.test.RewriteTest;
 
@@ -72,6 +73,48 @@ class AddMicronautValidationDependencyVersionTest implements RewriteTest {
     }
 
     @Test
+    void runtimeOnlyManagementDoesNotCoverCompileClasspath() {
+        rewriteRun(buildGradle(
+          """
+            plugins { id 'java' }
+            repositories { mavenCentral() }
+            dependencies {
+                runtimeOnly platform('io.micronaut.validation:micronaut-validation-bom:4.0.0')
+                implementation 'io.micronaut.validation:micronaut-validation'
+                annotationProcessor 'io.micronaut.validation:micronaut-validation-processor:4.0.0'
+            }
+            """,
+          """
+            plugins { id 'java' }
+            repositories { mavenCentral() }
+            dependencies {
+                runtimeOnly platform('io.micronaut.validation:micronaut-validation-bom:4.0.0')
+                implementation 'io.micronaut.validation:micronaut-validation:4.0.0'
+                annotationProcessor 'io.micronaut.validation:micronaut-validation-processor:4.0.0'
+            }
+            """));
+    }
+
+    @Test
+    void preserveResolutionStrategyVersion() {
+        rewriteRun(buildGradle(
+          """
+            plugins { id 'java' }
+            repositories { mavenCentral() }
+            configurations.all {
+                resolutionStrategy.eachDependency { details ->
+                    if (details.requested.group == 'io.micronaut.validation') {
+                        details.useVersion '4.0.0'
+                    }
+                }
+            }
+            dependencies {
+                implementation 'io.micronaut.validation:micronaut-validation'
+            }
+            """));
+    }
+
+    @Test
     void preservePlatformManagedVersion() {
         rewriteRun(buildGradle(
           """
@@ -104,7 +147,7 @@ class AddMicronautValidationDependencyVersionTest implements RewriteTest {
     @Test
     void newlyAddedProcessorKeepsPlatformManagement() {
         rewriteRun(spec -> spec.recipes(
-            new org.openrewrite.gradle.AddDependency("io.micronaut.validation", "micronaut-validation-processor", null, null,
+            new AddDependency("io.micronaut.validation", "micronaut-validation-processor", null, null,
               "annotationProcessor", null, null, null, null, null),
             new AddMicronautValidationDependencyVersion()),
           buildGradle(

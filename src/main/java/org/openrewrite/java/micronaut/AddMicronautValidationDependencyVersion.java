@@ -80,7 +80,6 @@ public class AddMicronautValidationDependencyVersion extends ScanningRecipe<Set<
                             String artifact = dependency.getArtifactId();
                             if (!"micronaut-validation".equals(artifact) && !"micronaut-validation-processor".equals(artifact) ||
                                 dependency.getDeclaredVersion() != null ||
-                                !dependency.getVersion().isEmpty() ||
                                 isManaged(project, dependency.getConfigurationName(), artifact, executionContext)) {
                                 return dependency.getTree();
                             }
@@ -151,6 +150,14 @@ public class AddMicronautValidationDependencyVersion extends ScanningRecipe<Set<
 
     private static boolean isManaged(GradleProject project, GradleDependencyConfiguration configuration,
                                      String artifact, ExecutionContext ctx) {
+        if (configuration.isCanBeResolved()) {
+            for (ResolvedDependency dependency : configuration.getDirectResolvedShallow()) {
+                if (GROUP.equals(dependency.getGroupId()) && artifact.equals(dependency.getArtifactId()) &&
+                    !dependency.getVersion().isEmpty()) {
+                    return true;
+                }
+            }
+        }
         List<GradleDependencyConfiguration> configurations = new ArrayList<>(configuration.allExtendsFrom());
         configurations.add(configuration);
         for (GradleDependencyConfiguration candidate : configurations) {
