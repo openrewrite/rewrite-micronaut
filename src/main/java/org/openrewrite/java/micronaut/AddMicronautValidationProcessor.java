@@ -49,7 +49,7 @@ public class AddMicronautValidationProcessor extends ScanningRecipe<Map<String, 
                     JavaSourceFile source = (JavaSourceFile) tree;
                     String sourceSet = source.getMarkers().findFirst(JavaSourceSet.class)
                             .map(JavaSourceSet::getName).orElse("main");
-                    String configuration = "main".equals(sourceSet) ? "annotationProcessor" : sourceSet + "AnnotationProcessor";
+                    String configuration = processorConfiguration(source, sourceSet);
                     AddDependency recipe = dependency(configuration);
                     recipe.getScanner(acc.computeIfAbsent(configuration, k -> recipe.getInitialValue(ctx))).visit(tree, ctx);
                 }
@@ -70,6 +70,17 @@ public class AddMicronautValidationProcessor extends ScanningRecipe<Map<String, 
                 return result;
             }
         };
+    }
+
+    private static String processorConfiguration(JavaSourceFile source, String sourceSet) {
+        String path = source.getSourcePath().toString();
+        if (path.endsWith(".kt")) {
+            return "main".equals(sourceSet) ? "kapt" :
+                    "kapt" + Character.toUpperCase(sourceSet.charAt(0)) + sourceSet.substring(1);
+        }
+        String configuration = path.endsWith(".groovy") ? "compileOnly" : "annotationProcessor";
+        return "main".equals(sourceSet) ? configuration :
+                sourceSet + Character.toUpperCase(configuration.charAt(0)) + configuration.substring(1);
     }
 
     private static boolean isSource(JavaSourceFile source) {

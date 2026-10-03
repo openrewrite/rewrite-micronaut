@@ -30,6 +30,7 @@ dependencies {
     runtimeOnly("org.openrewrite:rewrite-java-21")
 
     testImplementation("org.openrewrite:rewrite-test")
+    testImplementation("org.openrewrite:rewrite-kotlin")
     testImplementation("org.openrewrite.gradle.tooling:model:$rewriteVersion")
     testImplementation("org.assertj:assertj-core:latest.release")
     testRuntimeOnly(gradleApi())
