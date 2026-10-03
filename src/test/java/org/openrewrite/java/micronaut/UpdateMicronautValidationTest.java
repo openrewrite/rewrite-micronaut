@@ -70,6 +70,35 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
       """;
 
     @Test
+    void validationDependencyFollowsTestSourceSet() {
+        rewriteRun(spec -> spec.recipeFromResources("org.openrewrite.java.micronaut.UpdateMicronautValidation")
+            .beforeRecipe(withToolingApi()),
+          mavenProject("project",
+            srcTestJava(java(annotatedJakartaClass)),
+            buildGradle("""
+              plugins {
+                  id 'java'
+              }
+              repositories {
+                  mavenCentral()
+              }
+              """, """
+              plugins {
+                  id 'java'
+              }
+              repositories {
+                  mavenCentral()
+              }
+
+              dependencies {
+                  annotationProcessor "io.micronaut.validation:micronaut-validation-processor"
+
+                  testImplementation "io.micronaut.validation:micronaut-validation"
+              }
+              """)));
+    }
+
+    @Test
     void updateJavaCodeAndModifyGradleDependencies() {
         rewriteRun(spec -> spec.beforeRecipe(withToolingApi()).expectedCyclesThatMakeChanges(2),
           mavenProject("project", properties("micronautVersion=" + MicronautRewriteTestVersions.getLatestMN3Version(), s -> s.path("gradle.properties")), srcMainJava(java(annotatedJavaxClass, annotatedJakartaClass)),
