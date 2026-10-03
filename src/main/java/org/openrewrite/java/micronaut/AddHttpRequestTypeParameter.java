@@ -25,7 +25,7 @@ import org.openrewrite.java.JavaIsoVisitor;
 import org.openrewrite.java.tree.*;
 import org.openrewrite.marker.Markers;
 
-import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Arrays;
 import java.util.List;
 
@@ -61,14 +61,15 @@ public class AddHttpRequestTypeParameter extends Recipe {
             @Override
             public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext ctx) {
                 J.ClassDeclaration c = super.visitClassDeclaration(classDecl, ctx);
-                List<JavaType.Method> requestMethods = new ArrayList<>();
                 List<TypeTree> mappedInterfaceTypes = ListUtils.map(c.getImplements(), interfaceType -> {
                     if (interfaceType instanceof J.ParameterizedType) {
                         return interfaceType;
                     }
                     JavaType.FullyQualified fqInterfaceType = TypeUtils.asFullyQualified(interfaceType.getType());
                     if (fqInterfaceType != null && isCandidateInterface(fqInterfaceType)) {
-                        fqInterfaceType.getVisibleMethods().forEachRemaining(requestMethods::add);
+                        if (hasErasedRequestOverride(c, fqInterfaceType)) {
+                            return interfaceType;
+                        }
                         maybeAddImport(IO_MICRONAUT_HTTP_HTTP_REQUEST);
                         J.ParameterizedType httpRequestParameterized = httpRequestType();
                         NameTree nameTree = new J.Identifier(Tree.randomId(), Space.EMPTY, Markers.EMPTY, emptyList(), fqInterfaceType.getClassName(), null, null);
@@ -77,44 +78,28 @@ public class AddHttpRequestTypeParameter extends Recipe {
                     }
                     return interfaceType;
                 });
-                c = c.withImplements(mappedInterfaceTypes);
-                if (!requestMethods.isEmpty()) {
-                    c = c.withBody(c.getBody().withStatements(ListUtils.map(c.getBody().getStatements(), statement -> {
-                        if (!(statement instanceof J.MethodDeclaration)) {
-                            return statement;
-                        }
-                        J.MethodDeclaration method = (J.MethodDeclaration) statement;
-                        JavaType.Method methodType = method.getMethodType();
-                        if (methodType == null || method.hasModifier(J.Modifier.Type.Static)) {
-                            return method;
-                        }
-                        for (JavaType.Method candidate : requestMethods) {
-                            if (!matchesErasedSignature(methodType, candidate)) {
-                                continue;
+                return c.withImplements(mappedInterfaceTypes);
+            }
+
+            private boolean hasErasedRequestOverride(J.ClassDeclaration classDeclaration, JavaType.FullyQualified interfaceType) {
+                // An Object override already implements the generic API. Narrowing it would break its callers.
+                Iterator<JavaType.Method> methods = interfaceType.getVisibleMethods();
+                while (methods.hasNext()) {
+                    JavaType.Method candidate = methods.next();
+                    if (candidate.getParameterTypes().stream().noneMatch(JavaType.GenericTypeVariable.class::isInstance)) {
+                        continue;
+                    }
+                    for (Statement statement : classDeclaration.getBody().getStatements()) {
+                        if (statement instanceof J.MethodDeclaration) {
+                            J.MethodDeclaration method = (J.MethodDeclaration) statement;
+                            if (method.getMethodType() != null && !method.hasModifier(J.Modifier.Type.Static) &&
+                                matchesErasedSignature(method.getMethodType(), candidate)) {
+                                return true;
                             }
-                            List<JavaType> parameterTypes = new ArrayList<>(methodType.getParameterTypes());
-                            List<Statement> parameters = ListUtils.map(method.getParameters(), (index, parameter) -> {
-                                if (!(candidate.getParameterTypes().get(index) instanceof JavaType.GenericTypeVariable) ||
-                                    !(parameter instanceof J.VariableDeclarations)) {
-                                    return parameter;
-                                }
-                                J.VariableDeclarations declarations = (J.VariableDeclarations) parameter;
-                                TypeTree typeExpression = declarations.getTypeExpression();
-                                if (typeExpression == null || !TypeUtils.isOfClassType(typeExpression.getType(), "java.lang.Object")) {
-                                    return parameter;
-                                }
-                                J.ParameterizedType replacement = httpRequestType().withPrefix(typeExpression.getPrefix())
-                                        .withMarkers(typeExpression.getMarkers());
-                                JavaType httpRequest = replacement.getType();
-                                parameterTypes.set(index, httpRequest);
-                                return declarations.withTypeExpression(replacement).withVariables(ListUtils.map(declarations.getVariables(), variable -> variable.withType(httpRequest)));
-                            });
-                            method = method.withParameters(parameters).withMethodType(methodType.withParameterTypes(parameterTypes));
                         }
-                        return method;
-                    })));
+                    }
                 }
-                return c;
+                return false;
             }
 
             private J.ParameterizedType httpRequestType() {

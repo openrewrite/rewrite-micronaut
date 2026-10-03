@@ -57,8 +57,9 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
     }
 
     @Test
-    void rawObjectOverride() {
+    void rawObjectOverridePreservesApi() {
         rewriteRun(
+          spec -> spec.expectedCyclesThatMakeChanges(0),
           java(
             """
               import io.micronaut.security.authentication.Authentication;
@@ -71,31 +72,8 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
                       return null;
                   }
 
-                  public void unrelated(Object value) {}
-                  public void validateToken(Object token, Object request) {}
-
-                  static class Nested {
-                      public void validateToken(String token, Object request) {}
-                  }
-              }
-              """,
-            """
-              import io.micronaut.http.HttpRequest;
-              import io.micronaut.security.authentication.Authentication;
-              import io.micronaut.security.token.validator.TokenValidator;
-              import org.reactivestreams.Publisher;
-
-              class Custom implements TokenValidator<HttpRequest<?>> {
-                  @Override
-                  public Publisher<Authentication> validateToken(String token, HttpRequest<?> request) {
-                      return null;
-                  }
-
-                  public void unrelated(Object value) {}
-                  public void validateToken(Object token, Object request) {}
-
-                  static class Nested {
-                      public void validateToken(String token, Object request) {}
+                  void caller() {
+                      validateToken("token", new Object());
                   }
               }
               """
@@ -622,6 +600,12 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
                   public Publisher<Authentication> validateToken(String token, HttpRequest<?> request) {
                       return null;
                   }
+
+                  public void validateToken(Object token, Object request) {}
+
+                  static class Nested {
+                      public void validateToken(String token, Object request) {}
+                  }
               }
               """,
                 """
@@ -634,6 +618,12 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
                   @Override
                   public Publisher<Authentication> validateToken(String token, HttpRequest<?> request) {
                       return null;
+                  }
+
+                  public void validateToken(Object token, Object request) {}
+
+                  static class Nested {
+                      public void validateToken(String token, Object request) {}
                   }
               }
               """
