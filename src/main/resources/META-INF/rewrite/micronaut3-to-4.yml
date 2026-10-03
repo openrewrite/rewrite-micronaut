@@ -145,11 +145,7 @@ recipeList:
       groupId: io.micronaut.validation
       artifactId: micronaut-validation
       onlyIfUsing: jakarta.validation.constraints.*
-  - org.openrewrite.gradle.AddDependency:
-      groupId: io.micronaut.validation
-      artifactId: micronaut-validation-processor
-      configuration: annotationProcessor
-      onlyIfUsing: jakarta.validation.constraints.*
+  - org.openrewrite.java.micronaut.AddMicronautValidationProcessor
   - org.openrewrite.java.micronaut.AddAnnotationProcessorPath:
       groupId: io.micronaut.validation
       artifactId: micronaut-validation-processor
