@@ -61,7 +61,10 @@ public class AddHttpRequestTypeParameter extends Recipe {
             public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext ctx) {
                 J.ClassDeclaration c = super.visitClassDeclaration(classDecl, ctx);
                 List<TypeTree> mappedInterfaceTypes = ListUtils.map(c.getImplements(), interfaceType -> {
-                    JavaType.FullyQualified fqInterfaceType = (JavaType.FullyQualified) interfaceType.getType();
+                    if (interfaceType instanceof J.ParameterizedType) {
+                        return interfaceType;
+                    }
+                    JavaType.FullyQualified fqInterfaceType = TypeUtils.asFullyQualified(interfaceType.getType());
                     if (fqInterfaceType != null && isCandidateInterface(fqInterfaceType)) {
                         JavaType httpRequestType = JavaType.buildType(IO_MICRONAUT_HTTP_HTTP_REQUEST);
                         J.Identifier httpRequestIdentifier = new J.Identifier(Tree.randomId(), Space.EMPTY, Markers.EMPTY, emptyList(), "HttpRequest", httpRequestType, null);
