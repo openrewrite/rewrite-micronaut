@@ -25,8 +25,8 @@ import org.openrewrite.java.JavaIsoVisitor;
 import org.openrewrite.java.tree.*;
 import org.openrewrite.marker.Markers;
 
-import java.util.Iterator;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import static java.util.Collections.emptyList;
@@ -83,19 +83,21 @@ public class AddHttpRequestTypeParameter extends Recipe {
 
             private boolean hasErasedRequestOverride(J.ClassDeclaration classDeclaration, JavaType.FullyQualified interfaceType) {
                 // An Object override already implements the generic API. Narrowing it would break its callers.
+                JavaType.FullyQualified classType = classDeclaration.getType();
+                if (classType == null) {
+                    return false;
+                }
                 Iterator<JavaType.Method> methods = interfaceType.getVisibleMethods();
                 while (methods.hasNext()) {
                     JavaType.Method candidate = methods.next();
                     if (candidate.getParameterTypes().stream().noneMatch(JavaType.GenericTypeVariable.class::isInstance)) {
                         continue;
                     }
-                    for (Statement statement : classDeclaration.getBody().getStatements()) {
-                        if (statement instanceof J.MethodDeclaration) {
-                            J.MethodDeclaration method = (J.MethodDeclaration) statement;
-                            if (method.getMethodType() != null && !method.hasModifier(J.Modifier.Type.Static) &&
-                                matchesErasedSignature(method.getMethodType(), candidate)) {
-                                return true;
-                            }
+                    Iterator<JavaType.Method> implementations = classType.getVisibleMethods();
+                    while (implementations.hasNext()) {
+                        JavaType.Method implementation = implementations.next();
+                        if (!implementation.hasFlags(Flag.Static) && matchesErasedSignature(implementation, candidate)) {
+                            return true;
                         }
                     }
                 }

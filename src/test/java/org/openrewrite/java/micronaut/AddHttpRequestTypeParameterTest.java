@@ -82,6 +82,32 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
     }
 
     @Test
+    void inheritedObjectOverridePreservesApi() {
+        rewriteRun(
+          spec -> spec.expectedCyclesThatMakeChanges(0),
+          java(
+            """
+              import io.micronaut.security.authentication.Authentication;
+              import io.micronaut.security.token.validator.TokenValidator;
+              import org.reactivestreams.Publisher;
+
+              class Base {
+                  public Publisher<Authentication> validateToken(String token, Object request) {
+                      return null;
+                  }
+              }
+
+              class Custom extends Base implements TokenValidator {
+                  void caller() {
+                      validateToken("token", new Object());
+                  }
+              }
+              """
+          )
+        );
+    }
+
+    @Test
     void abstractImplementationNeedsImport() {
         rewriteRun(
           java(
