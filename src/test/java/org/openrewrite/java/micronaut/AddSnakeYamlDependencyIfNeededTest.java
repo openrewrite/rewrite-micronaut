@@ -132,6 +132,39 @@ class AddSnakeYamlDependencyIfNeededTest extends Micronaut4RewriteTest {
         """.formatted(latestMicronautVersion);
 
     @Test
+    void yamlDoesNotAddDependencyToOtherGradleProjects() {
+        String build = """
+          plugins {
+              id 'java'
+          }
+          repositories {
+              mavenCentral()
+          }
+          """;
+        rewriteRun(spec -> spec.beforeRecipe(withToolingApi()),
+          mavenProject("app",
+            srcMainResources(yaml(micronautConfig, s -> s.path("application.yml"))),
+            buildGradle(build, build + """
+
+              dependencies {
+                  runtimeOnly "org.yaml:snakeyaml"
+              }
+              """)),
+          mavenProject("buildSrc", buildGradle(build)),
+          mavenProject("library", buildGradle(build)));
+    }
+
+    @Test
+    void yamlDoesNotAddDependencyToOtherMavenProjects() {
+        rewriteRun(
+          pomXml(initialPom),
+          mavenProject("app",
+            srcMainResources(yaml(micronautConfig, s -> s.path("application.yml"))),
+            pomXml(initialPom, pomWithDependency)),
+          mavenProject("library", pomXml(initialPom)));
+    }
+
+    @Test
     void addGradleDependencyForApplicationYml() {
         rewriteRun(spec -> spec.beforeRecipe(withToolingApi()),
           mavenProject("project",

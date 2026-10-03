@@ -21,6 +21,11 @@ import lombok.Getter;
 import org.jspecify.annotations.Nullable;
 import org.openrewrite.*;
 import org.openrewrite.java.dependencies.AddDependency;
+import org.openrewrite.marker.SearchResult;
+
+import java.nio.file.Path;
+import java.util.HashSet;
+import java.util.Set;
 
 public class AddSnakeYamlDependencyIfNeeded extends ScanningRecipe<AddSnakeYamlDependencyIfNeeded.Accumulator> {
 
@@ -32,7 +37,7 @@ public class AddSnakeYamlDependencyIfNeeded extends ScanningRecipe<AddSnakeYamlD
 
     @Override
     public AddSnakeYamlDependencyIfNeeded.Accumulator getInitialValue(ExecutionContext ctx) {
-        return new Accumulator(false, addDependencyRecipe().getInitialValue(ctx));
+        return new Accumulator(new HashSet<>(), new HashSet<>(), addDependencyRecipe().getInitialValue(ctx));
     }
 
     @Override
@@ -42,8 +47,14 @@ public class AddSnakeYamlDependencyIfNeeded extends ScanningRecipe<AddSnakeYamlD
             @Override
             public @Nullable Tree visit(@Nullable Tree tree, ExecutionContext ctx) {
                 if (tree instanceof SourceFile) {
-                    if (!acc.usesYamlConfig) {
-                        acc.usesYamlConfig = tree != new FindYamlConfig().getVisitor().visit(tree, ctx);
+                    SourceFile source = (SourceFile) tree;
+                    Path path = source.getSourcePath().toAbsolutePath().normalize();
+                    String name = path.getFileName().toString();
+                    if ("pom.xml".equals(name) || "build.gradle".equals(name) || "build.gradle.kts".equals(name)) {
+                        acc.projectDirectories.add(path.getParent());
+                    }
+                    if (tree != new FindYamlConfig().getVisitor().visit(tree, ctx)) {
+                        acc.yamlConfigs.add(path);
                     }
                     TreeVisitor<?, ExecutionContext> addDependencyScanner = addDependencyRecipe.getScanner(acc.getAddDependencyAccumulator());
                     if (addDependencyScanner.isAcceptable((SourceFile) tree, ctx)) {
@@ -57,7 +68,29 @@ public class AddSnakeYamlDependencyIfNeeded extends ScanningRecipe<AddSnakeYamlD
 
     @Override
     public TreeVisitor<?, ExecutionContext> getVisitor(AddSnakeYamlDependencyIfNeeded.Accumulator acc) {
-        return Preconditions.check(acc.usesYamlConfig, addDependencyRecipe().getVisitor(acc.getAddDependencyAccumulator()));
+        // Prefer the closest build file so a child module does not enable the root project.
+        Set<Path> projectsUsingYaml = new HashSet<>();
+        for (Path yaml : acc.yamlConfigs) {
+            Path owner = null;
+            for (Path project : acc.projectDirectories) {
+                if (yaml.startsWith(project) && (owner == null || project.getNameCount() > owner.getNameCount())) {
+                    owner = project;
+                }
+            }
+            if (owner != null) {
+                projectsUsingYaml.add(owner);
+            }
+        }
+        return Preconditions.check(new TreeVisitor<Tree, ExecutionContext>() {
+            @Override
+            public @Nullable Tree visit(@Nullable Tree tree, ExecutionContext ctx) {
+                if (tree instanceof SourceFile && projectsUsingYaml.contains(
+                        ((SourceFile) tree).getSourcePath().toAbsolutePath().normalize().getParent())) {
+                    return SearchResult.found(tree);
+                }
+                return tree;
+            }
+        }, addDependencyRecipe().getVisitor(acc.getAddDependencyAccumulator()));
     }
 
     private static AddDependency addDependencyRecipe() {
@@ -69,7 +102,8 @@ public class AddSnakeYamlDependencyIfNeeded extends ScanningRecipe<AddSnakeYamlD
     @AllArgsConstructor
     @Data
     public static class Accumulator {
-        boolean usesYamlConfig;
+        Set<Path> projectDirectories;
+        Set<Path> yamlConfigs;
         AddDependency.Accumulator addDependencyAccumulator;
     }
 }
