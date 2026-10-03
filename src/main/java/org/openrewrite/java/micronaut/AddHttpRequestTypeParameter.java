@@ -25,6 +25,7 @@ import org.openrewrite.java.JavaIsoVisitor;
 import org.openrewrite.java.tree.*;
 import org.openrewrite.marker.Markers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -60,23 +61,88 @@ public class AddHttpRequestTypeParameter extends Recipe {
             @Override
             public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext ctx) {
                 J.ClassDeclaration c = super.visitClassDeclaration(classDecl, ctx);
+                List<JavaType.Method> requestMethods = new ArrayList<>();
                 List<TypeTree> mappedInterfaceTypes = ListUtils.map(c.getImplements(), interfaceType -> {
                     if (interfaceType instanceof J.ParameterizedType) {
                         return interfaceType;
                     }
                     JavaType.FullyQualified fqInterfaceType = TypeUtils.asFullyQualified(interfaceType.getType());
                     if (fqInterfaceType != null && isCandidateInterface(fqInterfaceType)) {
-                        JavaType httpRequestType = JavaType.buildType(IO_MICRONAUT_HTTP_HTTP_REQUEST);
-                        J.Identifier httpRequestIdentifier = new J.Identifier(Tree.randomId(), Space.EMPTY, Markers.EMPTY, emptyList(), "HttpRequest", httpRequestType, null);
-                        J.ParameterizedType httpRequestParameterized = new J.ParameterizedType(Tree.randomId(), Space.EMPTY, Markers.EMPTY, httpRequestIdentifier,
-                                JContainer.build(singletonList(JRightPadded.build(new J.Wildcard(Tree.randomId(), Space.EMPTY, Markers.EMPTY, null, null)))), httpRequestType);
+                        fqInterfaceType.getVisibleMethods().forEachRemaining(requestMethods::add);
+                        maybeAddImport(IO_MICRONAUT_HTTP_HTTP_REQUEST);
+                        J.ParameterizedType httpRequestParameterized = httpRequestType();
                         NameTree nameTree = new J.Identifier(Tree.randomId(), Space.EMPTY, Markers.EMPTY, emptyList(), fqInterfaceType.getClassName(), null, null);
                         return new J.ParameterizedType(Tree.randomId(), interfaceType.getPrefix(), Markers.EMPTY, nameTree,
                                 JContainer.build(singletonList(JRightPadded.build(httpRequestParameterized))), fqInterfaceType);
                     }
                     return interfaceType;
                 });
-                return c.withImplements(mappedInterfaceTypes);
+                c = c.withImplements(mappedInterfaceTypes);
+                if (!requestMethods.isEmpty()) {
+                    c = c.withBody(c.getBody().withStatements(ListUtils.map(c.getBody().getStatements(), statement -> {
+                        if (!(statement instanceof J.MethodDeclaration)) {
+                            return statement;
+                        }
+                        J.MethodDeclaration method = (J.MethodDeclaration) statement;
+                        JavaType.Method methodType = method.getMethodType();
+                        if (methodType == null || method.hasModifier(J.Modifier.Type.Static)) {
+                            return method;
+                        }
+                        for (JavaType.Method candidate : requestMethods) {
+                            if (!matchesErasedSignature(methodType, candidate)) {
+                                continue;
+                            }
+                            List<JavaType> parameterTypes = new ArrayList<>(methodType.getParameterTypes());
+                            List<Statement> parameters = ListUtils.map(method.getParameters(), (index, parameter) -> {
+                                if (!(candidate.getParameterTypes().get(index) instanceof JavaType.GenericTypeVariable) ||
+                                    !(parameter instanceof J.VariableDeclarations)) {
+                                    return parameter;
+                                }
+                                J.VariableDeclarations declarations = (J.VariableDeclarations) parameter;
+                                TypeTree typeExpression = declarations.getTypeExpression();
+                                if (typeExpression == null || !TypeUtils.isOfClassType(typeExpression.getType(), "java.lang.Object")) {
+                                    return parameter;
+                                }
+                                J.ParameterizedType replacement = httpRequestType().withPrefix(typeExpression.getPrefix())
+                                        .withMarkers(typeExpression.getMarkers());
+                                JavaType httpRequest = replacement.getType();
+                                parameterTypes.set(index, httpRequest);
+                                return declarations.withTypeExpression(replacement).withVariables(ListUtils.map(declarations.getVariables(), variable -> variable.withType(httpRequest)));
+                            });
+                            method = method.withParameters(parameters).withMethodType(methodType.withParameterTypes(parameterTypes));
+                        }
+                        return method;
+                    })));
+                }
+                return c;
+            }
+
+            private J.ParameterizedType httpRequestType() {
+                JavaType.FullyQualified rawType = JavaType.ShallowClass.build(IO_MICRONAUT_HTTP_HTTP_REQUEST);
+                JavaType.Parameterized type = new JavaType.Parameterized(null, rawType, singletonList(
+                        new JavaType.GenericTypeVariable(null, "?", JavaType.GenericTypeVariable.Variance.INVARIANT, emptyList())));
+                J.Identifier name = new J.Identifier(Tree.randomId(), Space.EMPTY, Markers.EMPTY, emptyList(), "HttpRequest", rawType, null);
+                return new J.ParameterizedType(Tree.randomId(), Space.EMPTY, Markers.EMPTY, name,
+                        JContainer.build(singletonList(JRightPadded.build(new J.Wildcard(Tree.randomId(), Space.EMPTY, Markers.EMPTY, null, null)))), type);
+            }
+
+            private boolean matchesErasedSignature(JavaType.Method method, JavaType.Method candidate) {
+                if (!method.getName().equals(candidate.getName()) ||
+                    method.getParameterTypes().size() != candidate.getParameterTypes().size()) {
+                    return false;
+                }
+                for (int i = 0; i < method.getParameterTypes().size(); i++) {
+                    JavaType expected = candidate.getParameterTypes().get(i);
+                    JavaType actual = method.getParameterTypes().get(i);
+                    if (expected instanceof JavaType.GenericTypeVariable) {
+                        if (!TypeUtils.isOfClassType(actual, "java.lang.Object")) {
+                            return false;
+                        }
+                    } else if (!TypeUtils.isOfType(expected, actual)) {
+                        return false;
+                    }
+                }
+                return true;
             }
 
             private boolean isCandidateInterface(JavaType.FullyQualified fqInterfaceType) {

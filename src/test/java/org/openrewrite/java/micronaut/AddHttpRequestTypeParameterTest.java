@@ -56,6 +56,72 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
         );
     }
 
+    @Test
+    void rawObjectOverride() {
+        rewriteRun(
+          java(
+            """
+              import io.micronaut.security.authentication.Authentication;
+              import io.micronaut.security.token.validator.TokenValidator;
+              import org.reactivestreams.Publisher;
+
+              class Custom implements TokenValidator {
+                  @Override
+                  public Publisher<Authentication> validateToken(String token, Object request) {
+                      return null;
+                  }
+
+                  public void unrelated(Object value) {}
+                  public void validateToken(Object token, Object request) {}
+
+                  static class Nested {
+                      public void validateToken(String token, Object request) {}
+                  }
+              }
+              """,
+            """
+              import io.micronaut.http.HttpRequest;
+              import io.micronaut.security.authentication.Authentication;
+              import io.micronaut.security.token.validator.TokenValidator;
+              import org.reactivestreams.Publisher;
+
+              class Custom implements TokenValidator<HttpRequest<?>> {
+                  @Override
+                  public Publisher<Authentication> validateToken(String token, HttpRequest<?> request) {
+                      return null;
+                  }
+
+                  public void unrelated(Object value) {}
+                  public void validateToken(Object token, Object request) {}
+
+                  static class Nested {
+                      public void validateToken(String token, Object request) {}
+                  }
+              }
+              """
+          )
+        );
+    }
+
+    @Test
+    void abstractImplementationNeedsImport() {
+        rewriteRun(
+          java(
+            """
+              import io.micronaut.security.token.validator.TokenValidator;
+
+              abstract class Custom implements TokenValidator {}
+              """,
+            """
+              import io.micronaut.http.HttpRequest;
+              import io.micronaut.security.token.validator.TokenValidator;
+
+              abstract class Custom implements TokenValidator<HttpRequest<?>> {}
+              """
+          )
+        );
+    }
+
     @DocumentExample
     @Test
     void authenticationProvider() {
