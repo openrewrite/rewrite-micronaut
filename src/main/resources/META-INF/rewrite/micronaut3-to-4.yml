@@ -144,8 +144,6 @@ recipeList:
   - org.openrewrite.java.dependencies.AddDependency:
       groupId: io.micronaut.validation
       artifactId: micronaut-validation
-      configuration: implementation
-      scope: compile
       onlyIfUsing: jakarta.validation.constraints.*
   - org.openrewrite.gradle.AddDependency:
       groupId: io.micronaut.validation
