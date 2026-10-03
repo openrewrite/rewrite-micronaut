@@ -56,6 +56,158 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
         );
     }
 
+    @Test
+    void rawObjectOverridePreservesApi() {
+        rewriteRun(
+          spec -> spec.expectedCyclesThatMakeChanges(0),
+          java(
+            """
+              import io.micronaut.security.authentication.Authentication;
+              import io.micronaut.security.token.validator.TokenValidator;
+              import org.reactivestreams.Publisher;
+
+              class Custom implements TokenValidator {
+                  @Override
+                  public Publisher<Authentication> validateToken(String token, Object request) {
+                      return null;
+                  }
+
+                  void caller() {
+                      validateToken("token", new Object());
+                  }
+              }
+              """
+          )
+        );
+    }
+
+    @Test
+    void inheritedObjectOverridePreservesApi() {
+        rewriteRun(
+          spec -> spec.expectedCyclesThatMakeChanges(0),
+          java(
+            """
+              import io.micronaut.security.authentication.Authentication;
+              import io.micronaut.security.token.validator.TokenValidator;
+              import org.reactivestreams.Publisher;
+
+              class Base {
+                  public Publisher<Authentication> validateToken(String token, Object request) {
+                      return null;
+                  }
+              }
+
+              class Custom extends Base implements TokenValidator {
+                  void caller() {
+                      validateToken("token", new Object());
+                  }
+              }
+              """
+          )
+        );
+    }
+
+    @Test
+    void inheritedGenericObjectOverridePreservesApi() {
+        rewriteRun(
+          spec -> spec.expectedCyclesThatMakeChanges(0),
+          java(
+            """
+              import io.micronaut.security.authentication.Authentication;
+              import io.micronaut.security.token.validator.TokenValidator;
+              import org.reactivestreams.Publisher;
+
+              class Base<T> {
+                  public Publisher<Authentication> validateToken(String token, T request) {
+                      return null;
+                  }
+              }
+
+              class Custom extends Base<Object> implements TokenValidator {
+                  void caller() {
+                      validateToken("token", new Object());
+                  }
+              }
+              """
+          )
+        );
+    }
+
+    @Test
+    void inheritedGenericObjectOverrideThroughIntermediateClass() {
+        rewriteRun(
+          spec -> spec.expectedCyclesThatMakeChanges(0),
+          java(
+            """
+              import io.micronaut.security.authentication.Authentication;
+              import io.micronaut.security.token.validator.TokenValidator;
+              import org.reactivestreams.Publisher;
+
+              class Base<T> {
+                  public Publisher<Authentication> validateToken(String token, T request) {
+                      return null;
+                  }
+              }
+              class Intermediate<U> extends Base<U> {}
+              class Custom extends Intermediate<Object> implements TokenValidator {}
+              """
+          )
+        );
+    }
+
+    @Test
+    void inheritedGenericHttpRequestOverrideNeedsTypeArgument() {
+        rewriteRun(
+          java(
+            """
+              import io.micronaut.http.HttpRequest;
+              import io.micronaut.security.authentication.Authentication;
+              import io.micronaut.security.token.validator.TokenValidator;
+              import org.reactivestreams.Publisher;
+
+              class Base<T> {
+                  public Publisher<Authentication> validateToken(String token, T request) {
+                      return null;
+                  }
+              }
+              class Custom extends Base<HttpRequest<?>> implements TokenValidator {}
+              """,
+            """
+              import io.micronaut.http.HttpRequest;
+              import io.micronaut.security.authentication.Authentication;
+              import io.micronaut.security.token.validator.TokenValidator;
+              import org.reactivestreams.Publisher;
+
+              class Base<T> {
+                  public Publisher<Authentication> validateToken(String token, T request) {
+                      return null;
+                  }
+              }
+              class Custom extends Base<HttpRequest<?>> implements TokenValidator<HttpRequest<?>> {}
+              """
+          )
+        );
+    }
+
+    @Test
+    void abstractImplementationNeedsImport() {
+        rewriteRun(
+          java(
+            """
+              import io.micronaut.security.token.validator.TokenValidator;
+
+              abstract class Custom implements TokenValidator {}
+              """,
+            """
+              import io.micronaut.http.HttpRequest;
+              import io.micronaut.security.token.validator.TokenValidator;
+
+              abstract class Custom implements TokenValidator<HttpRequest<?>> {}
+              """
+          )
+        );
+    }
+
     @DocumentExample
     @Test
     void authenticationProvider() {
@@ -556,6 +708,12 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
                   public Publisher<Authentication> validateToken(String token, HttpRequest<?> request) {
                       return null;
                   }
+
+                  public void validateToken(Object token, Object request) {}
+
+                  static class Nested {
+                      public void validateToken(String token, Object request) {}
+                  }
               }
               """,
                 """
@@ -568,6 +726,12 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
                   @Override
                   public Publisher<Authentication> validateToken(String token, HttpRequest<?> request) {
                       return null;
+                  }
+
+                  public void validateToken(Object token, Object request) {}
+
+                  static class Nested {
+                      public void validateToken(String token, Object request) {}
                   }
               }
               """
