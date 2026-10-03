@@ -26,8 +26,10 @@ import org.openrewrite.java.tree.*;
 import org.openrewrite.marker.Markers;
 
 import java.util.Arrays;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
@@ -96,7 +98,7 @@ public class AddHttpRequestTypeParameter extends Recipe {
                     Iterator<JavaType.Method> implementations = classType.getVisibleMethods();
                     while (implementations.hasNext()) {
                         JavaType.Method implementation = implementations.next();
-                        if (!implementation.hasFlags(Flag.Static) && matchesErasedSignature(implementation, candidate)) {
+                        if (!implementation.hasFlags(Flag.Static) && matchesErasedSignature(classType, implementation, candidate)) {
                             return true;
                         }
                     }
@@ -113,14 +115,14 @@ public class AddHttpRequestTypeParameter extends Recipe {
                         JContainer.build(singletonList(JRightPadded.build(new J.Wildcard(Tree.randomId(), Space.EMPTY, Markers.EMPTY, null, null)))), type);
             }
 
-            private boolean matchesErasedSignature(JavaType.Method method, JavaType.Method candidate) {
+            private boolean matchesErasedSignature(JavaType.FullyQualified classType, JavaType.Method method, JavaType.Method candidate) {
                 if (!method.getName().equals(candidate.getName()) ||
                     method.getParameterTypes().size() != candidate.getParameterTypes().size()) {
                     return false;
                 }
                 for (int i = 0; i < method.getParameterTypes().size(); i++) {
                     JavaType expected = candidate.getParameterTypes().get(i);
-                    JavaType actual = method.getParameterTypes().get(i);
+                    JavaType actual = resolveInheritedParameter(classType, method, method.getParameterTypes().get(i));
                     if (expected instanceof JavaType.GenericTypeVariable) {
                         if (!TypeUtils.isOfClassType(actual, "java.lang.Object")) {
                             return false;
@@ -130,6 +132,26 @@ public class AddHttpRequestTypeParameter extends Recipe {
                     }
                 }
                 return true;
+            }
+
+            private JavaType resolveInheritedParameter(JavaType.FullyQualified classType, JavaType.Method method, JavaType parameter) {
+                // Visible methods retain their declaration's type variables, even on Base<Object>.
+                Map<JavaType, JavaType> bindings = new IdentityHashMap<>();
+                for (JavaType.FullyQualified owner = classType; owner != null; owner = owner.getSupertype()) {
+                    if (owner instanceof JavaType.Parameterized) {
+                        JavaType.Parameterized parameterized = (JavaType.Parameterized) owner;
+                        List<JavaType> variables = parameterized.getType().getTypeParameters();
+                        List<JavaType> arguments = parameterized.getTypeParameters();
+                        for (int i = 0; i < Math.min(variables.size(), arguments.size()); i++) {
+                            JavaType argument = arguments.get(i);
+                            bindings.put(variables.get(i), bindings.getOrDefault(argument, argument));
+                        }
+                    }
+                    if (owner.getFullyQualifiedName().equals(method.getDeclaringType().getFullyQualifiedName())) {
+                        return bindings.getOrDefault(parameter, parameter);
+                    }
+                }
+                return parameter;
             }
 
             private boolean isCandidateInterface(JavaType.FullyQualified fqInterfaceType) {
