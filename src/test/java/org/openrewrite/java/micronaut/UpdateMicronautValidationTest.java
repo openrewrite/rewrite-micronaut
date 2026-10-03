@@ -112,6 +112,11 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
               repositories {
                   mavenCentral()
               }
+
+              dependencies {
+                  testAnnotationProcessor platform("io.micronaut.validation:micronaut-validation-bom:4.0.0")
+                  testImplementation platform("io.micronaut.validation:micronaut-validation-bom:4.0.0")
+              }
               """, """
               plugins {
                   id 'java'
@@ -121,8 +126,9 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
               }
 
               dependencies {
+                  testAnnotationProcessor platform("io.micronaut.validation:micronaut-validation-bom:4.0.0")
                   testAnnotationProcessor "io.micronaut.validation:micronaut-validation-processor"
-
+                  testImplementation platform("io.micronaut.validation:micronaut-validation-bom:4.0.0")
                   testImplementation "io.micronaut.validation:micronaut-validation"
               }
               """)));
@@ -143,6 +149,8 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
             }
 
             dependencies {
+                annotationProcessor platform("io.micronaut.validation:micronaut-validation-bom:4.0.0")
+                implementation platform("io.micronaut.validation:micronaut-validation-bom:4.0.0")
                 annotationProcessor("io.micronaut:micronaut-http-validation")
                 implementation("io.micronaut:micronaut-http-client")
                 implementation("io.micronaut:micronaut-jackson-databind")
@@ -159,6 +167,8 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
             }
 
             dependencies {
+                annotationProcessor platform("io.micronaut.validation:micronaut-validation-bom:4.0.0")
+                implementation platform("io.micronaut.validation:micronaut-validation-bom:4.0.0")
                 annotationProcessor("io.micronaut:micronaut-http-validation")
                 annotationProcessor "io.micronaut.validation:micronaut-validation-processor"
                 implementation("io.micronaut:micronaut-http-client")
@@ -184,6 +194,8 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
             }
 
             dependencies {
+                annotationProcessor platform("io.micronaut.validation:micronaut-validation-bom:4.0.0")
+                implementation platform("io.micronaut.validation:micronaut-validation-bom:4.0.0")
                 annotationProcessor("io.micronaut:micronaut-http-validation")
                 implementation("io.micronaut:micronaut-http-client")
                 implementation("io.micronaut:micronaut-jackson-databind")
@@ -199,6 +211,8 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
             }
 
             dependencies {
+                annotationProcessor platform("io.micronaut.validation:micronaut-validation-bom:4.0.0")
+                implementation platform("io.micronaut.validation:micronaut-validation-bom:4.0.0")
                 annotationProcessor("io.micronaut:micronaut-http-validation")
                 annotationProcessor "io.micronaut.validation:micronaut-validation-processor"
                 implementation("io.micronaut:micronaut-http-client")

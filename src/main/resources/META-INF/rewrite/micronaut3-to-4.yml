@@ -146,6 +146,7 @@ recipeList:
       artifactId: micronaut-validation
       onlyIfUsing: jakarta.validation.constraints.*
   - org.openrewrite.java.micronaut.AddMicronautValidationProcessor
+  - org.openrewrite.java.micronaut.AddMicronautValidationDependencyVersion
   - org.openrewrite.java.micronaut.AddAnnotationProcessorPath:
       groupId: io.micronaut.validation
       artifactId: micronaut-validation-processor
