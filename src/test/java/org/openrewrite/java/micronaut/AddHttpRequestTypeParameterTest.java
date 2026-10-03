@@ -37,7 +37,23 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
           "reactor-core"
         ));
         spec.recipe(new AddHttpRequestTypeParameter());
-        spec.expectedCyclesThatMakeChanges(2);
+        spec.expectedCyclesThatMakeChanges(1);
+    }
+
+    @Test
+    void preserveExistingTypeArguments() {
+        rewriteRun(
+          spec -> spec.expectedCyclesThatMakeChanges(0),
+          java(
+            """
+              import io.micronaut.security.token.validator.TokenValidator;
+
+              interface Custom<T> extends TokenValidator<T> {}
+              abstract class Concrete implements TokenValidator<String> {}
+              abstract class Generic<T> implements TokenValidator<T> {}
+              """
+          )
+        );
     }
 
     @DocumentExample
