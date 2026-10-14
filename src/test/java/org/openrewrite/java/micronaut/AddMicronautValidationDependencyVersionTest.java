@@ -16,6 +16,7 @@
 package org.openrewrite.java.micronaut;
 
 import org.junit.jupiter.api.Test;
+import org.openrewrite.DocumentExample;
 import org.openrewrite.gradle.AddDependency;
 import org.openrewrite.test.RecipeSpec;
 import org.openrewrite.test.RewriteTest;
@@ -30,6 +31,7 @@ class AddMicronautValidationDependencyVersionTest implements RewriteTest {
         spec.recipe(new AddMicronautValidationDependencyVersion()).beforeRecipe(withToolingApi());
     }
 
+    @DocumentExample
     @Test
     void unmanagedProcessorUsesExistingValidationVersion() {
         rewriteRun(buildGradle(
@@ -165,7 +167,8 @@ class AddMicronautValidationDependencyVersionTest implements RewriteTest {
                   annotationProcessor platform('io.micronaut.validation:micronaut-validation-bom:4.0.0')
                   annotationProcessor "io.micronaut.validation:micronaut-validation-processor"
               }
-              """));
+              """
+          ));
     }
 
     @Test

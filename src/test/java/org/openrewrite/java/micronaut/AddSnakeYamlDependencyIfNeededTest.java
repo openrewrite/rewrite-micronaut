@@ -133,7 +133,7 @@ class AddSnakeYamlDependencyIfNeededTest extends Micronaut4RewriteTest {
 
     @Test
     void yamlDoesNotAddDependencyToOtherGradleProjects() {
-        String build = """
+        var build = """
           plugins {
               id 'java'
           }

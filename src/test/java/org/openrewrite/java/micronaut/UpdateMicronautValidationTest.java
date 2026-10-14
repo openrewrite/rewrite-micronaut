@@ -17,6 +17,7 @@ package org.openrewrite.java.micronaut;
 
 import org.intellij.lang.annotations.Language;
 import org.junit.jupiter.api.Test;
+import org.openrewrite.DocumentExample;
 import org.openrewrite.InMemoryExecutionContext;
 import org.openrewrite.java.JavaParser;
 import org.openrewrite.test.RecipeSpec;
@@ -69,9 +70,10 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
       }
       """;
 
+    @DocumentExample
     @Test
     void validationProcessorFollowsProjectAndSourceSet() {
-        String build = """
+        var build = """
           plugins {
               id 'java'
           }

@@ -40,6 +40,48 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
         spec.expectedCyclesThatMakeChanges(1);
     }
 
+    @DocumentExample
+    @Test
+    void authenticationProvider() {
+        rewriteRun(
+          //language=java
+          java(
+            """
+              import io.micronaut.http.HttpRequest;
+              import io.micronaut.security.authentication.AuthenticationProvider;
+              import io.micronaut.security.authentication.AuthenticationRequest;
+              import io.micronaut.security.authentication.AuthenticationResponse;
+              import org.reactivestreams.Publisher;
+
+              public class AuthenticationProviderUserPassword implements AuthenticationProvider {
+
+                  @Override
+                  public Publisher<AuthenticationResponse> authenticate(HttpRequest<?> httpRequest,
+                                                                        AuthenticationRequest<?, ?> authenticationRequest) {
+                      return null;
+                  }
+              }
+              """,
+                """
+              import io.micronaut.http.HttpRequest;
+              import io.micronaut.security.authentication.AuthenticationProvider;
+              import io.micronaut.security.authentication.AuthenticationRequest;
+              import io.micronaut.security.authentication.AuthenticationResponse;
+              import org.reactivestreams.Publisher;
+
+              public class AuthenticationProviderUserPassword implements AuthenticationProvider<HttpRequest<?>> {
+
+                  @Override
+                  public Publisher<AuthenticationResponse> authenticate(HttpRequest<?> httpRequest,
+                                                                        AuthenticationRequest<?, ?> authenticationRequest) {
+                      return null;
+                  }
+              }
+              """
+          )
+        );
+    }
+
     @Test
     void preserveExistingTypeArguments() {
         rewriteRun(
@@ -203,48 +245,6 @@ class AddHttpRequestTypeParameterTest implements RewriteTest {
               import io.micronaut.security.token.validator.TokenValidator;
 
               abstract class Custom implements TokenValidator<HttpRequest<?>> {}
-              """
-          )
-        );
-    }
-
-    @DocumentExample
-    @Test
-    void authenticationProvider() {
-        rewriteRun(
-          //language=java
-          java(
-            """
-              import io.micronaut.http.HttpRequest;
-              import io.micronaut.security.authentication.AuthenticationProvider;
-              import io.micronaut.security.authentication.AuthenticationRequest;
-              import io.micronaut.security.authentication.AuthenticationResponse;
-              import org.reactivestreams.Publisher;
-
-              public class AuthenticationProviderUserPassword implements AuthenticationProvider {
-
-                  @Override
-                  public Publisher<AuthenticationResponse> authenticate(HttpRequest<?> httpRequest,
-                                                                        AuthenticationRequest<?, ?> authenticationRequest) {
-                      return null;
-                  }
-              }
-              """,
-                """
-              import io.micronaut.http.HttpRequest;
-              import io.micronaut.security.authentication.AuthenticationProvider;
-              import io.micronaut.security.authentication.AuthenticationRequest;
-              import io.micronaut.security.authentication.AuthenticationResponse;
-              import org.reactivestreams.Publisher;
-
-              public class AuthenticationProviderUserPassword implements AuthenticationProvider<HttpRequest<?>> {
-
-                  @Override
-                  public Publisher<AuthenticationResponse> authenticate(HttpRequest<?> httpRequest,
-                                                                        AuthenticationRequest<?, ?> authenticationRequest) {
-                      return null;
-                  }
-              }
               """
           )
         );

@@ -24,7 +24,8 @@ import org.openrewrite.kotlin.KotlinParser;
 import org.openrewrite.test.RecipeSpec;
 import org.openrewrite.test.RewriteTest;
 
-import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import static org.openrewrite.Tree.randomId;
 import static org.openrewrite.gradle.Assertions.buildGradle;
@@ -41,10 +42,10 @@ class AddMicronautValidationProcessorTest implements RewriteTest {
           .parser(KotlinParser.builder().classpathFromResources(new InMemoryExecutionContext(), "jakarta.validation-api-3.*"));
     }
 
-    @ParameterizedTest
     @CsvSource({"main,compileOnly", "test,testCompileOnly"})
+    @ParameterizedTest
     void groovyProcessorConfiguration(String sourceSet, String configuration) {
-        String build = """
+        var build = """
           plugins {
               id 'groovy'
           }
@@ -60,7 +61,7 @@ class AddMicronautValidationProcessorTest implements RewriteTest {
                   @NotBlank String name
               }
               """, s -> s.path("src/" + sourceSet + "/groovy/Person.groovy")
-              .markers(new JavaSourceSet(randomId(), sourceSet, Collections.emptyList(), Collections.emptyMap()))),
+              .markers(new JavaSourceSet(randomId(), sourceSet, List.of(), Map.of()))),
             buildGradle(build, build + """
 
               dependencies {
@@ -69,10 +70,10 @@ class AddMicronautValidationProcessorTest implements RewriteTest {
               """.formatted(configuration))));
     }
 
-    @ParameterizedTest
     @CsvSource({"main,kapt", "test,kaptTest"})
+    @ParameterizedTest
     void kotlinProcessorConfiguration(String sourceSet, String configuration) {
-        String build = """
+        var build = """
           plugins {
               id 'java'
           }
@@ -90,7 +91,7 @@ class AddMicronautValidationProcessorTest implements RewriteTest {
               import jakarta.validation.constraints.NotBlank
               class Person(@field:NotBlank val name: String)
               """, s -> s.path("src/" + sourceSet + "/kotlin/Person.kt")
-              .markers(new JavaSourceSet(randomId(), sourceSet, Collections.emptyList(), Collections.emptyMap()))),
+              .markers(new JavaSourceSet(randomId(), sourceSet, List.of(), Map.of()))),
             buildGradle(build, build + """
 
               dependencies {

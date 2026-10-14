@@ -37,6 +37,7 @@ public class AddMicronautValidationDependencyVersion extends ScanningRecipe<Set<
 
     @Getter
     final String displayName = "Add missing Micronaut validation dependency versions";
+
     @Getter
     final String description = "Supply a compatible version for unmanaged Gradle validation dependencies, " +
             "reusing the validation version already in use when possible.";
