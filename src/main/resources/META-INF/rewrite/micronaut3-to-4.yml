@@ -275,9 +275,6 @@ recipeList:
       oldFullyQualifiedTypeName: io.micronaut.security.token.jwt.cookie.JwtCookieLoginHandler
       newFullyQualifiedTypeName: io.micronaut.security.token.cookie.TokenCookieLoginHandler
   - org.openrewrite.java.ChangeType:
-      oldFullyQualifiedTypeName: io.micronaut.security.token.jwt.cookie.JwtCookieTokenReader
-      newFullyQualifiedTypeName: io.micronaut.security.token.cookie.TokenCookieTokenReader
-  - org.openrewrite.java.ChangeType:
       oldFullyQualifiedTypeName: io.micronaut.security.token.jwt.generator.AccessRefreshTokenGenerator
       newFullyQualifiedTypeName: io.micronaut.security.token.generator.AccessRefreshTokenGenerator
   - org.openrewrite.java.ChangeType:
