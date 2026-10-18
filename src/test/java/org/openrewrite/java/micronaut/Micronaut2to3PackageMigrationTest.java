@@ -17,6 +17,7 @@ package org.openrewrite.java.micronaut;
 
 import org.junit.jupiter.api.Test;
 import org.openrewrite.DocumentExample;
+import org.openrewrite.InMemoryExecutionContext;
 import org.openrewrite.java.JavaParser;
 import org.openrewrite.test.RecipeSpec;
 import org.openrewrite.test.RewriteTest;
@@ -81,6 +82,55 @@ class Micronaut2to3PackageMigrationTest implements RewriteTest {
 
               class A {
                   LdapSearchService service;
+              }
+              """
+          )
+        );
+    }
+
+    @Test
+    void migrateJsr305NullabilityAnnotations() {
+        rewriteRun(
+          spec -> spec.parser(JavaParser.fromJavaVersion()
+            .classpathFromResources(new InMemoryExecutionContext(), "micronaut-core-2.*")
+            .dependsOn(
+              """
+                package javax.annotation;
+                public @interface Nullable {}
+                """,
+              """
+                package javax.annotation;
+                public @interface Nonnull {}
+                """
+            )),
+          //language=java
+          java(
+            """
+              import javax.annotation.Nonnull;
+              import javax.annotation.Nullable;
+
+              class A {
+                  @Nullable
+                  String name;
+
+                  @Nonnull
+                  String id() {
+                      return "";
+                  }
+              }
+              """,
+            """
+              import io.micronaut.core.annotation.NonNull;
+              import io.micronaut.core.annotation.Nullable;
+
+              class A {
+                  @Nullable
+                  String name;
+
+                  @NonNull
+                  String id() {
+                      return "";
+                  }
               }
               """
           )

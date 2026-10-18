@@ -19,6 +19,12 @@ name: org.openrewrite.java.micronaut.Micronaut2to3Migration
 displayName: Migrate from Micronaut 2.x to 3.x
 description: This recipe will apply changes required for migrating from Micronaut 2 to Micronaut 3.
 recipeList:
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: javax.annotation.Nullable
+      newFullyQualifiedTypeName: io.micronaut.core.annotation.Nullable
+  - org.openrewrite.java.ChangeType:
+      oldFullyQualifiedTypeName: javax.annotation.Nonnull
+      newFullyQualifiedTypeName: io.micronaut.core.annotation.NonNull
   - org.openrewrite.java.migrate.jakarta.JavaxMigrationToJakarta
   - org.openrewrite.java.micronaut.BeanPropertyCapitalizationStrategy
   - org.openrewrite.java.micronaut.CopyNonInheritedAnnotations
@@ -128,12 +134,6 @@ recipeList:
   - org.openrewrite.java.ChangeMethodName:
       methodPattern: io.micronaut.web.router.RouteMatch explicitAccept(io.micronaut.http.MediaType)
       newMethodName: explicitlyConsumes
-  - org.openrewrite.java.ChangeType:
-      oldFullyQualifiedTypeName: javax.annotation.Nullable
-      newFullyQualifiedTypeName: io.micronaut.core.annotation.Nullable
-  - org.openrewrite.java.ChangeType:
-      oldFullyQualifiedTypeName: javax.annotation.Nonnull
-      newFullyQualifiedTypeName: io.micronaut.core.annotation.NonNull
   - org.openrewrite.java.ChangeType:
       oldFullyQualifiedTypeName: io.micronaut.test.annotation.MicronautTest
       newFullyQualifiedTypeName: io.micronaut.test.extensions.junit5.annotation.MicronautTest
