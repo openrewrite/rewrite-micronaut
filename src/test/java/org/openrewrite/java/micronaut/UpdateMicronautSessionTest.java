@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.openrewrite.DocumentExample;
 import org.openrewrite.test.RecipeSpec;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.openrewrite.gradle.Assertions.buildGradle;
 import static org.openrewrite.gradle.toolingapi.Assertions.withToolingApi;
 import static org.openrewrite.java.Assertions.mavenProject;
@@ -102,15 +103,6 @@ class UpdateMicronautSessionTest extends Micronaut4RewriteTest {
                         <artifactId>micronaut-parent</artifactId>
                         <version>%s</version>
                     </parent>
-                    <dependencyManagement>
-                        <dependencies>
-                            <dependency>
-                                <groupId>io.micronaut.session</groupId>
-                                <artifactId>micronaut-session</artifactId>
-                                <version>LATEST</version>
-                            </dependency>
-                        </dependencies>
-                    </dependencyManagement>
                     <dependencies>
                         <dependency>
                             <groupId>io.micronaut.session</groupId>
@@ -119,6 +111,60 @@ class UpdateMicronautSessionTest extends Micronaut4RewriteTest {
                     </dependencies>
                 </project>
                 """.formatted(latestMicronautVersion)
+            )
+          )
+        );
+    }
+
+    @Test
+    void updateGradleDependencyWithExplicitVersion() {
+        rewriteRun(
+          spec -> spec.beforeRecipe(withToolingApi()),
+          mavenProject("project",
+            //language=groovy
+            buildGradle(
+              """
+                plugins {
+                    id "java-library"
+                }
+                dependencies {
+                    implementation("io.micronaut:micronaut-session:3.10.15")
+                }
+                repositories {
+                    mavenCentral()
+                }
+                """,
+              spec -> spec.after(actual -> assertThat(actual)
+                .containsPattern("implementation\\(\"io.micronaut.session:micronaut-session:4\\.\\d+\\.\\d+\"\\)")
+                .actual())
+            )
+          )
+        );
+    }
+
+    @Test
+    void updateMavenDependencyWithExplicitVersion() {
+        rewriteRun(
+          mavenProject("project",
+            //language=xml
+            pomXml(
+              """
+                <project>
+                    <groupId>com.mycompany.app</groupId>
+                    <artifactId>my-app</artifactId>
+                    <version>1</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>io.micronaut</groupId>
+                            <artifactId>micronaut-session</artifactId>
+                            <version>3.10.15</version>
+                        </dependency>
+                    </dependencies>
+                </project>
+                """,
+              spec -> spec.after(actual -> assertThat(actual)
+                .containsPattern("<groupId>io.micronaut.session</groupId>\\s*<artifactId>micronaut-session</artifactId>\\s*<version>4\\.\\d+\\.\\d+</version>")
+                .actual())
             )
           )
         );

@@ -104,6 +104,7 @@ recipeList:
       oldGroupId: io.micronaut.build
       oldArtifactId: micronaut-maven-plugin
       newGroupId: io.micronaut.maven
+      newVersion: 4.x
 ---
 type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.UpdateMicronautPlatformBom
@@ -186,16 +187,11 @@ name: org.openrewrite.java.micronaut.UpdateMicronautSession
 displayName: Update the Micronaut Session support
 description: This recipe will update the Micronaut Session dependency if needed.
 recipeList:
-  - org.openrewrite.gradle.ChangeDependencyGroupId:
-      groupId: io.micronaut
-      artifactId: micronaut-session
-      newGroupId: io.micronaut.session
-      configuration: implementation
-  - org.openrewrite.maven.ChangeDependencyGroupIdAndArtifactId:
+  - org.openrewrite.java.dependencies.ChangeDependency:
       oldGroupId: io.micronaut
       oldArtifactId: micronaut-session
       newGroupId: io.micronaut.session
-      newVersion: LATEST
+      newVersion: 4.x
 ---
 type: specs.openrewrite.org/v1beta/recipe
 name: org.openrewrite.java.micronaut.AddMicronautRetryDependencyIfNeeded
