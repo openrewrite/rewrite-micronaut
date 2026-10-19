@@ -49,10 +49,12 @@ recipeList:
       oldGroupId: io.micronaut.security
       oldArtifactId: micronaut-security-annotations
       newArtifactId: micronaut-security-processor
+      newVersion: 5.x
   - org.openrewrite.java.dependencies.ChangeDependency:
       oldGroupId: io.micronaut.eclipsestore
       oldArtifactId: micronaut-eclipsestore-annotations
       newArtifactId: micronaut-eclipsestore-processor
+      newVersion: 2.x
   - org.openrewrite.java.ChangeType:
       oldFullyQualifiedTypeName: io.micronaut.views.turbo.TurboView
       newFullyQualifiedTypeName: io.micronaut.views.turbo.TurboStreamView
@@ -63,9 +65,10 @@ recipeList:
       scope: compile
       onlyIfUsing: io.micronaut.views.turbo..*
   - org.openrewrite.java.dependencies.ChangeDependency:
-      oldGroupId: io.micronaut.testresources
+      oldGroupId: org.testcontainers
       oldArtifactId: junit-jupiter
       newArtifactId: testcontainers-junit-jupiter
+      newVersion: 2.x
   - org.openrewrite.java.jackson.UpgradeJackson_2_3
   - org.openrewrite.java.jspecify.MigrateToJSpecify
 ---

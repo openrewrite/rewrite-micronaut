@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.openrewrite.DocumentExample;
 import org.openrewrite.test.RecipeSpec;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.openrewrite.gradle.Assertions.buildGradle;
 import static org.openrewrite.gradle.toolingapi.Assertions.withToolingApi;
 import static org.openrewrite.java.Assertions.mavenProject;
@@ -123,5 +124,35 @@ class UpdateBuildPluginsTest extends Micronaut4RewriteTest {
                     </build>
                 </project>
             """.formatted(latestMicronautVersion))));
+    }
+
+    @Test
+    void updateMavenBuildPluginWithExplicitVersion() {
+        rewriteRun(mavenProject("project",
+          //language=xml
+          pomXml("""
+                <project>
+                    <groupId>com.mycompany.app</groupId>
+                    <artifactId>my-app</artifactId>
+                    <version>1</version>
+                    <parent>
+                        <groupId>io.micronaut</groupId>
+                        <artifactId>micronaut-parent</artifactId>
+                        <version>3.9.1</version>
+                    </parent>
+                    <build>
+                      <plugins>
+                          <plugin>
+                              <groupId>io.micronaut.build</groupId>
+                              <artifactId>micronaut-maven-plugin</artifactId>
+                              <version>3.5.4</version>
+                          </plugin>
+                      </plugins>
+                    </build>
+                </project>
+            """,
+            spec -> spec.after(actual -> assertThat(actual)
+              .containsPattern("<groupId>io.micronaut.maven</groupId>\\s*<artifactId>micronaut-maven-plugin</artifactId>\\s*<version>4\\.\\d+\\.\\d+</version>")
+              .actual()))));
     }
 }

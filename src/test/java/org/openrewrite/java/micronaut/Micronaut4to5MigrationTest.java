@@ -22,7 +22,10 @@ import org.openrewrite.java.JavaParser;
 import org.openrewrite.test.RecipeSpec;
 import org.openrewrite.test.RewriteTest;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.openrewrite.java.Assertions.java;
+import static org.openrewrite.java.Assertions.mavenProject;
+import static org.openrewrite.maven.Assertions.pomXml;
 
 class Micronaut4to5MigrationTest implements RewriteTest {
 
@@ -54,6 +57,90 @@ class Micronaut4to5MigrationTest implements RewriteTest {
                   String name;
               }
               """
+          )
+        );
+    }
+
+    @Test
+    void securityAnnotationsWithExplicitVersionMoveToProcessor() {
+        rewriteRun(
+          mavenProject("project",
+            //language=xml
+            pomXml(
+              """
+                <project>
+                    <groupId>com.mycompany.app</groupId>
+                    <artifactId>my-app</artifactId>
+                    <version>1</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>io.micronaut.security</groupId>
+                            <artifactId>micronaut-security-annotations</artifactId>
+                            <version>4.18.0</version>
+                        </dependency>
+                    </dependencies>
+                </project>
+                """,
+              spec -> spec.after(actual -> assertThat(actual)
+                .containsPattern("<groupId>io.micronaut.security</groupId>\\s*<artifactId>micronaut-security-processor</artifactId>\\s*<version>5\\.\\d+\\.\\d+</version>")
+                .actual())
+            )
+          )
+        );
+    }
+
+    @Test
+    void eclipsestoreAnnotationsWithExplicitVersionMoveToProcessor() {
+        rewriteRun(
+          mavenProject("project",
+            //language=xml
+            pomXml(
+              """
+                <project>
+                    <groupId>com.mycompany.app</groupId>
+                    <artifactId>my-app</artifactId>
+                    <version>1</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>io.micronaut.eclipsestore</groupId>
+                            <artifactId>micronaut-eclipsestore-annotations</artifactId>
+                            <version>1.10.0</version>
+                        </dependency>
+                    </dependencies>
+                </project>
+                """,
+              spec -> spec.after(actual -> assertThat(actual)
+                .containsPattern("<groupId>io.micronaut.eclipsestore</groupId>\\s*<artifactId>micronaut-eclipsestore-processor</artifactId>\\s*<version>2\\.\\d+\\.\\d+</version>")
+                .actual())
+            )
+          )
+        );
+    }
+
+    @Test
+    void testcontainersJunitJupiterWithExplicitVersionMovesToRenamedModule() {
+        rewriteRun(
+          mavenProject("project",
+            //language=xml
+            pomXml(
+              """
+                <project>
+                    <groupId>com.mycompany.app</groupId>
+                    <artifactId>my-app</artifactId>
+                    <version>1</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.testcontainers</groupId>
+                            <artifactId>junit-jupiter</artifactId>
+                            <version>1.21.4</version>
+                        </dependency>
+                    </dependencies>
+                </project>
+                """,
+              spec -> spec.after(actual -> assertThat(actual)
+                .containsPattern("<groupId>org.testcontainers</groupId>\\s*<artifactId>testcontainers-junit-jupiter</artifactId>\\s*<version>2\\.\\d+\\.\\d+</version>")
+                .actual())
+            )
           )
         );
     }
