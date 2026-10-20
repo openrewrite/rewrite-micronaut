@@ -142,17 +142,18 @@ recipeList:
   - org.openrewrite.java.micronaut.RemoveAnnotationProcessorPath:
       groupId: io.micronaut
       artifactId: micronaut-validation
+  # Scanners see sources before ChangePackage migrates them, so javax constraints count as usage too.
   - org.openrewrite.java.dependencies.AddDependency:
       groupId: io.micronaut.validation
       artifactId: micronaut-validation
-      onlyIfUsing: jakarta.validation.constraints.*
+      onlyIfUsing: '*.validation.constraints.*'
   - org.openrewrite.java.micronaut.AddMicronautValidationProcessor
   - org.openrewrite.java.micronaut.AddMicronautValidationDependencyVersion
   - org.openrewrite.java.micronaut.AddAnnotationProcessorPath:
       groupId: io.micronaut.validation
       artifactId: micronaut-validation-processor
       version: ${micronaut.validation.version}
-      onlyIfUsing: jakarta.validation.constraints.*
+      onlyIfUsing: '*.validation.constraints.*'
       exclusions:
         - io.micronaut:micronaut-inject
 ---

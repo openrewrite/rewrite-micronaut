@@ -299,7 +299,6 @@ class SubclassesReturnedFromFactoriesNotInjectableTest implements RewriteTest {
     @Test
     void parameterizedReturnTypes() {
         rewriteRun(
-          spec -> spec.expectedCyclesThatMakeChanges(2),
           java(
             """
               package abc;
