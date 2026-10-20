@@ -138,7 +138,7 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
 
     @Test
     void updateJavaCodeAndModifyGradleDependencies() {
-        rewriteRun(spec -> spec.beforeRecipe(withToolingApi()).expectedCyclesThatMakeChanges(2),
+        rewriteRun(spec -> spec.beforeRecipe(withToolingApi()),
           mavenProject("project", properties("micronautVersion=" + MicronautRewriteTestVersions.getLatestMN3Version(), s -> s.path("gradle.properties")), srcMainJava(java(annotatedJavaxClass, annotatedJakartaClass)),
           //language=groovy
           buildGradle("""
@@ -183,7 +183,7 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
 
     @Test
     void updateJavaCodeAndAddMissingGradleDependencies() {
-        rewriteRun(spec -> spec.beforeRecipe(withToolingApi()).expectedCyclesThatMakeChanges(2),
+        rewriteRun(spec -> spec.beforeRecipe(withToolingApi()),
           mavenProject("project", properties("micronautVersion=" + MicronautRewriteTestVersions.getLatestMN3Version(), s -> s.path("gradle.properties")), srcMainJava(java(annotatedJavaxClass, annotatedJakartaClass)),
           //language=groovy
           buildGradle("""
@@ -228,7 +228,6 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
     @Test
     void updateJavaCodeAndModifyMavenDependencies() {
         rewriteRun(
-          spec -> spec.expectedCyclesThatMakeChanges(2),
           mavenProject("project", srcMainJava(java(annotatedJavaxClass, annotatedJakartaClass)),
           //language=xml
           pomXml("""
@@ -304,7 +303,6 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
     @Test
     void updateJavaCodeAndModifyMavenDependenciesAndAnnotationProcessor() {
         rewriteRun(
-          spec -> spec.expectedCyclesThatMakeChanges(2),
           mavenProject("project", srcMainJava(java(annotatedJavaxClass, annotatedJakartaClass)),
           //language=xml
           pomXml("""
@@ -384,7 +382,6 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
     @Test
     void updateJavaCodeAndAddMissingMavenDependencies() {
         rewriteRun(
-          spec -> spec.expectedCyclesThatMakeChanges(2),
           mavenProject("project", srcMainJava(java(annotatedJavaxClass, annotatedJakartaClass)),
           //language=xml
           pomXml("""

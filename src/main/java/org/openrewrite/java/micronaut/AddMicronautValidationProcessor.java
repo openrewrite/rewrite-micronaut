@@ -90,6 +90,6 @@ public class AddMicronautValidationProcessor extends ScanningRecipe<Map<String, 
 
     private static AddDependency dependency(String configuration) {
         return new AddDependency("io.micronaut.validation", "micronaut-validation-processor", null, null,
-                configuration, "jakarta.validation.constraints.*", null, null, null, null);
+                configuration, "*.validation.constraints.*", null, null, null, null);
     }
 }
