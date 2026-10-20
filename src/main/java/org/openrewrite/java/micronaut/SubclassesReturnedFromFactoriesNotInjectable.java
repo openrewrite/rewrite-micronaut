@@ -109,6 +109,11 @@ public class SubclassesReturnedFromFactoriesNotInjectable extends Recipe {
                     } else {
                         md = maybeAutoFormat(md, md.withReturnTypeExpression(resolvedReturnType), md.getName(), ctx, getCursor().getParent());
                     }
+                    JavaType.Method methodType = md.getMethodType();
+                    if (methodType != null) {
+                        methodType = methodType.withReturnType(returnedType);
+                        md = md.withMethodType(methodType).withName(md.getName().withType(methodType));
+                    }
                     maybeRemoveImport(methodReturnType.getFullyQualifiedName());
                 }
             }
