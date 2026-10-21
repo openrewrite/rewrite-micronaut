@@ -91,12 +91,8 @@ public class ProviderImplementationsToMicronautFactories extends Recipe {
             getCursor().putMessage("class-bean-annotations", beanAnnotations);
             J.ClassDeclaration cd = super.visitClassDeclaration(classDecl, ctx);
 
-            cd = cd.withLeadingAnnotations(ListUtils.map(cd.getLeadingAnnotations(), anno -> {
-                if (isBeanAnnotation(anno)) {
-                    return null;
-                }
-                return anno;
-            }));
+            cd = cd.withLeadingAnnotations(ListUtils.filter(cd.getLeadingAnnotations(), anno ->
+              !isBeanAnnotation(anno)));
 
             cd = JavaTemplate.builder("@Factory")
                     .imports("io.micronaut.context.annotation.Factory")
