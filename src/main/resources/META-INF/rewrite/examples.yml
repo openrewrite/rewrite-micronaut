@@ -50,6 +50,40 @@ examples:
     language: java
 ---
 type: specs.openrewrite.org/v1beta/example
+recipeName: org.openrewrite.java.micronaut.AddMicronautValidationDependencyVersion
+examples:
+- description: '`AddMicronautValidationDependencyVersionTest#unmanagedProcessorUsesExistingValidationVersion`'
+  sources:
+  - before: |
+      plugins { id 'java' }
+      repositories { mavenCentral() }
+      dependencies {
+          implementation 'io.micronaut.validation:micronaut-validation:4.0.0'
+          annotationProcessor 'io.micronaut.validation:micronaut-validation-processor'
+      }
+    after: |
+      plugins { id 'java' }
+      repositories { mavenCentral() }
+      dependencies {
+          implementation 'io.micronaut.validation:micronaut-validation:4.0.0'
+          annotationProcessor 'io.micronaut.validation:micronaut-validation-processor:4.0.0'
+      }
+    path: build.gradle
+    language: groovy
+---
+type: specs.openrewrite.org/v1beta/example
+recipeName: org.openrewrite.java.micronaut.AddMicronautValidationProcessor
+examples:
+- description: '`UpdateMicronautValidationTest#validationProcessorFollowsProjectAndSourceSet`'
+  sources:
+  - before: mainUse
+    language: mavenProject
+  - before: noUse
+    language: mavenProject
+  - before: testUse
+    language: mavenProject
+---
+type: specs.openrewrite.org/v1beta/example
 recipeName: org.openrewrite.java.micronaut.BeanPropertyCapitalizationStrategy
 examples:
 - description: '`BeanPropertyCapitalizationStrategyTest#deCapitalizeProperty`'

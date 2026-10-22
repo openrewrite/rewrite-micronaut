@@ -17,6 +17,7 @@ package org.openrewrite.java.micronaut;
 
 import org.intellij.lang.annotations.Language;
 import org.junit.jupiter.api.Test;
+import org.openrewrite.DocumentExample;
 import org.openrewrite.InMemoryExecutionContext;
 import org.openrewrite.Issue;
 import org.openrewrite.config.Environment;
@@ -135,6 +136,38 @@ class UpdateMicronautSecurityTest implements RewriteTest {
           name: foo
       """;
 
+    @DocumentExample
+    @Test
+    void relocateJwtCookieTokenReader() {
+        rewriteRun(
+          spec -> spec.parser(JavaParser.fromJavaVersion()
+            .classpathFromResources(new InMemoryExecutionContext(), "micronaut-security-4.*")
+            .dependsOn(
+              """
+                package io.micronaut.security.token.jwt.cookie;
+                public class JwtCookieTokenReader {}
+                """
+            )),
+          //language=java
+          java(
+            """
+              import io.micronaut.security.token.jwt.cookie.JwtCookieTokenReader;
+
+              class A {
+                  JwtCookieTokenReader reader;
+              }
+              """,
+            """
+              import io.micronaut.security.token.cookie.CookieTokenReader;
+
+              class A {
+                  CookieTokenReader reader;
+              }
+              """
+          )
+        );
+    }
+
     @Test
     void updatePropertyConfig() {
         rewriteRun(mavenProject("project", srcMainResources(properties(initialSecurityProps, expectedSecurityProps, s -> s.path("application.properties")))));
@@ -214,36 +247,5 @@ class UpdateMicronautSecurityTest implements RewriteTest {
     @Test
     void notMicronautConfigProperties() {
         rewriteRun(mavenProject("project", srcMainResources(properties(initialSecurityProps, s -> s.path("foo.properties")))));
-    }
-
-    @Test
-    void relocateJwtCookieTokenReader() {
-        rewriteRun(
-          spec -> spec.parser(JavaParser.fromJavaVersion()
-            .classpathFromResources(new InMemoryExecutionContext(), "micronaut-security-4.*")
-            .dependsOn(
-              """
-                package io.micronaut.security.token.jwt.cookie;
-                public class JwtCookieTokenReader {}
-                """
-            )),
-          //language=java
-          java(
-            """
-              import io.micronaut.security.token.jwt.cookie.JwtCookieTokenReader;
-
-              class A {
-                  JwtCookieTokenReader reader;
-              }
-              """,
-            """
-              import io.micronaut.security.token.cookie.CookieTokenReader;
-
-              class A {
-                  CookieTokenReader reader;
-              }
-              """
-          )
-        );
     }
 }
