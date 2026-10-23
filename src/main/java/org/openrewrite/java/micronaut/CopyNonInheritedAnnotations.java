@@ -19,16 +19,17 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.openrewrite.ExecutionContext;
-import org.openrewrite.ScanningRecipe;
-import org.openrewrite.TreeVisitor;
+import lombok.Value;
+import org.jspecify.annotations.Nullable;
+import org.openrewrite.*;
 import org.openrewrite.internal.ListUtils;
 import org.openrewrite.java.JavaIsoVisitor;
-import org.openrewrite.java.tree.J;
-import org.openrewrite.java.tree.JavaType;
-import org.openrewrite.java.tree.TypeUtils;
+import org.openrewrite.java.JavaParser;
+import org.openrewrite.java.tree.*;
+import org.openrewrite.marker.Markers;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toSet;
@@ -121,7 +122,8 @@ public class CopyNonInheritedAnnotations extends ScanningRecipe<CopyNonInherited
                     for (J.Annotation annotation : cd.getLeadingAnnotations()) {
                         JavaType.FullyQualified annoFq = TypeUtils.asFullyQualified(annotation.getType());
                         if (annoFq != null && NON_INHERITED_ANNOTATION_TYPES.stream().anyMatch(fqn -> fqn.equals(annoFq.getFullyQualifiedName()))) {
-                            acc.getParentAnnotationsByType().computeIfAbsent(classFqn, v -> new ArrayList<>()).add(annotation);
+                            acc.getParentAnnotationsByType().computeIfAbsent(classFqn, v -> new ArrayList<>())
+                                    .add(ParentAnnotation.of(annotation, annoFq.getFullyQualifiedName(), getCursor()));
                         }
                     }
                 }
@@ -141,7 +143,9 @@ public class CopyNonInheritedAnnotations extends ScanningRecipe<CopyNonInherited
 
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     private static final class CopyAnnoVisitor extends JavaIsoVisitor<ExecutionContext> {
-        private final Map<String, List<J.Annotation>> parentAnnotationsByType;
+        private final Map<String, List<ParentAnnotation>> parentAnnotationsByType;
+
+        private @Nullable JavaParser parser;
 
         @Override
         public J.ClassDeclaration visitClassDeclaration(J.ClassDeclaration classDecl, ExecutionContext ctx) {
@@ -173,14 +177,19 @@ public class CopyNonInheritedAnnotations extends ScanningRecipe<CopyNonInherited
 
             List<J.Annotation> annotationsFromParentClass = new ArrayList<>();
             for (String parentTypeFq : parentTypes) {
-                List<J.Annotation> parentAnnotations = parentAnnotationsByType.get(parentTypeFq);
+                List<ParentAnnotation> parentAnnotations = parentAnnotationsByType.get(parentTypeFq);
                 if (parentAnnotations != null) {
-                    for (J.Annotation annotation : parentAnnotations) {
-                        JavaType.FullyQualified annotationName = TypeUtils.asFullyQualified(annotation.getType());
-                        if (annotationName != null && !existingAnnotations.contains(annotationName.getFullyQualifiedName())) {
+                    for (ParentAnnotation parentAnnotation : parentAnnotations) {
+                        if (!existingAnnotations.contains(parentAnnotation.getFullyQualifiedName())) {
                             //If the annotation does not exist on the current class, add it.
-                            annotationsFromParentClass.add(annotation);
-                            existingAnnotations.add(annotationName.getFullyQualifiedName());
+                            if (parser == null) {
+                                parser = JavaParser.fromJavaVersion().build();
+                            }
+                            J.Annotation annotation = parentAnnotation.copy(parser);
+                            if (annotation != null) {
+                                annotationsFromParentClass.add(annotation);
+                                existingAnnotations.add(parentAnnotation.getFullyQualifiedName());
+                            }
                         }
                     }
                 }
@@ -203,6 +212,92 @@ public class CopyNonInheritedAnnotations extends ScanningRecipe<CopyNonInherited
 
     @Data
     static class Accumulator {
-        final Map<String, List<J.Annotation>> parentAnnotationsByType = new HashMap<>();
+        final Map<String, List<ParentAnnotation>> parentAnnotationsByType = new HashMap<>();
+    }
+
+    /**
+     * An annotation to copy, kept as its prefix, its source and, in pre-order, the class, markers and type attribution
+     * of each of its nodes.
+     */
+    @Value
+    static class ParentAnnotation {
+        String fullyQualifiedName;
+        Space prefix;
+        String source;
+        List<NodeType> nodeTypes;
+
+        static ParentAnnotation of(J.Annotation annotation, String fullyQualifiedName, Cursor parent) {
+            List<NodeType> nodeTypes = new ArrayList<>();
+            new JavaIsoVisitor<List<NodeType>>() {
+                @Override
+                public J preVisit(J tree, List<NodeType> nodeTypes) {
+                    nodeTypes.add(new NodeType(tree.getClass(), tree.getMarkers(), type(tree),
+                            tree instanceof J.Identifier ? ((J.Identifier) tree).getFieldType() : null));
+                    return tree;
+                }
+            }.visit(annotation, nodeTypes);
+            // printed without markers, which a search result would otherwise turn into a comment when parsed again
+            String source = annotation.withPrefix(Space.EMPTY)
+                    .print(parent, new PrintOutputCapture<>(0, PrintOutputCapture.MarkerPrinter.SANITIZED));
+            return new ParentAnnotation(fullyQualifiedName, annotation.getPrefix(), source, nodeTypes);
+        }
+
+        /**
+         * Parses the annotation again and puts back its prefix, markers and type attribution, or returns null if it
+         * parses to another shape.
+         */
+        J.@Nullable Annotation copy(JavaParser parser) {
+            SourceFile stub = parser.reset().parse(new InMemoryExecutionContext(), source + "\nclass Stub {\n}")
+                    .findFirst()
+                    .orElse(null);
+            if (!(stub instanceof J.CompilationUnit) || ((J.CompilationUnit) stub).getClasses().size() != 1 ||
+                ((J.CompilationUnit) stub).getClasses().get(0).getLeadingAnnotations().size() != 1) {
+                return null;
+            }
+            Iterator<NodeType> kept = nodeTypes.iterator();
+            AtomicBoolean sameShape = new AtomicBoolean(true);
+            J.Annotation annotation = (J.Annotation) new JavaIsoVisitor<AtomicBoolean>() {
+                @Override
+                public J preVisit(J tree, AtomicBoolean sameShape) {
+                    if (sameShape.get() && kept.hasNext()) {
+                        NodeType nodeType = kept.next();
+                        if (nodeType.getTreeClass() == tree.getClass()) {
+                            J j = withType(tree.withMarkers(nodeType.getMarkers()), nodeType.getType());
+                            return j instanceof J.Identifier ?
+                                    ((J.Identifier) j).withFieldType(nodeType.getFieldType()) : j;
+                        }
+                    }
+                    sameShape.set(false);
+                    return tree;
+                }
+            }.visitNonNull(((J.CompilationUnit) stub).getClasses().get(0).getLeadingAnnotations().get(0), sameShape);
+            return sameShape.get() && !kept.hasNext() ? annotation.withPrefix(prefix) : null;
+        }
+
+        // a method call's type is its method type, which withType can't change
+        private static @Nullable JavaType type(J tree) {
+            return tree instanceof MethodCall ? ((MethodCall) tree).getMethodType() :
+                    tree instanceof TypedTree ? ((TypedTree) tree).getType() : null;
+        }
+
+        private static J withType(J tree, @Nullable JavaType type) {
+            return tree instanceof MethodCall ? ((MethodCall) tree).withMethodType((JavaType.Method) type) :
+                    tree instanceof TypedTree ? ((TypedTree) tree).withType(type) : tree;
+        }
+    }
+
+    /**
+     * The class of a node, its markers and its type attribution.
+     */
+    @Value
+    static class NodeType {
+        Class<?> treeClass;
+
+        Markers markers;
+
+        @Nullable
+        JavaType type;
+
+        JavaType.@Nullable Variable fieldType;
     }
 }
