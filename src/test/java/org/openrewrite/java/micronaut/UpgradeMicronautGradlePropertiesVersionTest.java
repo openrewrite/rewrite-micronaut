@@ -18,7 +18,9 @@ package org.openrewrite.java.micronaut;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.openrewrite.DocumentExample;
+import org.openrewrite.ExecutionContext;
 import org.openrewrite.test.RewriteTest;
+import org.openrewrite.test.SourceSpec;
 
 import java.nio.file.Path;
 
@@ -26,6 +28,12 @@ import static org.openrewrite.properties.Assertions.properties;
 
 @SuppressWarnings("UnusedProperty")
 class UpgradeMicronautGradlePropertiesVersionTest implements RewriteTest {
+
+    // The recipe looks Micronaut's versions up in this context, which has no Maven settings, as these tests parse no POM
+    @Override
+    public ExecutionContext defaultExecutionContext(SourceSpec<?>[] sourceSpecs) {
+        return MicronautRewriteTestVersions.withMavenCentralMirror(RewriteTest.super.defaultExecutionContext(sourceSpecs));
+    }
 
     @DocumentExample
     @Test
