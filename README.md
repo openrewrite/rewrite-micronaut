@@ -15,7 +15,7 @@
 <div align="center">
 
 <!-- Keep the gap above this line, otherwise they won't render correctly! -->
-[![ci](https://github.com/openrewrite/rewrite-micronaut/actions/workflows/ci.yml/badge.svg)](https://github.com/openrewrite/rewrite-micronaut/actions/workflows/ci.yml)
+[![ci](https://codegenomeproject.org/ci/modules/openrewrite/rewrite-micronaut/badge.svg)](https://codegenomeproject.org/ci/modules/openrewrite/rewrite-micronaut/builds/latest)
 [![Apache 2.0](https://img.shields.io/github/license/openrewrite/rewrite-micronaut.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Revved up by Develocity](https://img.shields.io/badge/Revved%20up%20by-Develocity-06A0CE?logo=Gradle&labelColor=02303A)](https://community.develocity.cloud/scans)
 </div>
