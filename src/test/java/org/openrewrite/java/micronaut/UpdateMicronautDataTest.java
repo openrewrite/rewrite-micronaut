@@ -33,6 +33,7 @@ class UpdateMicronautDataTest extends Micronaut4RewriteTest {
     public void defaults(RecipeSpec spec) {
         spec
           .parser(JavaParser.fromJavaVersion().classpathFromResources(new InMemoryExecutionContext(),
+            "micronaut-core-2.*",
             "javax.transaction-api-1.*",
             "jakarta.transaction-api-2.*",
             "micronaut-data-jdbc-3.*",
