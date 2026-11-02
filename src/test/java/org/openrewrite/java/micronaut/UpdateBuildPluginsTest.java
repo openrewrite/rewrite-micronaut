@@ -36,9 +36,10 @@ class UpdateBuildPluginsTest extends Micronaut4RewriteTest {
     }
 
     @DocumentExample
+    // Micronaut 3.7's Gradle plugin applies a Shadow plugin that Gradle 9 no longer supports
     @Test
     void updateGradleBuildPlugins() {
-        rewriteRun(spec -> spec.beforeRecipe(withToolingApi()), properties("micronautVersion=3.9.1", s -> s.path("gradle.properties")),
+        rewriteRun(spec -> spec.beforeRecipe(withToolingApi("8.14.5")), properties("micronautVersion=3.9.1", s -> s.path("gradle.properties")),
           //language=groovy
           buildGradle(
                 """

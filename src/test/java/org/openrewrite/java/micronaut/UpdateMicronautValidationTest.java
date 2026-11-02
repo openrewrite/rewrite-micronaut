@@ -136,9 +136,10 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
               """)));
     }
 
+    // Micronaut 3.7's Gradle plugin applies a Shadow plugin that Gradle 9 no longer supports
     @Test
     void updateJavaCodeAndModifyGradleDependencies() {
-        rewriteRun(spec -> spec.beforeRecipe(withToolingApi()),
+        rewriteRun(spec -> spec.beforeRecipe(withToolingApi("8.14.5")),
           mavenProject("project", properties("micronautVersion=" + MicronautRewriteTestVersions.getLatestMN3Version(), s -> s.path("gradle.properties")), srcMainJava(java(annotatedJavaxClass, annotatedJakartaClass)),
           //language=groovy
           buildGradle("""
@@ -181,9 +182,10 @@ class UpdateMicronautValidationTest extends Micronaut4RewriteTest {
             """.formatted(latestApplicationPluginVersion))));
     }
 
+    // Micronaut 3.7's Gradle plugin applies a Shadow plugin that Gradle 9 no longer supports
     @Test
     void updateJavaCodeAndAddMissingGradleDependencies() {
-        rewriteRun(spec -> spec.beforeRecipe(withToolingApi()),
+        rewriteRun(spec -> spec.beforeRecipe(withToolingApi("8.14.5")),
           mavenProject("project", properties("micronautVersion=" + MicronautRewriteTestVersions.getLatestMN3Version(), s -> s.path("gradle.properties")), srcMainJava(java(annotatedJavaxClass, annotatedJakartaClass)),
           //language=groovy
           buildGradle("""
