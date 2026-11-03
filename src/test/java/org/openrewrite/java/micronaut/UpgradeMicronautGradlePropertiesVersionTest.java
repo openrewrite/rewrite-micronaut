@@ -29,12 +29,6 @@ import static org.openrewrite.properties.Assertions.properties;
 @SuppressWarnings("UnusedProperty")
 class UpgradeMicronautGradlePropertiesVersionTest implements RewriteTest {
 
-    // The recipe looks Micronaut's versions up in this context, which has no Maven settings, as these tests parse no POM
-    @Override
-    public ExecutionContext defaultExecutionContext(SourceSpec<?>[] sourceSpecs) {
-        return MicronautRewriteTestVersions.withMavenCentralMirror(RewriteTest.super.defaultExecutionContext(sourceSpecs));
-    }
-
     @DocumentExample
     @Test
     void upgradeMicronaut2(@TempDir Path tempDir) {
@@ -47,6 +41,12 @@ class UpgradeMicronautGradlePropertiesVersionTest implements RewriteTest {
             source -> source.path("gradle.properties")
           )
         );
+    }
+
+    // The recipe looks Micronaut's versions up in this context, which has no Maven settings, as these tests parse no POM
+    @Override
+    public ExecutionContext defaultExecutionContext(SourceSpec<?>[] sourceSpecs) {
+        return MicronautRewriteTestVersions.withMavenCentralMirror(RewriteTest.super.defaultExecutionContext(sourceSpecs));
     }
 
     @Test
