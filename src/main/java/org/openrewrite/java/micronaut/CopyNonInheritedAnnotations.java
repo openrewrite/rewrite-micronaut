@@ -227,15 +227,14 @@ public class CopyNonInheritedAnnotations extends ScanningRecipe<CopyNonInherited
         List<NodeType> nodeTypes;
 
         static ParentAnnotation of(J.Annotation annotation, String fullyQualifiedName, Cursor parent) {
-            List<NodeType> nodeTypes = new ArrayList<>();
-            new JavaIsoVisitor<List<NodeType>>() {
+            List<NodeType> nodeTypes = new JavaIsoVisitor<List<NodeType>>() {
                 @Override
                 public J preVisit(J tree, List<NodeType> nodeTypes) {
                     nodeTypes.add(new NodeType(tree.getClass(), tree.getMarkers(), type(tree),
                             tree instanceof J.Identifier ? ((J.Identifier) tree).getFieldType() : null));
                     return tree;
                 }
-            }.visit(annotation, nodeTypes);
+            }.reduce(annotation, new ArrayList<>());
             // printed without markers, which a search result would otherwise turn into a comment when parsed again
             String source = annotation.withPrefix(Space.EMPTY)
                     .print(parent, new PrintOutputCapture<>(0, PrintOutputCapture.MarkerPrinter.SANITIZED));
