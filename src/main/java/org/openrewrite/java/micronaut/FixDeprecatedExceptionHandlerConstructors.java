@@ -49,10 +49,6 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
             "io.micronaut.validation.exceptions.ValidationExceptionHandler"
     );
 
-    @SuppressWarnings("unchecked")
-    private static final TreeVisitor<?, ExecutionContext> precondition =
-            Preconditions.or(exception_handlers.stream().map(fqn -> new UsesType<>(fqn, false)).toArray(TreeVisitor[]::new));
-
     private static final AnnotationMatcher javax_matcher = new AnnotationMatcher("@javax.inject.Inject");
     private static final AnnotationMatcher jakarta_matcher = new AnnotationMatcher("@jakarta.inject.Inject");
 
@@ -63,7 +59,10 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
     final String description = "Adds `ErrorResponseProcessor` argument to deprecated no-arg `ExceptionHandler` constructors.";
 
     @Override
+    @SuppressWarnings("unchecked")
     public TreeVisitor<?, ExecutionContext> getVisitor() {
+        TreeVisitor<?, ExecutionContext> precondition =
+                Preconditions.or(exception_handlers.stream().map(fqn -> new UsesType<>(fqn, false)).toArray(TreeVisitor[]::new));
         return Preconditions.check(precondition, Repeat.repeatUntilStable(new JavaIsoVisitor<ExecutionContext>() {
 
             final JavaParser.Builder<?, ?> parser =
