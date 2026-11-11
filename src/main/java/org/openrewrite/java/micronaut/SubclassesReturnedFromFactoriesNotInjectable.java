@@ -95,6 +95,10 @@ public class SubclassesReturnedFromFactoriesNotInjectable extends Recipe {
             Set<JavaType> returnTypes = getCursor().pollMessage("return-types");
             if (returnTypes != null && returnTypes.size() == 1) {
                 JavaType returnedType = returnTypes.iterator().next();
+                if (!(md.getReturnTypeExpression() instanceof J.ParameterizedType) && returnedType instanceof JavaType.Parameterized) {
+                    // Written without type arguments, the return type is the raw type of what the method returns
+                    returnedType = ((JavaType.Parameterized) returnedType).getType();
+                }
                 JavaType.FullyQualified methodReturnType = md.getReturnTypeExpression() != null ? TypeUtils.asFullyQualified(md.getReturnTypeExpression().getType()) : null;
                 JavaType.FullyQualified returnedTypeFqn = TypeUtils.asFullyQualified(returnedType);
                 if (returnedTypeFqn != null && methodReturnType != null && !TypeUtils.isOfType(methodReturnType, returnedType)) {
