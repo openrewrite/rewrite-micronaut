@@ -339,6 +339,11 @@ class SubclassesReturnedFromFactoriesNotInjectableTest implements RewriteTest {
                   public Kq<?> u() {
                       return new Kq<String>("c");
                   }
+
+                  @Singleton
+                  public Qi<?> v() {
+                      return new Kq<String>("d");
+                  }
               }
               """,
             """
@@ -362,6 +367,11 @@ class SubclassesReturnedFromFactoriesNotInjectableTest implements RewriteTest {
                   @Singleton
                   public Kq<?> u() {
                       return new Kq<String>("c");
+                  }
+
+                  @Singleton
+                  public Kq<?> v() {
+                      return new Kq<String>("d");
                   }
               }
               """
