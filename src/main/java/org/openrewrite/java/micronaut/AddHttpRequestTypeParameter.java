@@ -70,9 +70,11 @@ public class AddHttpRequestTypeParameter extends Recipe {
                         }
                         maybeAddImport(IO_MICRONAUT_HTTP_HTTP_REQUEST);
                         J.ParameterizedType httpRequestParameterized = httpRequestType();
-                        NameTree nameTree = new J.Identifier(Tree.randomId(), Space.EMPTY, Markers.EMPTY, emptyList(), fqInterfaceType.getClassName(), null, null);
+                        NameTree nameTree = new J.Identifier(Tree.randomId(), Space.EMPTY, Markers.EMPTY, emptyList(), fqInterfaceType.getClassName(), fqInterfaceType, null);
+                        JavaType.Parameterized type = new JavaType.Parameterized(null, fqInterfaceType,
+                                singletonList(httpRequestParameterized.getType()));
                         return new J.ParameterizedType(Tree.randomId(), interfaceType.getPrefix(), Markers.EMPTY, nameTree,
-                                JContainer.build(singletonList(JRightPadded.build(httpRequestParameterized))), fqInterfaceType);
+                                JContainer.build(singletonList(JRightPadded.build(httpRequestParameterized))), type);
                     }
                     return interfaceType;
                 });

@@ -16,6 +16,7 @@
 package org.openrewrite.java.micronaut;
 
 import lombok.Getter;
+import org.jspecify.annotations.Nullable;
 import org.openrewrite.*;
 import org.openrewrite.java.AnnotationMatcher;
 import org.openrewrite.java.JavaIsoVisitor;
@@ -87,6 +88,10 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
                 if (cd != null && "super".equals(mi.getSimpleName()) && isClassExceptionHandler(cd)) {
                     if (mi.getArguments().stream().noneMatch(exp -> TypeUtils.isOfClassType(exp.getType(), errorResponseProcessorFqn))) {
                         mi = mi.withArguments(singletonList(new J.Identifier(Tree.randomId(), Space.EMPTY, Markers.EMPTY, emptyList(), "errorResponseProcessor", JavaType.buildType(errorResponseProcessorFqn), null)));
+                        JavaType.Method constructor = errorResponseProcessorConstructor(mi.getMethodType());
+                        if (constructor != null) {
+                            mi = mi.withMethodType(constructor).withName(mi.getName().withType(constructor));
+                        }
                     }
                     if (mi.getArguments().stream().anyMatch(exp -> TypeUtils.isOfClassType(exp.getType(), errorResponseProcessorFqn))) {
                         getCursor().dropParentUntil(J.MethodDeclaration.class::isInstance).putMessage("super-invocation-exists", Boolean.TRUE);
@@ -165,6 +170,18 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
                     }
                 }
                 return cd;
+            }
+
+            private JavaType.@Nullable Method errorResponseProcessorConstructor(JavaType.@Nullable Method superConstructor) {
+                if (superConstructor != null) {
+                    for (JavaType.Method method : superConstructor.getDeclaringType().getMethods()) {
+                        if (method.isConstructor() && method.getParameterTypes().size() == 1 &&
+                            TypeUtils.isOfClassType(method.getParameterTypes().get(0), errorResponseProcessorFqn)) {
+                            return method;
+                        }
+                    }
+                }
+                return null;
             }
 
             private boolean isErrorProcessorParameter(Statement statement) {
