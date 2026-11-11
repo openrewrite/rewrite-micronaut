@@ -101,7 +101,8 @@ public class SubclassesReturnedFromFactoriesNotInjectable extends Recipe {
                 }
                 JavaType.FullyQualified methodReturnType = md.getReturnTypeExpression() != null ? TypeUtils.asFullyQualified(md.getReturnTypeExpression().getType()) : null;
                 JavaType.FullyQualified returnedTypeFqn = TypeUtils.asFullyQualified(returnedType);
-                if (returnedTypeFqn != null && methodReturnType != null && !TypeUtils.isOfType(methodReturnType, returnedType)) {
+                if (returnedTypeFqn != null && methodReturnType != null &&
+                    !TypeUtils.isOfClassType(methodReturnType, returnedTypeFqn.getFullyQualifiedName())) {
                     J.Identifier resolvedReturnType = new J.Identifier(Tree.randomId(), Space.EMPTY, Markers.EMPTY, emptyList(), returnedTypeFqn.getClassName(), returnedType, null);
                     if (returnedType instanceof JavaType.Parameterized && md.getReturnTypeExpression() instanceof J.ParameterizedType) {
                         J.ParameterizedType mdReturnTypeExpression = (J.ParameterizedType) md.getReturnTypeExpression();
