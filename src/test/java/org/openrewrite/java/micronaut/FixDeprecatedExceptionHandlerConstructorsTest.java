@@ -21,7 +21,6 @@ import org.openrewrite.InMemoryExecutionContext;
 import org.openrewrite.java.JavaParser;
 import org.openrewrite.test.RecipeSpec;
 import org.openrewrite.test.RewriteTest;
-import org.openrewrite.test.TypeValidation;
 
 import static org.openrewrite.java.Assertions.java;
 
@@ -43,7 +42,6 @@ class FixDeprecatedExceptionHandlerConstructorsTest implements RewriteTest {
     @Test
     void addsErrorProcessorConstructor() {
         rewriteRun(
-          spec -> spec.typeValidationOptions(TypeValidation.none()),
           java(
             """
               package abc;
@@ -77,7 +75,6 @@ class FixDeprecatedExceptionHandlerConstructorsTest implements RewriteTest {
     @Test
     void addsErrorProcessorConstructorArg() {
         rewriteRun(
-          spec -> spec.typeValidationOptions(TypeValidation.none()),
           java(
             """
               package abc;
@@ -146,7 +143,6 @@ class FixDeprecatedExceptionHandlerConstructorsTest implements RewriteTest {
     @Test
     void addsErrorProcessorConstructorParamToExistingParams() {
         rewriteRun(
-          spec -> spec.typeValidationOptions(TypeValidation.none()),
           java(
             """
               package abc;
