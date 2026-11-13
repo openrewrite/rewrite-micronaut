@@ -72,7 +72,7 @@ public class FixDeprecatedExceptionHandlerConstructors extends Recipe {
                                     "package io.micronaut.http.server.exceptions.response; public interface ErrorContext {}",
                                     "package io.micronaut.http; public interface MutableHttpResponse<B> {}",
                                     "package io.micronaut.http.server.exceptions.response; public interface ErrorResponseProcessor<T> {MutableHttpResponse<T> processResponse(ErrorContext errorContext, MutableHttpResponse<?> baseResponse);}",
-                                    "package io.micronaut.validation.exceptions; public class ConstraintExceptionHandler { public ConstraintExceptionHandler(ErrorResponseProcessor<?> responseProcessor){}}");
+                                    "package io.micronaut.validation.exceptions; public class ConstraintExceptionHandler { public ConstraintExceptionHandler(io.micronaut.http.server.exceptions.response.ErrorResponseProcessor<?> responseProcessor){}}");
 
             final JavaTemplate injectTemplate = JavaTemplate.builder("@Inject")
                     .javaParser(parser)
