@@ -19,29 +19,20 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
-import org.openrewrite.ExecutionContext;
-import org.openrewrite.test.RewriteTest;
-import org.openrewrite.test.SourceSpec;
 import org.openrewrite.test.SourceSpecs;
 
 import static org.openrewrite.properties.Assertions.properties;
 
-public abstract class Micronaut4RewriteTest implements RewriteTest {
+public abstract class Micronaut4RewriteTest extends MicronautRewriteTest {
     protected static String latestApplicationPluginVersion;
     protected static String latestMicronautVersion;
     @Getter(AccessLevel.PROTECTED)
     private SourceSpecs gradleProperties;
 
-    // The recipes look Micronaut's versions up in this context, which has Maven settings only in tests that parse a POM
-    @Override
-    public ExecutionContext defaultExecutionContext(SourceSpec<?>[] sourceSpecs) {
-        return MicronautRewriteTestVersions.withMavenCentralMirror(RewriteTest.super.defaultExecutionContext(sourceSpecs));
-    }
-
     @BeforeAll
     static void init() {
-        latestApplicationPluginVersion = MicronautRewriteTestVersions.getLatestMN4ApplicationPluginVersion();
-        latestMicronautVersion = MicronautRewriteTestVersions.getLatestMN4Version();
+        latestApplicationPluginVersion = getLatestMN4ApplicationPluginVersion();
+        latestMicronautVersion = getLatestMN4Version();
     }
 
     @BeforeEach

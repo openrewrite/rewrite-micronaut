@@ -20,14 +20,13 @@ import org.openrewrite.DocumentExample;
 import org.openrewrite.InMemoryExecutionContext;
 import org.openrewrite.java.JavaParser;
 import org.openrewrite.test.RecipeSpec;
-import org.openrewrite.test.RewriteTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.openrewrite.java.Assertions.java;
 import static org.openrewrite.java.Assertions.mavenProject;
 import static org.openrewrite.maven.Assertions.pomXml;
 
-class Micronaut4to5MigrationTest implements RewriteTest {
+class Micronaut4to5MigrationTest extends MicronautRewriteTest {
 
     @Override
     public void defaults(RecipeSpec spec) {

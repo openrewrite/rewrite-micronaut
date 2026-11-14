@@ -17,16 +17,15 @@ package org.openrewrite.java.micronaut;
 
 import org.junit.jupiter.api.Test;
 import org.openrewrite.DocumentExample;
-import org.openrewrite.test.RewriteTest;
 
 import static org.openrewrite.maven.Assertions.pomXml;
 
-class UpgradeMicronautMavenPropertyVersionTest implements RewriteTest {
+class UpgradeMicronautMavenPropertyVersionTest extends MicronautRewriteTest {
 
     @DocumentExample
     @Test
     void changeMavenMicronautVersion() {
-        String latestMicronautVersion = MicronautRewriteTestVersions.getLatestMN2Version();
+        String latestMicronautVersion = getLatestMN2Version();
 
         rewriteRun(spec -> spec.recipe(new UpgradeMicronautMavenPropertyVersion("2.x")),
           pomXml(
@@ -57,7 +56,7 @@ class UpgradeMicronautMavenPropertyVersionTest implements RewriteTest {
 
     @Test
     void changeMavenMicronautVersion3() {
-        String latestMicronautVersion = MicronautRewriteTestVersions.getLatestMN3Version();
+        String latestMicronautVersion = getLatestMN3Version();
 
         rewriteRun(spec -> spec.recipe(new UpgradeMicronautMavenPropertyVersion("3.x")),
           pomXml(
@@ -88,7 +87,7 @@ class UpgradeMicronautMavenPropertyVersionTest implements RewriteTest {
 
     @Test
     void changeMavenMicronautVersion4() {
-        String latestMicronautVersion = MicronautRewriteTestVersions.getLatestMN4Version();
+        String latestMicronautVersion = getLatestMN4Version();
 
         rewriteRun(
           spec -> spec.recipe(new UpgradeMicronautMavenPropertyVersion("4.x")),

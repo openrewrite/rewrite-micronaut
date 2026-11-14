@@ -21,14 +21,13 @@ import org.openrewrite.InMemoryExecutionContext;
 import org.openrewrite.config.Environment;
 import org.openrewrite.java.JavaParser;
 import org.openrewrite.test.RecipeSpec;
-import org.openrewrite.test.RewriteTest;
 
 import static org.openrewrite.gradle.Assertions.buildGradle;
 import static org.openrewrite.java.Assertions.*;
 import static org.openrewrite.maven.Assertions.pomXml;
 import static org.openrewrite.properties.Assertions.properties;
 
-class UpdateJakartaPersistenceTest implements RewriteTest {
+class UpdateJakartaPersistenceTest extends MicronautRewriteTest {
 
     @Override
     public void defaults(RecipeSpec spec) {

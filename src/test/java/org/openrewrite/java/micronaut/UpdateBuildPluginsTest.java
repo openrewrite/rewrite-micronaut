@@ -79,7 +79,17 @@ class UpdateBuildPluginsTest extends Micronaut4RewriteTest {
                 repositories {
                     mavenCentral()
                 }
-            """.formatted(latestApplicationPluginVersion, MicronautRewriteTestVersions.getLatestMN4PluginVersion("io.micronaut.minimal.application"), MicronautRewriteTestVersions.getLatestMN4PluginVersion("io.micronaut.aot"), MicronautRewriteTestVersions.getLatestMN4PluginVersion("io.micronaut.component"), MicronautRewriteTestVersions.getLatestMN4PluginVersion("io.micronaut.crac"), MicronautRewriteTestVersions.getLatestMN4PluginVersion("io.micronaut.docker"), MicronautRewriteTestVersions.getLatestMN4PluginVersion("io.micronaut.graalvm"), MicronautRewriteTestVersions.getLatestMN4PluginVersion("io.micronaut.library"), MicronautRewriteTestVersions.getLatestMN4PluginVersion("io.micronaut.minimal.library"), MicronautRewriteTestVersions.getLatestMN4PluginVersion("io.micronaut.test-resources"))));
+            """.formatted(
+              latestApplicationPluginVersion,
+              getLatestMN4PluginVersion("io.micronaut.minimal.application"),
+              getLatestMN4PluginVersion("io.micronaut.aot"),
+              getLatestMN4PluginVersion("io.micronaut.component"),
+              getLatestMN4PluginVersion("io.micronaut.crac"),
+              getLatestMN4PluginVersion("io.micronaut.docker"),
+              getLatestMN4PluginVersion("io.micronaut.graalvm"),
+              getLatestMN4PluginVersion("io.micronaut.library"),
+              getLatestMN4PluginVersion("io.micronaut.minimal.library"),
+              getLatestMN4PluginVersion("io.micronaut.test-resources"))));
     }
 
     @Test
