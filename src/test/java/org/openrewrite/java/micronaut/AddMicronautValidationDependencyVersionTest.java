@@ -19,13 +19,12 @@ import org.junit.jupiter.api.Test;
 import org.openrewrite.DocumentExample;
 import org.openrewrite.gradle.AddDependency;
 import org.openrewrite.test.RecipeSpec;
-import org.openrewrite.test.RewriteTest;
 
 import static org.openrewrite.gradle.Assertions.buildGradle;
 import static org.openrewrite.gradle.toolingapi.Assertions.withToolingApi;
 import static org.openrewrite.java.Assertions.mavenProject;
 
-class AddMicronautValidationDependencyVersionTest implements RewriteTest {
+class AddMicronautValidationDependencyVersionTest extends MicronautRewriteTest {
     @Override
     public void defaults(RecipeSpec spec) {
         spec.recipe(new AddMicronautValidationDependencyVersion()).beforeRecipe(withToolingApi());

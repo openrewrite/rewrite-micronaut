@@ -15,16 +15,18 @@
  */
 package org.openrewrite.java.micronaut;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import org.openrewrite.ExecutionContext;
 import org.openrewrite.InMemoryExecutionContext;
 import org.openrewrite.maven.MavenDownloadingException;
 import org.openrewrite.maven.MavenExecutionContextView;
 import org.openrewrite.maven.MavenSettings;
+import org.openrewrite.maven.cache.InMemoryMavenPomCache;
+import org.openrewrite.maven.cache.MavenPomCache;
 import org.openrewrite.maven.tree.MavenRepository;
 import org.openrewrite.maven.tree.MavenRepositoryCredentials;
 import org.openrewrite.maven.tree.MavenRepositoryMirror;
+import org.openrewrite.test.RewriteTest;
+import org.openrewrite.test.SourceSpec;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,8 +39,7 @@ import static org.openrewrite.internal.StringUtils.isNullOrEmpty;
 import static org.openrewrite.maven.tree.MavenRepository.MAVEN_CENTRAL;
 import static org.openrewrite.maven.tree.MavenRepository.MAVEN_LOCAL_DEFAULT;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class MicronautRewriteTestVersions {
+public abstract class MicronautRewriteTest implements RewriteTest {
     private static final String MIRROR_ID = "maven-central-mirror";
 
     /**
@@ -48,6 +49,11 @@ public final class MicronautRewriteTestVersions {
       .id("gradle-plugins")
       .uri("https://plugins.gradle.org/m2/")
       .build();
+
+    /**
+     * Shared by every test in the JVM, so that each does not download Micronaut's BOMs and their imports again.
+     */
+    private static final MavenPomCache POM_CACHE = new InMemoryMavenPomCache();
 
     private static final String MN_2_VERSION;
     private static final String MN_3_VERSION;
@@ -62,29 +68,29 @@ public final class MicronautRewriteTestVersions {
         MN_4_APPLICATION_PLUGIN_VERSION = resolvePluginVersion("io.micronaut.application");
     }
 
-    public static String getLatestMN2Version() {
+    protected static String getLatestMN2Version() {
         return MN_2_VERSION;
     }
 
-    public static String getLatestMN3Version() {
+    protected static String getLatestMN3Version() {
         return MN_3_VERSION;
     }
 
-    public static String getLatestMN4Version() {
+    protected static String getLatestMN4Version() {
         return MN_4_VERSION;
     }
 
-    public static String getLatestMN4ApplicationPluginVersion() {
+    protected static String getLatestMN4ApplicationPluginVersion() {
         return MN_4_APPLICATION_PLUGIN_VERSION;
     }
 
-    public static String getLatestMN4PluginVersion(String pluginId) {
+    protected static String getLatestMN4PluginVersion(String pluginId) {
         return resolvePluginVersion(pluginId);
     }
 
     private static String resolveVersion(String versionPattern, String currentVersion) {
         try {
-            return MicronautVersionHelper.getNewerVersion(versionPattern, currentVersion, withMavenCentralMirror(new InMemoryExecutionContext())).orElse(currentVersion);
+            return MicronautVersionHelper.getNewerVersion(versionPattern, currentVersion, withSharedPomCache(withMavenCentralMirror(new InMemoryExecutionContext()))).orElse(currentVersion);
         } catch (MavenDownloadingException e) {
             throw new IllegalStateException("Failed to resolve latest Micronaut Framework %s version".formatted(versionPattern), e);
         }
@@ -92,10 +98,21 @@ public final class MicronautRewriteTestVersions {
 
     private static String resolvePluginVersion(String pluginId) {
         try {
-            return MicronautVersionHelper.getNewerGradlePluginVersion(pluginId, "4.x", "4.0.0", withMavenCentralMirror(new InMemoryExecutionContext())).orElse("4.0.0");
+            return MicronautVersionHelper.getNewerGradlePluginVersion(pluginId, "4.x", "4.0.0", withSharedPomCache(withMavenCentralMirror(new InMemoryExecutionContext()))).orElse("4.0.0");
         } catch (MavenDownloadingException e) {
             throw new IllegalStateException("Failed to resolve plugin version for " + pluginId, e);
         }
+    }
+
+    // The recipes look Micronaut's versions up in this context, which has Maven settings only in tests that parse a POM
+    @Override
+    public ExecutionContext defaultExecutionContext(SourceSpec<?>[] sourceSpecs) {
+        return withSharedPomCache(withMavenCentralMirror(RewriteTest.super.defaultExecutionContext(sourceSpecs)));
+    }
+
+    private static <T extends ExecutionContext> T withSharedPomCache(T ctx) {
+        MavenExecutionContextView.view(ctx).setPomCache(POM_CACHE);
+        return ctx;
     }
 
     /**
@@ -104,7 +121,7 @@ public final class MicronautRewriteTestVersions {
      * Gradle plugin portal no mirror serves yet. For the contexts the lookups above make, and for tests that parse no
      * POM, which never load the settings.
      */
-    public static <T extends ExecutionContext> T withMavenCentralMirror(T ctx) {
+    private static <T extends ExecutionContext> T withMavenCentralMirror(T ctx) {
         MavenExecutionContextView mctx = MavenExecutionContextView.view(ctx);
         boolean nothingConfigured = mctx.getSettings() == null &&
           mctx.getLocalRepository().equals(MAVEN_LOCAL_DEFAULT) &&

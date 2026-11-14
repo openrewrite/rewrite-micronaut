@@ -92,7 +92,7 @@ class UpdateMicronautSessionTest extends Micronaut4RewriteTest {
                         </dependency>
                     </dependencies>
                 </project>
-                """.formatted(MicronautRewriteTestVersions.getLatestMN3Version()),
+                """.formatted(getLatestMN3Version()),
               """
                 <project>
                     <groupId>com.mycompany.app</groupId>

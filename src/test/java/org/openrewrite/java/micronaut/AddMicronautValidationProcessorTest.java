@@ -22,7 +22,6 @@ import org.openrewrite.groovy.GroovyParser;
 import org.openrewrite.java.marker.JavaSourceSet;
 import org.openrewrite.kotlin.KotlinParser;
 import org.openrewrite.test.RecipeSpec;
-import org.openrewrite.test.RewriteTest;
 
 import java.util.List;
 import java.util.Map;
@@ -34,7 +33,7 @@ import static org.openrewrite.groovy.Assertions.groovy;
 import static org.openrewrite.java.Assertions.mavenProject;
 import static org.openrewrite.kotlin.Assertions.kotlin;
 
-class AddMicronautValidationProcessorTest implements RewriteTest {
+class AddMicronautValidationProcessorTest extends MicronautRewriteTest {
     @Override
     public void defaults(RecipeSpec spec) {
         spec.recipe(new AddMicronautValidationProcessor())

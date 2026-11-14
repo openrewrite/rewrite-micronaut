@@ -113,7 +113,7 @@ class UpdateMavenAnnotationProcessorsTest extends Micronaut4RewriteTest {
                     </plugins>
                 </build>
             </project>
-            """.formatted(MicronautRewriteTestVersions.getLatestMN3Version()), """
+            """.formatted(getLatestMN3Version()), """
             <project>
                 <groupId>com.mycompany.app</groupId>
                 <artifactId>my-app</artifactId>
@@ -191,7 +191,7 @@ class UpdateMavenAnnotationProcessorsTest extends Micronaut4RewriteTest {
                     </plugins>
                 </build>
             </project>
-            """.formatted(MicronautRewriteTestVersions.getLatestMN3Version())));
+            """.formatted(getLatestMN3Version())));
     }
 
     @Test

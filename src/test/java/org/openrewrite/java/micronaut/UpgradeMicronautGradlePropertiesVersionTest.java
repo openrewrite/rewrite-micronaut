@@ -18,21 +18,18 @@ package org.openrewrite.java.micronaut;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.openrewrite.DocumentExample;
-import org.openrewrite.ExecutionContext;
-import org.openrewrite.test.RewriteTest;
-import org.openrewrite.test.SourceSpec;
 
 import java.nio.file.Path;
 
 import static org.openrewrite.properties.Assertions.properties;
 
 @SuppressWarnings("UnusedProperty")
-class UpgradeMicronautGradlePropertiesVersionTest implements RewriteTest {
+class UpgradeMicronautGradlePropertiesVersionTest extends MicronautRewriteTest {
 
     @DocumentExample
     @Test
     void upgradeMicronaut2(@TempDir Path tempDir) {
-        String latestMicronautVersion = MicronautRewriteTestVersions.getLatestMN2Version();
+        String latestMicronautVersion = getLatestMN2Version();
 
         rewriteRun(spec -> spec.recipe(new UpgradeMicronautGradlePropertiesVersion("2.x")),
           properties(
@@ -43,15 +40,9 @@ class UpgradeMicronautGradlePropertiesVersionTest implements RewriteTest {
         );
     }
 
-    // The recipe looks Micronaut's versions up in this context, which has no Maven settings, as these tests parse no POM
-    @Override
-    public ExecutionContext defaultExecutionContext(SourceSpec<?>[] sourceSpecs) {
-        return MicronautRewriteTestVersions.withMavenCentralMirror(RewriteTest.super.defaultExecutionContext(sourceSpecs));
-    }
-
     @Test
     void upgradeToMicronaut3() {
-        String latestMicronautVersion = MicronautRewriteTestVersions.getLatestMN3Version();
+        String latestMicronautVersion = getLatestMN3Version();
 
         rewriteRun(
           spec -> spec.recipe(new UpgradeMicronautGradlePropertiesVersion("3.x")),
@@ -65,7 +56,7 @@ class UpgradeMicronautGradlePropertiesVersionTest implements RewriteTest {
 
     @Test
     void upgradeToMicronaut4() {
-        String latestMicronautVersion = MicronautRewriteTestVersions.getLatestMN4Version();
+        String latestMicronautVersion = getLatestMN4Version();
 
         rewriteRun(
           spec -> spec.recipe(new UpgradeMicronautGradlePropertiesVersion("4.x")),
