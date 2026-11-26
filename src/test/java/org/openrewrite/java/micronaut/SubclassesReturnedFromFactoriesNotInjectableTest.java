@@ -15,6 +15,7 @@
  */
 package org.openrewrite.java.micronaut;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.openrewrite.DocumentExample;
 import org.openrewrite.InMemoryExecutionContext;
@@ -65,50 +66,6 @@ class SubclassesReturnedFromFactoriesNotInjectableTest implements RewriteTest {
               
                   @Singleton
                   public ForkJoinPool executorService() {
-                      return ForkJoinPool.commonPool();
-                  }
-              }
-              """
-          )
-        );
-    }
-
-    @Test
-    void beanTypeMatchesReturnType() {
-        rewriteRun(
-          java(
-            """
-              import java.util.concurrent.ForkJoinPool;
-              import javax.inject.Singleton;
-              import io.micronaut.context.annotation.Factory;
-              
-              @Factory
-              public class ExecutorFactory {
-              
-                  @Singleton
-                  public ForkJoinPool executorService() {
-                      return ForkJoinPool.commonPool();
-                  }
-              }
-              """
-          )
-        );
-    }
-
-    @Test
-    void notAFactory() {
-        rewriteRun(
-          java(
-            """
-              import java.util.concurrent.ExecutorService;
-              import java.util.concurrent.ForkJoinPool;
-              import javax.inject.Singleton;
-              import io.micronaut.context.annotation.Factory;
-              
-              public class ExecutorFactory {
-                  
-                  @Singleton
-                  public ExecutorService executorService() {
                       return ForkJoinPool.commonPool();
                   }
               }
@@ -220,83 +177,6 @@ class SubclassesReturnedFromFactoriesNotInjectableTest implements RewriteTest {
     }
 
     @Test
-    void multipleReturnTypes() {
-        rewriteRun(
-          java(
-            """
-              package abc;
-              public class MyConfig {
-                  public boolean isSomething() {
-                      return false;
-                  }
-              }
-              """
-          ),
-          java(
-            """
-              package abc;
-              public interface MyInterface {}
-              """
-          ),
-          java(
-            """
-              package abc;
-              public class MyThing implements MyInterface {
-                  private String name;
-                  public MyThing(String name) {
-                      if (name == null) {
-                          throw new IllegalArgumentException();
-                      }
-                      this.name = name;
-                  }
-              }
-              """
-          ),
-          java(
-            """
-              package abc;
-              public class MyOtherThing implements MyInterface {
-                  private String name;
-                  public MyOtherThing(String name) {
-                      if (name == null) {
-                          throw new IllegalArgumentException();
-                      }
-                      this.name = name;
-                  }
-              }
-              """
-          ),
-          java(
-            """
-              package abc;
-              import jakarta.inject.Inject;
-              import jakarta.inject.Singleton;
-              import io.micronaut.context.annotation.Factory;
-              
-              @Factory
-              public class ExecutorFactory {
-                  @Inject
-                  MyConfig myConfig;
-                  
-                  @Singleton
-                  public MyInterface myInterface() {
-                      try {
-                          if (myConfig.isSomething()) {
-                              return new MyThing("some name");
-                          } else {
-                              return new MyOtherThing("some other thing");
-                          }
-                      } catch (Exception ex) {
-                          return null;
-                      }
-                  }
-              }
-              """
-          )
-        );
-    }
-
-    @Test
     void parameterizedReturnTypes() {
         rewriteRun(
           java(
@@ -377,5 +257,130 @@ class SubclassesReturnedFromFactoriesNotInjectableTest implements RewriteTest {
               """
           )
         );
+    }
+
+    @Nested
+    class NoChange {
+
+        @Test
+        void beanTypeMatchesReturnType() {
+            rewriteRun(
+              java(
+                """
+                  import java.util.concurrent.ForkJoinPool;
+                  import javax.inject.Singleton;
+                  import io.micronaut.context.annotation.Factory;
+              
+                  @Factory
+                  public class ExecutorFactory {
+              
+                      @Singleton
+                      public ForkJoinPool executorService() {
+                          return ForkJoinPool.commonPool();
+                      }
+                  }
+                  """
+              )
+            );
+        }
+
+        @Test
+        void notAFactory() {
+            rewriteRun(
+              java(
+                """
+                  import java.util.concurrent.ExecutorService;
+                  import java.util.concurrent.ForkJoinPool;
+                  import javax.inject.Singleton;
+                  import io.micronaut.context.annotation.Factory;
+              
+                  public class ExecutorFactory {
+                  
+                      @Singleton
+                      public ExecutorService executorService() {
+                          return ForkJoinPool.commonPool();
+                      }
+                  }
+                  """
+              )
+            );
+        }
+
+        @Test
+        void multipleReturnTypes() {
+            rewriteRun(
+              java(
+                """
+                  package abc;
+                  public class MyConfig {
+                      public boolean isSomething() {
+                          return false;
+                      }
+                  }
+                  """
+              ),
+              java(
+                """
+                  package abc;
+                  public interface MyInterface {}
+                  """
+              ),
+              java(
+                """
+                  package abc;
+                  public class MyThing implements MyInterface {
+                      private String name;
+                      public MyThing(String name) {
+                          if (name == null) {
+                              throw new IllegalArgumentException();
+                          }
+                          this.name = name;
+                      }
+                  }
+                  """
+              ),
+              java(
+                """
+                  package abc;
+                  public class MyOtherThing implements MyInterface {
+                      private String name;
+                      public MyOtherThing(String name) {
+                          if (name == null) {
+                              throw new IllegalArgumentException();
+                          }
+                          this.name = name;
+                      }
+                  }
+                  """
+              ),
+              java(
+                """
+                  package abc;
+                  import jakarta.inject.Inject;
+                  import jakarta.inject.Singleton;
+                  import io.micronaut.context.annotation.Factory;
+              
+                  @Factory
+                  public class ExecutorFactory {
+                      @Inject
+                      MyConfig myConfig;
+                  
+                      @Singleton
+                      public MyInterface myInterface() {
+                          try {
+                              if (myConfig.isSomething()) {
+                                  return new MyThing("some name");
+                              } else {
+                                  return new MyOtherThing("some other thing");
+                              }
+                          } catch (Exception ex) {
+                              return null;
+                          }
+                      }
+                  }
+                  """
+              )
+            );
+        }
     }
 }

@@ -16,6 +16,7 @@
 package org.openrewrite.java.micronaut;
 
 import org.intellij.lang.annotations.Language;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.openrewrite.InMemoryExecutionContext;
 import org.openrewrite.java.JavaParser;
@@ -214,15 +215,6 @@ class AddSnakeYamlDependencyIfNeededTest extends Micronaut4RewriteTest {
     }
 
     @Test
-    void noMavenDependencyForMissingApplicationYml() {
-        rewriteRun(
-          mavenProject("project",
-            srcMainJava(java(micronautApplication)),
-            srcMainResources(yaml(micronautConfig, s -> s.path("foo.yml"))),
-            pomXml(initialPom)));
-    }
-
-    @Test
     void noGradleDependencyForApplicationProperties() {
         rewriteRun(spec -> spec.beforeRecipe(withToolingApi()),
           mavenProject("project",
@@ -233,15 +225,6 @@ class AddSnakeYamlDependencyIfNeededTest extends Micronaut4RewriteTest {
     }
 
     @Test
-    void noMavenDependencyForApplicationProperties() {
-        rewriteRun(
-          mavenProject("project",
-            srcMainJava(java(micronautApplication)),
-            srcMainResources(properties(micronautPropertiesConfig, s -> s.path("application.properties"))),
-            pomXml(initialPom)));
-    }
-
-    @Test
     void existingGradleDependencyUnchanged() {
         rewriteRun(spec -> spec.beforeRecipe(withToolingApi()),
           mavenProject("project",
@@ -249,15 +232,6 @@ class AddSnakeYamlDependencyIfNeededTest extends Micronaut4RewriteTest {
             srcMainResources(yaml(micronautConfig, s -> s.path("application.yml"))),
             getGradleProperties(),
             buildGradle(buildGradleWithDependency)));
-    }
-
-    @Test
-    void existingMavenDependencyUnchanged() {
-        rewriteRun(
-          mavenProject("project",
-            srcMainJava(java(micronautApplication)),
-            srcMainResources(yaml(micronautConfig, s -> s.path("application.yml"))),
-            pomXml(pomWithDependency)));
     }
 
     @Test
@@ -334,5 +308,36 @@ class AddSnakeYamlDependencyIfNeededTest extends Micronaut4RewriteTest {
             srcMainJava(java(micronautApplication)),
             srcMainResources(yaml(micronautConfig, s -> s.path("bootstrap-foo.yml"))),
             pomXml(initialPom, pomWithDependency)));
+    }
+
+    @Nested
+    class NoChange {
+
+        @Test
+        void noMavenDependencyForMissingApplicationYml() {
+            rewriteRun(
+              mavenProject("project",
+                srcMainJava(java(micronautApplication)),
+                srcMainResources(yaml(micronautConfig, s -> s.path("foo.yml"))),
+                pomXml(initialPom)));
+        }
+
+        @Test
+        void noMavenDependencyForApplicationProperties() {
+            rewriteRun(
+              mavenProject("project",
+                srcMainJava(java(micronautApplication)),
+                srcMainResources(properties(micronautPropertiesConfig, s -> s.path("application.properties"))),
+                pomXml(initialPom)));
+        }
+
+        @Test
+        void existingMavenDependencyUnchanged() {
+            rewriteRun(
+              mavenProject("project",
+                srcMainJava(java(micronautApplication)),
+                srcMainResources(yaml(micronautConfig, s -> s.path("application.yml"))),
+                pomXml(pomWithDependency)));
+        }
     }
 }
