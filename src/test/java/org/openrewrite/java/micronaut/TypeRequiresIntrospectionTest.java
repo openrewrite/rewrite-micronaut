@@ -16,6 +16,7 @@
 package org.openrewrite.java.micronaut;
 
 import org.intellij.lang.annotations.Language;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.openrewrite.DocumentExample;
 import org.openrewrite.InMemoryExecutionContext;
@@ -105,29 +106,6 @@ class TypeRequiresIntrospectionTest implements RewriteTest {
     }
 
     @Test
-    void hasIntrospectionAnnotation() {
-        //language=java
-        rewriteRun(
-          java(controllerClass),
-          java(pojoD),
-          java(
-            """
-              package a.b;
-              
-              import io.micronaut.core.annotation.Introspected;
-              
-              @Introspected
-              public class C {
-                  String name;
-                  String getName() { return name;}
-                  void setName(String name) {this.name = name;}
-              }
-              """
-          )
-        );
-    }
-
-    @Test
     void addsIntrospectionAnnotationForOptional() {
         //language=java
         rewriteRun(
@@ -159,43 +137,6 @@ class TypeRequiresIntrospectionTest implements RewriteTest {
               
               @Introspected
               public class C {
-              }
-              """
-          )
-        );
-    }
-
-    @Test
-    void doesNotChangeServiceOrController() {
-        //language=java
-        rewriteRun(
-          java(
-            """
-              package a.b;
-              import io.micronaut.http.annotation.Controller;
-              
-              @Controller
-              public class AbController {
-                  AbcClient abcClient;
-              
-                  public AbcClient client() {
-                      return abcClient;
-                  }
-              }
-              """
-          ),
-          java(
-            """
-              package a.b;
-              import io.micronaut.http.annotation.Controller;
-              import io.micronaut.http.annotation.Get;
-              import io.micronaut.http.client.annotation.Client;
-              import java.util.Optional;
-              
-              @Client
-              public interface AbcClient {
-                  @Get
-                  Optional<String> getC(long cId);
               }
               """
           )
@@ -290,93 +231,157 @@ class TypeRequiresIntrospectionTest implements RewriteTest {
         );
     }
 
-    @Test
-    void serviceShouldNotBeIntrospected() {
-        //language=java
-        rewriteRun(
-          java(
-            """
-              package a.b;
-              import io.micronaut.http.annotation.Controller;
-              
-              @Controller
-              public class AbController {
-                  private final CdService cdService;
-                  public AbController(CdService cdService) {
-                      this.cdService = cdService;
-                  }
-              }
-              """
-          ),
-          java(
-            """
-              package a.b;
-              
-              import io.micronaut.http.client.annotation.Client;
-              
-              @Client
-              public class CdService {
-              }
-              """
-          )
-        );
-    }
+    @Nested
+    class NoChange {
 
-    @Test
-    void serviceShouldNotBeIntrospectedBecauseOfTest() {
-        //language=java
-        rewriteRun(
-          java(
-            """
-              package api.model;
+        @Test
+        void hasIntrospectionAnnotation() {
+            //language=java
+            rewriteRun(
+              java(controllerClass),
+              java(pojoD),
+              java(
+                """
+                  package a.b;
               
-              import io.micronaut.core.annotation.Introspected;
+                  import io.micronaut.core.annotation.Introspected;
               
-              @Introspected
-              public class Event {
-              }
-              """
-          ),
-          java(
-            """
-              package api.services.support;
-              
-              import api.model.Event;
-              import api.services.EventsService;
-              import io.micronaut.http.annotation.Controller;
-              
-              @Controller
-              public class TrackEventFilter {
-                  private final EventsService eventsService;
-              
-                  public TrackEventFilter(EventsService eventsService) {
-                      this.eventsService = eventsService;
+                  @Introspected
+                  public class C {
+                      String name;
+                      String getName() { return name;}
+                      void setName(String name) {this.name = name;}
                   }
-              
-                  private Event trackEventError(String event, Throwable throwable) {
-                      return eventsService.trackEvents("api", "id", new Event());
-                  }
-              }
-              """
-          ),
-          java(
-            """
-                  package api.services;
-              
-                  import api.model.Event;
+                  """
+              )
+            );
+        }
+
+        @Test
+        void doesNotChangeServiceOrController() {
+            //language=java
+            rewriteRun(
+              java(
+                """
+                  package a.b;
                   import io.micronaut.http.annotation.Controller;
-                  import io.micronaut.http.annotation.Post;
+              
+                  @Controller
+                  public class AbController {
+                      AbcClient abcClient;
+              
+                      public AbcClient client() {
+                          return abcClient;
+                      }
+                  }
+                  """
+              ),
+              java(
+                """
+                  package a.b;
+                  import io.micronaut.http.annotation.Controller;
+                  import io.micronaut.http.annotation.Get;
+                  import io.micronaut.http.client.annotation.Client;
+                  import java.util.Optional;
+              
+                  @Client
+                  public interface AbcClient {
+                      @Get
+                      Optional<String> getC(long cId);
+                  }
+                  """
+              )
+            );
+        }
+
+        @Test
+        void serviceShouldNotBeIntrospected() {
+            //language=java
+            rewriteRun(
+              java(
+                """
+                  package a.b;
+                  import io.micronaut.http.annotation.Controller;
+              
+                  @Controller
+                  public class AbController {
+                      private final CdService cdService;
+                      public AbController(CdService cdService) {
+                          this.cdService = cdService;
+                      }
+                  }
+                  """
+              ),
+              java(
+                """
+                  package a.b;
+              
                   import io.micronaut.http.client.annotation.Client;
               
-                  @Controller("/api")
-                  @Client("eventService")
-                  public interface EventsService {
-                      @Post("/events")
-                      Boolean trackEvents(String source, String track, Event... events);
+                  @Client
+                  public class CdService {
                   }
+                  """
+              )
+            );
+        }
+
+        @Test
+        void serviceShouldNotBeIntrospectedBecauseOfTest() {
+            //language=java
+            rewriteRun(
+              java(
+                """
+                  package api.model;
               
-              """
-          )
-        );
+                  import io.micronaut.core.annotation.Introspected;
+              
+                  @Introspected
+                  public class Event {
+                  }
+                  """
+              ),
+              java(
+                """
+                  package api.services.support;
+              
+                  import api.model.Event;
+                  import api.services.EventsService;
+                  import io.micronaut.http.annotation.Controller;
+              
+                  @Controller
+                  public class TrackEventFilter {
+                      private final EventsService eventsService;
+              
+                      public TrackEventFilter(EventsService eventsService) {
+                          this.eventsService = eventsService;
+                      }
+              
+                      private Event trackEventError(String event, Throwable throwable) {
+                          return eventsService.trackEvents("api", "id", new Event());
+                      }
+                  }
+                  """
+              ),
+              java(
+                """
+                      package api.services;
+              
+                      import api.model.Event;
+                      import io.micronaut.http.annotation.Controller;
+                      import io.micronaut.http.annotation.Post;
+                      import io.micronaut.http.client.annotation.Client;
+              
+                      @Controller("/api")
+                      @Client("eventService")
+                      public interface EventsService {
+                          @Post("/events")
+                          Boolean trackEvents(String source, String track, Event... events);
+                      }
+              
+                  """
+              )
+            );
+        }
     }
 }

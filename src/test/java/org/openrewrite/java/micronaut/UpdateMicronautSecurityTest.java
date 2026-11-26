@@ -16,6 +16,7 @@
 package org.openrewrite.java.micronaut;
 
 import org.intellij.lang.annotations.Language;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.openrewrite.DocumentExample;
 import org.openrewrite.InMemoryExecutionContext;
@@ -183,31 +184,6 @@ class UpdateMicronautSecurityTest implements RewriteTest {
         rewriteRun(mavenProject("project", srcMainResources(yaml(initialSecurityYamlPartial, expectedSecurityYamlPartial, s -> s.path("application.yml")))));
     }
 
-    @Test
-    void noJwtConfig() {
-        rewriteRun(mavenProject("project", srcMainResources(yaml(noJwtConfig, s -> s.path("application.yml")))));
-    }
-
-    @Issue("https://github.com/openrewrite/rewrite-micronaut/issues/145")
-    @Test
-    void retainJwtKeysThatWereNotRelocated() {
-        rewriteRun(mavenProject("project", srcMainResources(yaml(
-          """
-            micronaut:
-              security:
-                token:
-                  jwt:
-                    signatures:
-                      jwks:
-                        azure:
-                          url: "https://login.microsoftonline.com/example-tennant-id/discovery/v2.0/keys"
-                    claims-validators:
-                      audience: "example-audience"
-                      issuer: "https://login.microsoftonline.com/example-tennant-id/v2.0"
-            """,
-          s -> s.path("application.yml")))));
-    }
-
     @Issue("https://github.com/openrewrite/rewrite-micronaut/issues/145")
     @Test
     void relocateOnlyChangedKeys() {
@@ -239,13 +215,42 @@ class UpdateMicronautSecurityTest implements RewriteTest {
           s -> s.path("application.yml")))));
     }
 
-    @Test
-    void notMicronautConfigYaml() {
-        rewriteRun(mavenProject("project", srcMainResources(yaml(initialSecurityYaml, s -> s.path("foo.yml")))));
-    }
+    @Nested
+    class NoChange {
 
-    @Test
-    void notMicronautConfigProperties() {
-        rewriteRun(mavenProject("project", srcMainResources(properties(initialSecurityProps, s -> s.path("foo.properties")))));
+        @Test
+        void noJwtConfig() {
+            rewriteRun(mavenProject("project", srcMainResources(yaml(noJwtConfig, s -> s.path("application.yml")))));
+        }
+
+        @Issue("https://github.com/openrewrite/rewrite-micronaut/issues/145")
+        @Test
+        void retainJwtKeysThatWereNotRelocated() {
+            rewriteRun(mavenProject("project", srcMainResources(yaml(
+              """
+                micronaut:
+                  security:
+                    token:
+                      jwt:
+                        signatures:
+                          jwks:
+                            azure:
+                              url: "https://login.microsoftonline.com/example-tennant-id/discovery/v2.0/keys"
+                        claims-validators:
+                          audience: "example-audience"
+                          issuer: "https://login.microsoftonline.com/example-tennant-id/v2.0"
+                """,
+              s -> s.path("application.yml")))));
+        }
+
+        @Test
+        void notMicronautConfigYaml() {
+            rewriteRun(mavenProject("project", srcMainResources(yaml(initialSecurityYaml, s -> s.path("foo.yml")))));
+        }
+
+        @Test
+        void notMicronautConfigProperties() {
+            rewriteRun(mavenProject("project", srcMainResources(properties(initialSecurityProps, s -> s.path("foo.properties")))));
+        }
     }
 }

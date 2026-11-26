@@ -15,6 +15,7 @@
  */
 package org.openrewrite.java.micronaut;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.openrewrite.DocumentExample;
 import org.openrewrite.gradle.AddDependency;
@@ -97,55 +98,6 @@ class AddMicronautValidationDependencyVersionTest extends MicronautRewriteTest {
     }
 
     @Test
-    void preserveResolutionStrategyVersion() {
-        rewriteRun(buildGradle(
-          """
-            plugins { id 'java' }
-            repositories { mavenCentral() }
-            configurations.all {
-                resolutionStrategy.eachDependency { details ->
-                    if (details.requested.group == 'io.micronaut.validation') {
-                        details.useVersion '4.0.0'
-                    }
-                }
-            }
-            dependencies {
-                implementation 'io.micronaut.validation:micronaut-validation'
-            }
-            """));
-    }
-
-    @Test
-    void preservePlatformManagedVersion() {
-        rewriteRun(buildGradle(
-          """
-            plugins { id 'java' }
-            repositories { mavenCentral() }
-            dependencies {
-                implementation platform('io.micronaut.validation:micronaut-validation-bom:4.0.0')
-                implementation 'io.micronaut.validation:micronaut-validation'
-                annotationProcessor platform('io.micronaut.validation:micronaut-validation-bom:4.0.0')
-                annotationProcessor 'io.micronaut.validation:micronaut-validation-processor'
-            }
-            """));
-    }
-
-    @Test
-    void preserveConstraintManagedVersion() {
-        rewriteRun(buildGradle(
-          """
-            plugins { id 'java' }
-            repositories { mavenCentral() }
-            dependencies {
-                constraints {
-                    implementation 'io.micronaut.validation:micronaut-validation:4.0.0'
-                }
-                implementation 'io.micronaut.validation:micronaut-validation'
-            }
-            """));
-    }
-
-    @Test
     void newlyAddedProcessorKeepsPlatformManagement() {
         rewriteRun(spec -> spec.recipes(
             new AddDependency("io.micronaut.validation", "micronaut-validation-processor", null, null,
@@ -196,6 +148,59 @@ class AddMicronautValidationDependencyVersionTest extends MicronautRewriteTest {
                   annotationProcessor 'io.micronaut.validation:micronaut-validation-processor:4.0.0'
               }
               """)));
+    }
+
+    @Nested
+    class NoChange {
+
+        @Test
+        void preserveResolutionStrategyVersion() {
+            rewriteRun(buildGradle(
+              """
+                plugins { id 'java' }
+                repositories { mavenCentral() }
+                configurations.all {
+                    resolutionStrategy.eachDependency { details ->
+                        if (details.requested.group == 'io.micronaut.validation') {
+                            details.useVersion '4.0.0'
+                        }
+                    }
+                }
+                dependencies {
+                    implementation 'io.micronaut.validation:micronaut-validation'
+                }
+                """));
+        }
+
+        @Test
+        void preservePlatformManagedVersion() {
+            rewriteRun(buildGradle(
+              """
+                plugins { id 'java' }
+                repositories { mavenCentral() }
+                dependencies {
+                    implementation platform('io.micronaut.validation:micronaut-validation-bom:4.0.0')
+                    implementation 'io.micronaut.validation:micronaut-validation'
+                    annotationProcessor platform('io.micronaut.validation:micronaut-validation-bom:4.0.0')
+                    annotationProcessor 'io.micronaut.validation:micronaut-validation-processor'
+                }
+                """));
+        }
+
+        @Test
+        void preserveConstraintManagedVersion() {
+            rewriteRun(buildGradle(
+              """
+                plugins { id 'java' }
+                repositories { mavenCentral() }
+                dependencies {
+                    constraints {
+                        implementation 'io.micronaut.validation:micronaut-validation:4.0.0'
+                    }
+                    implementation 'io.micronaut.validation:micronaut-validation'
+                }
+                """));
+        }
     }
 
 }
